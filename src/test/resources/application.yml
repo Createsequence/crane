@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://192.168.0.115:3306/localmy?serverTimezone=UTC&characterEncoding=utf8
+#    username: root
+#    password: 123456
+    url: jdbc:mysql://10.75.6.14:3306/xinjian?serverTimezone=UTC&characterEncoding=utf8
+    username: root
+    password: novarootpwtest
