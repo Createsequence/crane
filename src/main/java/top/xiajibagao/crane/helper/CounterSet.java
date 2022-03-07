@@ -3,6 +3,7 @@ package top.xiajibagao.crane.helper;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.function.ObjIntConsumer;
 
 /**
  * 基于HashMap的计数器实现
@@ -55,6 +56,21 @@ public class CounterSet<T> {
             .min(Map.Entry.comparingByValue())
             .map(Map.Entry::getKey)
             .orElse(null);
+    }
+
+    public void foreachByAsc(ObjIntConsumer<T> consumer) {
+        CollUtils.toList(counter, PairEntry::new)
+            .stream()
+            .sorted(Map.Entry.comparingByValue())
+            .forEach(e -> consumer.accept(e.getKey(), e.getValue()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public void foreachByDesc(ObjIntConsumer<T> consumer) {
+        CollUtils.toList(counter, PairEntry::new)
+            .stream()
+            .sorted((Comparator<? super PairEntry<T, Integer>>) Map.Entry.comparingByValue().reversed())
+            .forEach(e -> consumer.accept(e.getKey(), e.getValue()));
     }
 
 }

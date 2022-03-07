@@ -16,7 +16,6 @@ public class PairEntry<K, V> implements Map.Entry<K, V> {
 
     @Setter
     private K key;
-    @Setter
     private V value;
     private final PairEntry<K, V> self;
 
@@ -28,7 +27,7 @@ public class PairEntry<K, V> implements Map.Entry<K, V> {
 
     @Override
     public V setValue(V value) {
-        V old = value;
+        V old = this.value;
         this.value = value;
         return old;
     }

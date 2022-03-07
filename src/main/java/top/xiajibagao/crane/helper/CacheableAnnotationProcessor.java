@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
- * 一个简单的{@link ProcessConfig}解析器，用于快速搭建待缓存功能的注解处理器
+ * 一个简单的{@link ProcessConfig}解析器，用于快速搭建带缓存功能的注解处理器
  *
  * @param <T> 解析注解的目标类型
  * @author huangchengxing

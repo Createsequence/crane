@@ -1,14 +1,16 @@
 # crane
 
+![CRANE](https://img.xiajibagao.top/CRANE.png)
+
 基于 SpringBoot 的注解式字典项、关联表与枚举值通用处理框架。
 
 ## 一、项目介绍
 
 ### 1、简介
 
-在我们日常开发中，常常会遇到一些烦人的关联数据处理和转换问题，比如各种 id 传到前端时需要联查除的相关数据，01这样的字段需要转成男女......等等，这些数据并不具参与后台实际的业务逻辑，但是我们却不得不为此多写一些重复的查询与塞值代码。
+在我们日常开发中，常常会遇到一些烦人的关联数据处理和转换问题，比如各种 id 传到前端时需要联查相关数据，01这样的字段需要转成男女......等等，这些数据并不具参与后台实际的业务逻辑，但是我们却不得不为此多写一些重复的查询与字段填值代码。
 
-为了避免这种情况，我希望能有个统一的地方配置填充的数据源——不管是数据库、字典还是枚举——然后通过字段注解去自动获取并填充到对象中，为了实现这个功能，在公司的时候我分别开发了一套字典项自动填充框架，与关联表字段信息自动填充框架，这两套框架在使用中暴露了一些问题，经过总结与重新设计，于是有了 crane。 
+为了避免这种情况，我希望能有个统一的地方配置填充的数据源——不管是数据库、字典还是枚举还是其他什么——然后通过字段注解去自动获取并填充到对象中，为了实现这个功能，在公司的时候我分别开发了一套字典项自动填充框架，与关联表字段信息自动填充框架，这两套框架在使用中暴露了一些问题，经过总结与重新设计，于是有了 crane。 
 
 crane 本身不产生数据，它只是数据的搬运工，像一个吊车一样将一个数据来源中的数据“转移”到我们指定货对象中，这也正是其名字的由来。
 
@@ -439,8 +441,8 @@ public class Person {
 ~~~java
 Person jsonPerson = new Person().setName("小明");
 jsonPerson.setRelatives(Arrays.asList(
-    new Person().setName("小明爸"),
-    new Person().setName("小明妈")
+    new Person().setName("小明爸").setSex(1),
+    new Person().setName("小明妈").setSex(0)
 ));
 
 JsonNode jsonNode = objectMapper.valueToTree(jsonPerson);
@@ -545,7 +547,7 @@ private Integer userId;
 
 - `top.xiajibagao.crane.operator.interfaces.Assembler`：与 `@Assemble`注解对应，用于获取 key 数据与处理容器中获取的数据源；
 - `top.xiajibagao.crane.operator.interfaces.Disassembler`：与 `@Disassemble`注解对应，用于将提取实例中的嵌套字段数据；
-- `top.xiajibagao.crane.operator.interfaces.OperatorFactory`：用于生产上述两接口的实现了实例；
+- `top.xiajibagao.crane.operator.interfaces.OperatorFactory`：用于生产上述两接口的实现类实例；
 
 此外，提供了`top.xiajibagao.crane.impl.json`包的基本实现用于处理 JsonNode 对象，以及`top.xiajibagao.crane.impl.bean`包的基本实现用于处理普通 JavaBean。
 
@@ -647,7 +649,7 @@ public List<Foo> listFooById(Integer id) {
 
 ### 3、全局序列化配置
 
-针对 `SpringBoot`的 `@RequestBody`或 `@RestController`注解，提供`top.xiajibagao.crane.impl.json.module.ProcessJson`注解和`top.xiajibagao.crane.impl.json.module.CraneDynamicJsonModule`模块用于配置全局的 Json 序列号配置。
+针对 `SpringBoot`的 `@RequestBody`或 `@RestController`注解，提供`top.xiajibagao.crane.impl.json.module.ProcessJson`注解和`top.xiajibagao.crane.impl.json.module.CraneDynamicJsonModule`模块用于配置全局的 Json 序列化配置。
 
 首先将 module 注册到全局序列化使用的 `ObjectMapper`中：
 
@@ -661,7 +663,7 @@ public ObjectMapper objectMapper(BeanFactory beanFactory) {
 }
 ~~~
 
-> **注意：CraneDynamicJsonModule 创建时也需要一个 ObjectMapper 实例，该实例不可用是该 Module 要注册的 ObjectMapper 实例，否则将序列化时将进入死循环！**
+> **注意：CraneDynamicJsonModule 创建时也需要一个 ObjectMapper 实例，该实例不可以与 Module 要注册的 ObjectMapper 实例相同，否则将序列化时将进入死循环！**
 
 然后，在需要进行处理的类上注解：
 
