@@ -1,9 +1,9 @@
 package top.xiajibagao.crane.helper;
 
-import com.sun.istack.internal.NotNull;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -360,7 +360,7 @@ public final class CollUtils {
 			.filter(Objects::nonNull)
 			.collect(Collectors.toCollection(collFactory));
 	}
-	
+
 	/**
 	 * 针对源集合中每一个元素创建另一类型元素，经过处理后返回另一类型元素祖册的集合，总是忽略源集合与返回集合中未null的元素 <br />
 	 * eg:

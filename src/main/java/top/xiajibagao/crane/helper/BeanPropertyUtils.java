@@ -1,6 +1,5 @@
 package top.xiajibagao.crane.helper;
 
-import com.sun.javafx.fxml.BeanAdapter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -17,6 +16,9 @@ import java.util.stream.Stream;
  * @date 2022/03/02 14:08
  */
 public class BeanPropertyUtils {
+
+    public static final String GET_PREFIX = "get";
+    public static final String SET_PREFIX = "set";
 
     private BeanPropertyUtils() {
     }
@@ -82,7 +84,7 @@ public class BeanPropertyUtils {
      * @date 2022/3/6 14:52
      */
     public static Method findSetterMethod(Class<?> targetClass, String fieldName, Class<?> fieldType) {
-        String methodName = getMethodName(BeanAdapter.SET_PREFIX, fieldName);
+        String methodName = getMethodName(SET_PREFIX, fieldName);
         return Stream.of(targetClass.getDeclaredMethods())
             .filter(m -> Objects.equals(m.getName(), methodName) || Objects.equals(m.getName(), fieldName))
             .filter(m ->
@@ -108,7 +110,7 @@ public class BeanPropertyUtils {
      * @date 2022/3/6 14:52
      */
     public static Method findGetterMethod(Class<?> targetClass, String fieldName) {
-        String methodName = getMethodName(BeanAdapter.GET_PREFIX, fieldName);
+        String methodName = getMethodName(GET_PREFIX, fieldName);
         return Stream.of(targetClass.getDeclaredMethods())
             .filter(m -> Objects.equals(m.getName(), methodName) || Objects.equals(m.getName(), fieldName))
             .filter(m -> ArrayUtils.getLength(m.getParameterTypes()) == 0)
