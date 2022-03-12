@@ -27,12 +27,15 @@ public class PropertyCache {
         this.descriptor = descriptor;
         this.targetClass = targetClass;
 
-        this.getter = descriptor.getReadMethod();
+        this.getter = ObjectUtils.defaultIfNull(
+            descriptor.getReadMethod(),
+            BeanPropertyUtils.findGetterMethod(targetClass, descriptor.getName())
+        );
         Objects.requireNonNull(this.getter, String.format("[%s]属性[%s]没有getter方法！", targetClass, descriptor.getName()));
 
         this.setter = ObjectUtils.defaultIfNull(
             descriptor.getWriteMethod(),
-            PropertyDescriptorUtils.findSetterMethod(targetClass, descriptor.getName(), descriptor.getPropertyType())
+            BeanPropertyUtils.findSetterMethod(targetClass, descriptor.getName(), descriptor.getPropertyType())
         );
         Objects.requireNonNull(this.setter, String.format("[%s]属性[%s]没有setter方法！", targetClass, descriptor.getName()));
     }

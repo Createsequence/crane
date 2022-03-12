@@ -16,12 +16,12 @@ import java.util.stream.Stream;
  * @author huangchengxing
  * @date 2022/03/02 14:08
  */
-public class PropertyDescriptorUtils {
+public class BeanPropertyUtils {
 
-    private PropertyDescriptorUtils() {
+    private BeanPropertyUtils() {
     }
 
-    private static final TableMap<Class<?>, String, PropertyCache> cache = new TableMap<>();
+    private static final TableMap<Class<?>, String, PropertyCache> PROPERTY_CACHES = new TableMap<>();
 
     /**
      * 从缓存中获取属性描述器缓存对象，若不存在则先创建缓存
@@ -32,7 +32,7 @@ public class PropertyDescriptorUtils {
      * @date 2022/3/2 14:19
      */
     public static Optional<PropertyCache> getCache(Class<?> targetClass, String propertyName) {
-        Map<String, PropertyCache> propertyCaches = cache.computeIfAbsent(targetClass, PropertyDescriptorUtils::createCache);
+        Map<String, PropertyCache> propertyCaches = PROPERTY_CACHES.computeIfAbsent(targetClass, BeanPropertyUtils::createCache);
         if (CollectionUtils.isEmpty(propertyCaches)) {
             return Optional.empty();
         }
@@ -43,12 +43,12 @@ public class PropertyDescriptorUtils {
      * 从缓存中获取属性描述器缓存对象，若不存在则先创建缓存
      *
      * @param targetClass 目标类型
-     * @return java.util.Map<java.lang.String,top.xiajibagao.crane.helper.PropertyDescriptorUtils.PropertyCache>
+     * @return java.util.Map<java.lang.String,top.xiajibagao.crane.helper.BeanPropertyUtils.PropertyCache>
      * @author huangchengxing
      * @date 2022/3/2 14:19
      */
     public static Map<String, PropertyCache> getPropertyCaches(Class<?> targetClass) {
-        return cache.computeIfAbsent(targetClass, PropertyDescriptorUtils::createCache);
+        return PROPERTY_CACHES.computeIfAbsent(targetClass, BeanPropertyUtils::createCache);
     }
 
     /**
@@ -67,7 +67,12 @@ public class PropertyDescriptorUtils {
     }
 
     /**
-     * 获取Setter方法，要求方法名为：“set + field.getName”，且仅有一个与field.getType()相同类型的参数
+     * 获取Setter方法
+     * <ul>
+     *     <li>标准：以set开头 + 首字母大写的属性名，有且仅有一个与field.getType()类型相同或为子类型的参数；</li>
+     *     <li>fluent：与属性名同名，有且仅有一个与field.getType()类型相同或为子类型的参数；</li>
+     * </ul>
+     * 当获取到任意一个符合上述标准的方法后将直接返回
      *
      * @param targetClass 目标类型
      * @param fieldName 属性名
@@ -79,11 +84,34 @@ public class PropertyDescriptorUtils {
     public static Method findSetterMethod(Class<?> targetClass, String fieldName, Class<?> fieldType) {
         String methodName = getMethodName(BeanAdapter.SET_PREFIX, fieldName);
         return Stream.of(targetClass.getDeclaredMethods())
-            .filter(m -> Objects.equals(m.getName(), methodName))
+            .filter(m -> Objects.equals(m.getName(), methodName) || Objects.equals(m.getName(), fieldName))
             .filter(m ->
                 ArrayUtils.getLength(m.getParameterTypes()) == 1
                     && m.getParameterTypes()[0].isAssignableFrom(fieldType)
             )
+            .findAny()
+            .orElse(null);
+    }
+
+    /**
+     * 获取Getter方法
+     * <ul>
+     *     <li>标准：以get开头 + 首字母大写的属性名，没有参数；</li>
+     *     <li>fluent：与属性名同名，没有参数；</li>
+     * </ul>
+     * 当获取到任意一个符合上述标准的方法后将直接返回
+     *
+     * @param targetClass 目标类型
+     * @param fieldName 属性名
+     * @return java.lang.reflect.Method
+     * @author huangchengxing
+     * @date 2022/3/6 14:52
+     */
+    public static Method findGetterMethod(Class<?> targetClass, String fieldName) {
+        String methodName = getMethodName(BeanAdapter.GET_PREFIX, fieldName);
+        return Stream.of(targetClass.getDeclaredMethods())
+            .filter(m -> Objects.equals(m.getName(), methodName) || Objects.equals(m.getName(), fieldName))
+            .filter(m -> ArrayUtils.getLength(m.getParameterTypes()) == 0)
             .findAny()
             .orElse(null);
     }

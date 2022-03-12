@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import top.xiajibagao.crane.exception.CraneException;
+import top.xiajibagao.crane.helper.BeanPropertyUtils;
 import top.xiajibagao.crane.helper.PropertyCache;
-import top.xiajibagao.crane.helper.PropertyDescriptorUtils;
 import top.xiajibagao.crane.operator.interfaces.Assembler;
 import top.xiajibagao.crane.parse.interfaces.AssembleOperation;
 import top.xiajibagao.crane.parse.interfaces.AssembleProperty;
@@ -61,7 +61,7 @@ public class BeanReflexAssembler implements Assembler {
      * @date 2022/3/2 16:01
      */
     protected void processIfNonProperties(Class<?> targetClass, Object target, Object source, AssembleOperation operation) {
-        PropertyDescriptorUtils.getCache(targetClass, operation.getTargetProperty().getName())
+        BeanPropertyUtils.getCache(targetClass, operation.getTargetProperty().getName())
             .ifPresent(c -> c.setValue(target, source));
     }
 
@@ -80,7 +80,7 @@ public class BeanReflexAssembler implements Assembler {
      * @date 2022/3/2 16:01
      */
     protected void processIfObjectSource(Class<?> targetClass, Object target, Class<?> sourceClass, Object source, AssembleProperty property, AssembleOperation operation) {
-        Optional<PropertyCache> targetProperty = PropertyDescriptorUtils.getCache(targetClass, property.getReference());
+        Optional<PropertyCache> targetProperty = BeanPropertyUtils.getCache(targetClass, property.getReference());
         if (!targetProperty.isPresent()) {
             return;
         }
@@ -103,7 +103,7 @@ public class BeanReflexAssembler implements Assembler {
         }
 
         // 若设置了引用字段，且数据源为对象
-        PropertyDescriptorUtils.getCache(sourceClass, property.getResource())
+        BeanPropertyUtils.getCache(sourceClass, property.getResource())
             .ifPresent(sourceProperty -> targetProperty.get().setValue(
                 target, sourceProperty.getValue(source)
             ));
@@ -121,7 +121,7 @@ public class BeanReflexAssembler implements Assembler {
      * @date 2022/3/2 16:01
      */
     protected void processIfCollectionSource(Class<?> targetClass, Object target, Collection<?> source, AssembleProperty property, AssembleOperation operation) {
-        PropertyDescriptorUtils.getCache(targetClass, property.getReference())
+        BeanPropertyUtils.getCache(targetClass, property.getReference())
             .ifPresent(c -> c.setValue(target, source));
     }
     
@@ -137,14 +137,14 @@ public class BeanReflexAssembler implements Assembler {
      * @date 2022/3/2 16:01
      */
     protected void processIfArraySource(Class<?> targetClass, Object target, Object[] source, AssembleProperty property, AssembleOperation operation) {
-        PropertyDescriptorUtils.getCache(targetClass, property.getReference())
+        BeanPropertyUtils.getCache(targetClass, property.getReference())
             .ifPresent(c -> c.setValue(target, source));
     }
 
     @Override
     public Object getKey(Object target, AssembleOperation operation) {
         checkType(target, operation);
-        return PropertyDescriptorUtils.getCache(operation.getOwner().getTargetClass(), operation.getTargetProperty().getName())
+        return BeanPropertyUtils.getCache(operation.getOwner().getTargetClass(), operation.getTargetProperty().getName())
             .map(dc -> dc.getValue(target))
             .orElse(null);
     }
