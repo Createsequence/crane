@@ -2,7 +2,6 @@ package top.xiajibagao.crane.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +28,7 @@ public class DefaultCraneConfig {
 
     @Order
     @ConditionalOnMissingBean(BeanOperateConfigurationParser.class)
-    @Bean
+    @Bean("DefaultCraneBeanOperateConfigurationParser")
     public BeanOperateConfigurationParser beanOperateConfigurationParser(CraneGlobalConfiguration configuration, BeanFactory beanFactory) {
         return new BeanOperateConfigurationParser(configuration, beanFactory);
     }
@@ -38,10 +37,9 @@ public class DefaultCraneConfig {
 
     @Order
     @ConditionalOnMissingBean(ObjectMapper.class)
-    @Bean
+    @Bean("DefaultCraneObjectMapper")
     public ObjectMapper objectMapper(BeanFactory beanFactory) {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.registerModule(new CraneDynamicJsonModule(new ObjectMapper(), beanFactory));
         return objectMapper;
@@ -49,14 +47,14 @@ public class DefaultCraneConfig {
 
     @Order
     @ConditionalOnMissingBean(JacksonOperatorFactory.class)
-    @Bean("JacksonOperatorFactory")
+    @Bean("DefaultCraneJacksonOperatorFactory")
     public JacksonOperatorFactory jacksonOperatorFactory(ObjectMapper objectMapper) {
         return new JacksonOperatorFactory(objectMapper);
     }
 
     @Order
     @ConditionalOnMissingBean(BeanReflexOperatorFactory.class)
-    @Bean("BeanReflexOperatorFactory")
+    @Bean("DefaultCraneBeanReflexOperatorFactory")
     public BeanReflexOperatorFactory reflexOperatorFactory() {
         return new BeanReflexOperatorFactory();
     }
@@ -66,21 +64,21 @@ public class DefaultCraneConfig {
 
     @Order
     @ConditionalOnMissingBean(EnumDict.class)
-    @Bean
+    @Bean("DefaultCraneEnumDict")
     public EnumDict enumDict() {
         return EnumDict.instance();
     }
 
     @Order
     @ConditionalOnMissingBean(EnumDictContainer.class)
-    @Bean("EnumDictContainer")
+    @Bean("DefaultCraneEnumDictContainer")
     public EnumDictContainer enumDictContainer(EnumDict enumDict) {
         return new EnumDictContainer(enumDict);
     }
 
     @Order
     @ConditionalOnMissingBean(KeyValueContainer.class)
-    @Bean("KeyValueContainer")
+    @Bean("DefaultCraneKeyValueContainer")
     public KeyValueContainer simpleKeyValueActuator() {
         return new KeyValueContainer();
     }
@@ -89,14 +87,14 @@ public class DefaultCraneConfig {
 
     @Order
     @ConditionalOnMissingBean(UnorderedOperationExecutor.class)
-    @Bean("UnorderedOperationExecutor")
+    @Bean("DefaultCraneUnorderedOperationExecutor")
     public UnorderedOperationExecutor unorderedOperationExecutor() {
         return new UnorderedOperationExecutor();
     }
 
     @Order
     @ConditionalOnMissingBean(SequentialOperationExecutor.class)
-    @Bean("SequentialOperationExecutor")
+    @Bean("DefaultCraneSequentialOperationExecutor")
     public SequentialOperationExecutor operationExecutor() {
         return new SequentialOperationExecutor();
     }
