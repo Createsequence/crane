@@ -59,17 +59,16 @@ public class CounterSet<T> {
     }
 
     public void foreachByAsc(ObjIntConsumer<T> consumer) {
-        CollUtils.toList(counter, PairEntry::new)
+        counter.entrySet()
             .stream()
             .sorted(Map.Entry.comparingByValue())
             .forEach(e -> consumer.accept(e.getKey(), e.getValue()));
     }
 
-    @SuppressWarnings("unchecked")
     public void foreachByDesc(ObjIntConsumer<T> consumer) {
-        CollUtils.toList(counter, PairEntry::new)
+        counter.entrySet()
             .stream()
-            .sorted((Comparator<? super PairEntry<T, Integer>>) Map.Entry.comparingByValue().reversed())
+            .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
             .forEach(e -> consumer.accept(e.getKey(), e.getValue()));
     }
 

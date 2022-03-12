@@ -43,11 +43,11 @@ public class BeanTests {
     @Autowired
     BeanOperateConfigurationParser configurationParser;
 
-    @Qualifier("UnorderedOperationExecutor")
+    @Qualifier("DefaultCraneUnorderedOperationExecutor")
     @Autowired
     OperationExecutor unorderedOperationExecutor;
 
-    @Qualifier("SequentialOperationExecutor")
+    @Qualifier("DefaultCraneSequentialOperationExecutor")
     @Autowired
     OperationExecutor sequentialOperationExecutor;
 
