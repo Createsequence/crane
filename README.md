@@ -789,4 +789,4 @@ public class BeanPerson {
   {"id": 12, "name": "小明", "sex": 1}
   ~~~
 
-  
+- 改造为多模块项目，分离 Json 与普通 JavaBean 处理模块，并且分别为其提供更多扩展功能；
