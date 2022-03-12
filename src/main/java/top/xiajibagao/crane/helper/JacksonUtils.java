@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -164,8 +165,8 @@ public class JacksonUtils {
      * @date 2022/3/2 10:53
      */
     public static String translatePropertyName(ObjectMapper objectMapper, String defName) {
-        return objectMapper.getPropertyNamingStrategy()
-            .nameForField(objectMapper.getSerializationConfig(), null, defName);
+        PropertyNamingStrategy namingStrategy = objectMapper.getPropertyNamingStrategy();
+        return ObjectUtils.computeIfNotNull(namingStrategy, s -> s.nameForField(objectMapper.getSerializationConfig(), null, defName), defName);
     }
     
     /**

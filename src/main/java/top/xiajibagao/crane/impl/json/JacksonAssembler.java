@@ -12,7 +12,6 @@ import org.springframework.util.StringUtils;
 import top.xiajibagao.crane.exception.CraneException;
 import top.xiajibagao.crane.helper.CollUtils;
 import top.xiajibagao.crane.helper.JacksonUtils;
-import top.xiajibagao.crane.helper.ObjectUtils;
 import top.xiajibagao.crane.operator.interfaces.Assembler;
 import top.xiajibagao.crane.parse.interfaces.AssembleOperation;
 import top.xiajibagao.crane.parse.interfaces.AssembleProperty;
@@ -37,9 +36,8 @@ public class JacksonAssembler implements Assembler {
             return;
         }
         ObjectNode targetNode = (ObjectNode) target;
-        JsonNode sourceNode = (JsonNode) ObjectUtils.computeIfMatch(
-            source, s -> !(s instanceof JsonNode), objectMapper.valueToTree(source), source
-        );
+        JsonNode sourceNode = (source instanceof JsonNode) ?
+            (JsonNode)source : objectMapper.valueToTree(source);
 
         // 若不存在字段配置
         if (CollectionUtils.isEmpty(operation.getProperties())) {
