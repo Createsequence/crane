@@ -188,7 +188,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
             log.warn("类{}与嵌套的成员变量类型{}形成循环依赖...", configuration.getTargetClass(), operateClass);
             operationConfiguration = parseContext.getLookingForConfig(operateClass);
         } else {
-            operationConfiguration = createConfiguration(operateClass, configuration.getOperatorFactory());
+            operationConfiguration = parse(operateClass, configuration.getOperatorFactory(), parseContext);
         }
         DisassembleOperation operation = createDisassembleOperation(property, disassemble, configuration, operationConfiguration, parseContext);
         parseContext.found(configuration);
