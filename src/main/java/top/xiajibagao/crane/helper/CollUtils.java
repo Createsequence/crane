@@ -19,8 +19,20 @@ public final class CollUtils {
 	private CollUtils() {
 	}
 
+	public static boolean isEmpty(Map<?, ?> target) {
+		return CollectionUtils.isEmpty(target);
+	}
+
+	public static boolean isNotEmpty(Map<?, ?> target) {
+		return !isEmpty(target);
+	}
+
+	public static boolean isEmpty(Collection<?> target) {
+		return CollectionUtils.isEmpty(target);
+	}
+
 	public static boolean isNotEmpty(Collection<?> target) {
-		return !CollectionUtils.isEmpty(target);
+		return !isEmpty(target);
 	}
 
 	public static <T> T getFirst(Iterable<T> target) {

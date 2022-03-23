@@ -55,4 +55,12 @@ public @interface ProcessResult {
     @AliasFor(annotation = ProcessConfig.class)
     Class<? extends OperationExecutor> executor() default UnorderedOperationExecutor.class;
 
+    /**
+     * <p>执行条件SpEL表达式
+     *
+     * <p>当该项不为空或空字符串时，该表达时的解析执行后必须返回布尔值true或false,当表达式解析发生异常时，将默认为true。<br />
+     * 允许通过“#result”直接引用返回值，或通过“#方法参数名”引用方法参数。
+     */
+    String condition() default "";
+
 }

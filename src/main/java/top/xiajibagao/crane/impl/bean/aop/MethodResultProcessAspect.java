@@ -6,11 +6,16 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import top.xiajibagao.crane.annotation.ProcessConfig;
 import top.xiajibagao.crane.helper.CacheableAnnotationProcessor;
+import top.xiajibagao.crane.helper.ExpressionUtils;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 /**
  * {@link ProcessResult}注解方法返回值处理切面
@@ -33,7 +38,31 @@ public class MethodResultProcessAspect extends CacheableAnnotationProcessor<Meth
         }
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
-        process(method, result);
+
+        ProcessResult annotation = AnnotatedElementUtils.findMergedAnnotation(method, ProcessResult.class);
+        if (Objects.isNull(annotation)) {
+            return;
+        }
+        String condition = annotation.condition();
+        // 无表达式需要执行
+        if (!StringUtils.hasText(condition)) {
+            process(method, result);
+            return;
+        }
+
+        // 先执行表达式
+        Boolean isProcess = Boolean.TRUE;
+        StandardEvaluationContext context = new StandardEvaluationContext();
+        ExpressionUtils.registerMethodArgs(joinPoint, methodSignature, context);
+        context.setVariable("result", result);
+        try {
+            isProcess = ExpressionUtils.execute(condition, context, Boolean.class, true);
+        } catch (Exception e) {
+            log.warn("表达式[{}]执行失败，错误信息：[{}]", condition, e.getMessage());
+        }
+        if (isProcess) {
+            process(method, result);
+        }
     }
 
     @Override

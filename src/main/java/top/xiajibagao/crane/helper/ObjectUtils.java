@@ -1,8 +1,10 @@
 package top.xiajibagao.crane.helper;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * @author huangchengxing
@@ -70,6 +72,57 @@ public class ObjectUtils {
      */
     public static <T, R> R computeIfMatch(T target, Predicate<T> predicate, Function<T, R> mapping) {
         return computeIfMatch(target, predicate, mapping, null);
+    }
+    
+    /**
+     * 尝试进行一次操作
+     *
+     * @param runnable 操作
+     * @param failAction 错误响应
+     * @author huangchengxing
+     * @date 2022/3/23 21:14
+     */
+    public static void tryAction(Runnable runnable, Consumer<Throwable> failAction) {
+        try {
+            runnable.run();
+        } catch (Throwable e) {
+            failAction.accept(e);
+        }
+    }
+
+    /**
+     * 尝试进行一次生成
+     *
+     * @param supplier 操作
+     * @param failAction 错误响应
+     * @author huangchengxing
+     * @date 2022/3/23 21:14
+     */
+    public static <T> T trySupply(Supplier<T> supplier, Consumer<Throwable> failAction) {
+        T result = null;
+        try {
+            result = supplier.get();
+        } catch (Throwable e) {
+            failAction.accept(e);
+        }
+        return result;
+    }
+
+    /**
+     * 尝试进行一次操作
+     *
+     * @param supplier 操作
+     * @param failAction 错误响应
+     * @author huangchengxing
+     * @date 2022/3/23 21:14
+     */
+    public static <T> void tryAction(Supplier<T> supplier, Consumer<Throwable> failAction, Consumer<T> successAction) {
+        try {
+            T result = supplier.get();
+            successAction.accept(result);
+        } catch (Throwable e) {
+            failAction.accept(e);
+        }
     }
 
 }
