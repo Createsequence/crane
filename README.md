@@ -164,7 +164,7 @@ crane 支持批量处理 Json 对象中的嵌套的 Json 数组与 Json 对象�
 在启动类添加 `@EnableScane` 注解引入默认配置：
 
 ```java
-@EnableScane
+@EnableCrane
 @SpringBootApplication
 public class Application {
     public static void main(String[] args) {
@@ -223,7 +223,7 @@ class CraneApplicationTests {
 
 启动测用例，控制台输出：
 
-~~~json
+~~~
 {"sex":0} // 处理前
 {"sex":"女"} // 处理后
 ~~~
@@ -723,7 +723,7 @@ public class BeanPerson {
 
 ## 五、待开发功能
 
-- 字段配置支持 SpEL 表达式，比如：
+- [ ] 字段配置支持 SpEL 表达式，比如：
 
   ~~~java
   @Assemble(
@@ -735,12 +735,13 @@ public class BeanPerson {
   )
   private Integer userId;
   ~~~
+  并且基于此提供根据特殊条件判断是否执行本次操作等相关功能；
 
-- 允许以类似 jackson 的方式对属性中的各个被注解方法的返回值进行拦截处理；
+- [ ] 允许以类似 jackson 的方式对属性中的各个被注解方法的返回值进行拦截处理；
 
-- 操作者中的具体字段处理支持自定义或者通过类似 MessageConverter 的机制进行集中配置；
+- [ ] 操作者中的具体字段处理支持自定义或者通过类似 MessageConverter 的机制进行集中配置；
 
-- 支持集合的元素的批量处理，比如：
+- [ ] 支持集合的元素的批量处理，比如：
 
   ~~~json
   {"userIds": [1, 2, 3]}
@@ -767,15 +768,15 @@ public class BeanPerson {
   }
   ~~~
 
-- 多重嵌套的集合类型字段支持，比如：
+- [ ] 多重嵌套的集合类型字段支持，比如：
 
   ~~~java
   private List<List<Foo>> nestedProperty;
   ~~~
 
-- 更简洁与高效的支持排序的操作执行器；
+- [ ] 更简洁与高效的执行器排序算法；
 
-- 支持 Json 格式的入参填充，比如：
+- [ ] 支持 Json 格式的入参填充，比如：
 
   前端请求入参：
 
@@ -789,4 +790,16 @@ public class BeanPerson {
   {"id": 12, "name": "小明", "sex": 1}
   ~~~
 
-- 改造为多模块项目，分离 Json 与普通 JavaBean 处理模块，并且分别为其提供更多扩展功能；
+- [ ] 改造为多模块项目，分离注解模块、核心模块与 Json 和普通 JavaBean 等功能实现模块；
+
+- [ ] 为实现模块提供更多扩展功能，如基于通用 mapper 或 rpc 接口的填充默认容器实现；
+
+- [ ] 提供支持多线程处理的执行器和解析器；
+
+- [ ] 为容器提供一个带有基本方法的抽象类或工具类，简化自定义容器的实现，并且提供如缓存等相关功能扩展；
+
+- [ ] 提供支持同时对装配与拆卸操作排序的执行器；
+
+- [ ] 提供支持缓存的类注解配置解析器；
+
+- [ ] 增加一些全局配置项，比如字段解析异常时是否继续对当前对象解析等；
