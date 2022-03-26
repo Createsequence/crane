@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 通用容器，使用方式类型MybatisPlus或JPA的通用底层，使用步骤如下：
+ * 通用容器，使用方式类似MybatisPlus或JPA的通用底层，使用步骤如下：
  * <ul>
  *     <li>使需要作为数据源的类实现{@link UniversalBean}接口；</li>
  *     <li>使Mapper或Repository类实现{@link UniversalMapper}接口，并使其被Spring容器管理；</li>
@@ -28,6 +28,7 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/03/24 20:40
  */
+// TODO 提供基于注解的版本。使用注解标记标记指定getSourcesByIds方法和对象的key字段，然后在spring初始化式建立关联，表现类似SpringEvent或者Guava的EventBus
 @Slf4j
 @RequiredArgsConstructor
 public class UniversalContainer<K> extends BaseContainer<K, UniversalBean<K>> {
