@@ -10,7 +10,8 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import top.xiajibagao.crane.annotation.ProcessConfig;
+import top.xiajibagao.crane.extend.cache.ICacheManager;
+import top.xiajibagao.crane.extend.cache.SimpleCacheManager;
 import top.xiajibagao.crane.helper.CacheableAnnotationProcessor;
 import top.xiajibagao.crane.helper.ExpressionUtils;
 
@@ -28,7 +29,11 @@ import java.util.Objects;
 public class MethodResultProcessAspect extends CacheableAnnotationProcessor<Method> {
 
     public MethodResultProcessAspect(BeanFactory beanFactory) {
-        super(beanFactory);
+        super(beanFactory, new SimpleCacheManager());
+    }
+
+    public MethodResultProcessAspect(BeanFactory beanFactory, ICacheManager simpleCacheManager) {
+        super(beanFactory, simpleCacheManager);
     }
 
     @AfterReturning(returning = "result", pointcut = "@annotation(top.xiajibagao.crane.impl.bean.aop.ProcessResult)")
@@ -60,14 +65,9 @@ public class MethodResultProcessAspect extends CacheableAnnotationProcessor<Meth
         } catch (Exception e) {
             log.warn("表达式[{}]执行失败，错误信息：[{}]", condition, e.getMessage());
         }
-        if (isProcess) {
+        if (Objects.nonNull(isProcess) && isProcess) {
             process(method, result);
         }
-    }
-
-    @Override
-    protected String getProcessorId(Method annotatedElement, Object target, ProcessConfig annotation) {
-        return annotatedElement.getName();
     }
 
 }

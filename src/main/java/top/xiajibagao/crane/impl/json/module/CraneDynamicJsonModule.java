@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import top.xiajibagao.crane.extend.cache.SimpleCacheManager;
 import top.xiajibagao.crane.helper.CacheableAnnotationProcessor;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class CraneDynamicJsonModule extends Module {
 
     public CraneDynamicJsonModule(ObjectMapper objectMapper, BeanFactory beanFactory) {
         this.objectMapper = objectMapper;
-        this.processor = new CacheableAnnotationProcessor.SimpleCacheableAnnotationProcessor<>(beanFactory, Class::getName);
+        this.processor = new CacheableAnnotationProcessor<>(beanFactory, new SimpleCacheManager());
     }
 
     @Override
