@@ -45,6 +45,9 @@ public class PropertyCache {
     }
 
     public void setValue(Object target, Object value) {
+        if (Objects.isNull(target)) {
+            return;
+        }
         CraneException.throwIfFalse(
             ClassUtils.isAssignable(descriptor.getPropertyType(), value.getClass()),
             "[%s]字段[%s]类型为[%s]，但待映射的值[%s]类型为[%s]",
@@ -55,7 +58,7 @@ public class PropertyCache {
     }
 
     public Object getValue(Object target) {
-        return ReflectionUtils.invokeMethod(getter, target);
+        return ObjectUtils.computeIfNotNull(target, t -> ReflectionUtils.invokeMethod(getter, target));
     }
 
 }

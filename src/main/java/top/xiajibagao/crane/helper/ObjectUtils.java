@@ -42,6 +42,19 @@ public class ObjectUtils {
     }
 
     /**
+     * 若指定值不为空，则将其映射另一值并返回，若前者或后者为空则都将返回null
+     *
+     * @param target 指定值
+     * @param mapping 映射方法
+     * @return R
+     * @author huangchengxing
+     * @date 2022/3/1 13:39
+     */
+    public static <T, R> R computeIfNotNull(T target, Function<T, R> mapping) {
+        return computeIfNotNull(target, mapping, null);
+    }
+
+    /**
      * 若校验为true，则将其映射另一值并返回，若前者或后者为空则都将返回默认值
      *
      * @param target 指定值
