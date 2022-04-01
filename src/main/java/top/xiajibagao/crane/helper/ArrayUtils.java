@@ -23,6 +23,11 @@ public class ArrayUtils {
         return Objects.isNull(targets) || targets.length == 0;
     }
 
+    @SafeVarargs
+    public static <T> boolean isNotEmpty(T... targets) {
+        return !isEmpty(targets);
+    }
+
     public static boolean notEmpty(Object... targets) {
         return !isEmpty(targets);
     }

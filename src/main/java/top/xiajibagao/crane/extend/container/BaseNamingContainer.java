@@ -21,7 +21,7 @@ import java.util.Objects;
  * @date 2022/03/23 21:07
  */
 @Slf4j
-public abstract class BaseContainer<K, T> implements Container {
+public abstract class BaseNamingContainer<K, T> implements Container {
 
     @Override
     public void process(List<Object> targets, List<AssembleOperation> operations) {

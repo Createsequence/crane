@@ -33,6 +33,50 @@ public class PropertyUtils {
     public static final String SET_PREFIX = "set";
 
     /**
+     * 从类中查找指定方法
+     *
+     * @param targetClass 类
+     * @param methodName 方法名称
+     * @param allowSubclasses 参数类型是否允许子类
+     * @param returnType 返回值类型
+     * @param paramTypes 参数类型
+     * @return java.lang.reflect.Method
+     * @author huangchengxing
+     * @date 2022/4/1 17:28
+     */
+    @Nullable
+    public static Method findMethod(
+        Class<?> targetClass, String methodName, boolean allowSubclasses, Class<?> returnType, Class<?>... paramTypes) {
+        return findFromClass(targetClass, Class::getDeclaredMethods, method -> {
+            // 方法名是否匹配
+            if (!Objects.equals(method.getName(), methodName)) {
+                return false;
+            }
+            // 返回值是否匹配
+            boolean returnTypeMatched = allowSubclasses ?
+                ClassUtils.isAssignable(returnType, method.getReturnType()) : Objects.equals(returnType, method.getReturnType());
+            if (!returnTypeMatched) {
+                return false;
+            }
+            // 参数是否匹配
+            if (ArrayUtils.isNotEmpty(paramTypes)) {
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                if (paramTypes.length != parameterTypes.length) {
+                    return false;
+                }
+                for (int i = 0; i < parameterTypes.length; i++) {
+                    boolean paramTypeMatched = allowSubclasses ?
+                        ClassUtils.isAssignable(paramTypes[i], parameterTypes[i]) : Objects.equals(paramTypes[i], parameterTypes[i]);
+                    if (!paramTypeMatched) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
+    }
+
+    /**
      * 获取字段缓存
      *
      * @param targetClass 类
