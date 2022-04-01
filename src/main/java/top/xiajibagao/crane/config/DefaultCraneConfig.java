@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import top.xiajibagao.crane.container.EnumDictContainer;
 import top.xiajibagao.crane.container.KeyValueContainer;
+import top.xiajibagao.crane.extend.cache.SimpleCacheManager;
 import top.xiajibagao.crane.helper.EnumDict;
 import top.xiajibagao.crane.impl.bean.BeanReflexOperatorFactory;
 import top.xiajibagao.crane.impl.json.JacksonOperatorFactory;
-import top.xiajibagao.crane.impl.json.module.CraneDynamicJsonModule;
 import top.xiajibagao.crane.operator.SequentialOperationExecutor;
 import top.xiajibagao.crane.operator.UnorderedOperationExecutor;
 import top.xiajibagao.crane.parse.BeanOperateConfigurationParser;
@@ -28,6 +28,13 @@ public class DefaultCraneConfig {
 
     @Order
     @ConditionalOnMissingBean(BeanOperateConfigurationParser.class)
+    @Bean("DefaultCraneSimpleCacheManager")
+    public SimpleCacheManager simpleCacheManager() {
+        return new SimpleCacheManager();
+    }
+
+    @Order
+    @ConditionalOnMissingBean(BeanOperateConfigurationParser.class)
     @Bean("DefaultCraneBeanOperateConfigurationParser")
     public BeanOperateConfigurationParser beanOperateConfigurationParser(CraneGlobalConfiguration configuration, BeanFactory beanFactory) {
         return new BeanOperateConfigurationParser(configuration, beanFactory);
@@ -38,10 +45,9 @@ public class DefaultCraneConfig {
     @Order
     @ConditionalOnMissingBean(ObjectMapper.class)
     @Bean("DefaultCraneObjectMapper")
-    public ObjectMapper objectMapper(BeanFactory beanFactory) {
+    public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        objectMapper.registerModule(new CraneDynamicJsonModule(new ObjectMapper(), beanFactory));
         return objectMapper;
     }
 

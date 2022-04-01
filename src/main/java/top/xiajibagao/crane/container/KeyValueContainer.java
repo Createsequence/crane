@@ -1,6 +1,7 @@
 package top.xiajibagao.crane.container;
 
 import org.springframework.util.CollectionUtils;
+import top.xiajibagao.crane.helper.BaseTableMap;
 import top.xiajibagao.crane.helper.TableMap;
 import top.xiajibagao.crane.parse.interfaces.AssembleOperation;
 
@@ -19,7 +20,7 @@ public class KeyValueContainer implements Container {
     /**
      * 数据缓存
      */
-    public final TableMap<String, String, Object> cache = new TableMap<>();
+    public final TableMap<String, String, Object> cache = new BaseTableMap<>();
 
     /**
      * 注册值

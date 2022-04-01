@@ -2,6 +2,7 @@ package top.xiajibagao.crane.config;
 
 import org.springframework.stereotype.Component;
 import top.xiajibagao.crane.container.Container;
+import top.xiajibagao.crane.helper.BaseTableMap;
 import top.xiajibagao.crane.helper.TableMap;
 import top.xiajibagao.crane.parse.interfaces.AssembleOperation;
 
@@ -20,7 +21,7 @@ public class TestBeanContainer implements Container {
     @Override
     public void process(List<Object> targets, List<AssembleOperation> operations) {
         // 模拟一个服务，根据id查询返回一个bean
-        TableMap<Integer, String, Object> mockService = new TableMap<>();
+        TableMap<Integer, String, Object> mockService = new BaseTableMap<>();
         Map<String, Object> mockBean = new HashMap<>();
         mockBean.put("name", "小李");
         mockBean.put("age", 18);

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.MultiValueMap;
 import top.xiajibagao.crane.annotation.Assemble;
+import top.xiajibagao.crane.helper.BaseTableMap;
 import top.xiajibagao.crane.helper.CollUtils;
 import top.xiajibagao.crane.helper.TableMap;
 
@@ -38,7 +39,7 @@ public class UniversalContainer<K> extends BaseContainer<K, UniversalBean<K>> {
     @Override
     protected Map<String, Map<K, UniversalBean<K>>> getSources(MultiValueMap<String, K> namespaceAndKeys) {
         // 获取数据源，并按namespace与id分组
-        TableMap<String, K, UniversalBean<K>> sourceTable = new TableMap<>();
+        TableMap<String, K, UniversalBean<K>> sourceTable = new BaseTableMap<>();
         namespaceAndKeys.forEach((namespace, keys) -> {
             if (CollUtils.isEmpty(keys)) {
                 return;
