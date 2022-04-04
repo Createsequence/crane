@@ -302,6 +302,55 @@ private Gender gender;
 
 当然，如果我们希望只引用枚举中的某些特定字段值，这也是支持的，具体参见后文的字段配置部分。
 
+#### **通用方法容器**
+
+由于实际场景中可能存在大量需要通过 Mapper/service 或 RPC 接口根据 id 查询的情景，因此，若针对每一个接口都需要创建一个容器提供数据源是一件繁琐的事情，为此，crane 提供了通用方法容器`top.xiajibagao.crane.extend.container.MethodContainer`，用于通过注解快速将查询接口接入容器。
+
+**基于方法注解**
+
+crane 提供了 `top.xiajibagao.crane.annotation.extend.ContainerMethodBean`使用该注解标记需要的 Mapper/service 或其他任何被 Spring 管理的实例所对应的类，再使用`top.xiajibagao.crane.annotation.extend.ContainerMethod` 标记其中的方法即可：
+
+~~~java
+@ContainerMethodBean
+public class UserService {
+    
+    // 通过“user”寻找对应的实例，然后指定返回值类型为 User.class, key 字段为 id
+    @ContainerMethod(namespace = "user", sourceType = User.class, sourceKey = "id")
+    public List<User> getByIds(List<Integer>) {
+        // 返回user对象集合
+    }
+}
+~~~
+
+当使用时，在类对象中引用即可：
+
+~~~java
+@Assemble(container = MethodContainer.class, namespace = "user")
+private Integer userId;
+~~~
+
+当实际调用时，将会在`UserManager`容器中找到`UserManager.getByIds`方法，然后传入 `userId`查询集合，再按指定的 “id” 字段对结果分组，最后作为数据源交由操作者处理。
+
+**基于类注解**
+
+当目标方法位于父类时，无法通过`ContainerMethod`直接注明指定方法，如果为此专门在所有的实现类里重写方法又显得繁琐，因此，也可以直接在`ContainerMethodBean`注解中声明方法。
+
+我们依然以上述获取用户的方法为例，但是`UserService`的 `getByIds`方法通过继承 `BaseService` 得到的，我们可以这么写：
+
+~~~java
+@ContainerMethodBean({
+    @ContainerMethodBean.Method(
+        namespace = "user",
+        name = "getByIds", returnType = User.class, paramTypes = List.class,
+        sourceType = User.class, sourceKey = "id"
+    )
+})
+public class UserService extend BaseService<User> {
+}
+~~~
+
+该写法依然等效于上述例子。
+
 #### **自定义容器**
 
 当我们的数据源来自于数据库查询，或者默认提供的容器不满足需求时，可以自定义容器。
@@ -350,7 +399,21 @@ private Integer userId;
 
 由于通过`AssembleOperation`可以轻松获取到待处理数据实际类型，以及一些全局配置信息，因此如果项目基于 JPA 或者 mybatis-plus 这类框架开发，也可以借助通用 Mapper 层实现一个通用的查询容器。
 
-### 2、字段
+**通用容器模板**
+
+由于大部分的容器其实操作基本不外乎四步：
+
+1. 从待处理的对象中获取 key / namespace ；
+2. 根据 key / namespace 集合查询获取数据源；
+3. 查询出的数据源按 key  / namespace 分组 ；
+4. 将分组的数据源处理后填充到对应的待处理对象中；
+
+因此 crane 也提供了抽象模板用于简化操作：
+
+- `top.xiajibagao.crane.extend.container.BaseKeyContainer`：基于 key 的容器；
+- `top.xiajibagao.crane.extend.container.BaseNamingContainer`：基于 key 和 namespace 的容器；
+
+### 2、处理字段
 
 假如我们有一个已经注册 spring 的 `UserContainer`容器，他提供`User`实例作为数据源：
 
@@ -604,11 +667,23 @@ OperationConfiguration jsonConfig = configurationParser.parse(Person.class, jack
 
 ### 4、配置解析器
 
-解析器用于解析类注解并生成`OperationConfiguration`，它同样提供了一个顶层接口`top.xiajibagao.crane.parse.interfaces.OperateConfigurationParser`。
+解析器对应的顶层接口为`top.xiajibagao.crane.parse.interfaces.OperateConfigurationParser`，其主要用于解析类注解并生成`OperationConfiguration`。
 
-尽管默认提供的解析器`top.xiajibagao.crane.parse.BeanOperateConfigurationParser`已经足以覆盖大部分的功能，但是如果用户需要的话——比如有其他自定义注解需要解析，或者希望修改解析的流程——可以选择重写`BeanOperateConfigurationParser`提供的方法，或者自行实现`OperateConfigurationParser`接口。
+提供了默认的实现类`top.xiajibagao.crane.parse.BeanOperateConfigurationParser`，该实现类提供了对所有默认注解的解析支持，并且主要的关键方法都使用`protected`修饰以便于子类重写。
 
-当然，由于 crane 的配置解析与执行过程是完全分离的，执行器 `top.xiajibagao.crane.operator.interfaces.OperationExecutor`并不在意`OperationConfiguration`到底是怎么来的，因此`OperateConfigurationParser`接口仅是为了后文的扩展功能而作出的规范，若无此需求，用户也可以自行构建`OperationConfiguration`——只要能够塞进`OperationExecutor#execute()`方法即可。
+因此，若有扩展的需求，推荐基于该实现重写，否则需要注意是否会影响到原有注解的解析。
+
+### 5、配置执行器
+
+执行器对应的顶层接口为`top.xiajibagao.crane.operator.interfaces.OperationExecutor`，其主要用于根据解析出的配置`OperationConfiguration`对数据进行处理。
+
+默认提供三个实现类：
+
+- `top.xiajibagao.crane.operator.SequentialOperationExecutor`：有序且同步的执行器，会按照`top.xiajibagao.crane.annotation.Sort`注解指定的顺序处理字段，由于为了保证顺序，对同一批数据进行处理时，可能会多次访问同一个容器；
+- `top.xiajibagao.crane.operator.UnorderedOperationExecutor`：无序且同步的执行器，不会按照`top.xiajibagao.crane.annotation.Sort`注解指定的顺序处理字段，由于不需要保证顺序，对同一批数据进行处理时，同一个容器仅需访问一次；
+- `top.xiajibagao.crane.operator.AsyncUnorderedOperationExecutor`：`UnorderedOperationExecutor`的异步版，不同之处在于不同容器之间的访问是并行进行的。该容器默认不注册到 Spring，需要自行启用。
+
+若有其他需求同样可以自行实现接口。
 
 ## 四、扩展功能
 
@@ -685,6 +760,17 @@ public List<Foo> listFooById(Integer id) {
 
 注解`ProcessResult`同样可以作为元注解使用。
 
+此外，该注解支持通过 `ProcessResult#condition()`属性根据一个返回布尔值的 SpEL 表达式执行结果选择是否执行填充，比如：
+
+~~~java
+@ProcessResult(targetClass = Foo.class, condition = "#id != null")
+public List<Foo> listFooById(Integer id) {
+    // 具体实现
+}
+~~~
+
+按上述写法，当 id 为 null 时将不执行填充。
+
 ### 3、全局序列化配置
 
 针对 `SpringBoot`的 `@RequestBody`或 `@RestController`注解，提供`top.xiajibagao.crane.impl.json.module.ProcessJson`注解和`top.xiajibagao.crane.impl.json.module.CraneDynamicJsonModule`模块用于配置全局的 Json 序列化配置。
@@ -722,6 +808,14 @@ public class BeanPerson {
 如此，当返回给前段的数据在序列化时，就会先解析注解配置并对 JsonNode 对象进行处理。
 
 ## 五、待开发功能
+
+- [x] 提供支持缓存的类注解配置解析器；
+
+- [x] 提供支持多线程处理的执行器和解析器；
+
+- [x] 为容器提供一个带有基本方法的抽象类或工具类，简化自定义容器的实现，并且提供如缓存等相关功能扩展；
+
+- [x] 为实现模块提供更多扩展功能，如基于通用 mapper 或 rpc 接口的填充默认容器实现；
 
 - [ ] 字段配置支持 SpEL 表达式，比如：
 
@@ -792,14 +886,6 @@ public class BeanPerson {
 
 - [ ] 改造为多模块项目，分离注解模块、核心模块与 Json 和普通 JavaBean 等功能实现模块；
 
-- [ ] 为实现模块提供更多扩展功能，如基于通用 mapper 或 rpc 接口的填充默认容器实现；
-
-- [ ] 提供支持多线程处理的执行器和解析器；
-
-- [ ] 为容器提供一个带有基本方法的抽象类或工具类，简化自定义容器的实现，并且提供如缓存等相关功能扩展；
-
 - [ ] 提供支持同时对装配与拆卸操作排序的执行器；
-
-- [ ] 提供支持缓存的类注解配置解析器；
 
 - [ ] 增加一些全局配置项，比如字段解析异常时是否继续对当前对象解析等；
