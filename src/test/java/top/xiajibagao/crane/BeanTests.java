@@ -25,7 +25,7 @@ import java.util.Map;
  * @date 2022/03/06 14:27
  */
 @SpringBootTest
-public class BeanTests {
+class BeanTests {
 
     @Autowired
     ObjectMapper objectMapper;

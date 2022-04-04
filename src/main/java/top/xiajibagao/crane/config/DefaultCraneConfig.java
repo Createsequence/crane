@@ -4,17 +4,23 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
+import top.xiajibagao.crane.annotation.extend.ContainerMethodBean;
 import top.xiajibagao.crane.container.EnumDictContainer;
 import top.xiajibagao.crane.container.KeyValueContainer;
 import top.xiajibagao.crane.extend.cache.SimpleCacheManager;
+import top.xiajibagao.crane.extend.container.MethodContainer;
+import top.xiajibagao.crane.helper.CollUtils;
 import top.xiajibagao.crane.helper.EnumDict;
 import top.xiajibagao.crane.impl.bean.BeanReflexOperatorFactory;
 import top.xiajibagao.crane.impl.json.JacksonOperatorFactory;
 import top.xiajibagao.crane.operator.SequentialOperationExecutor;
 import top.xiajibagao.crane.operator.UnorderedOperationExecutor;
 import top.xiajibagao.crane.parse.BeanOperateConfigurationParser;
+
+import java.util.Map;
 
 /**
  * 默认配置
@@ -87,6 +93,16 @@ public class DefaultCraneConfig {
     @Bean("DefaultCraneKeyValueContainer")
     public KeyValueContainer simpleKeyValueActuator() {
         return new KeyValueContainer();
+    }
+    
+    @Order
+    @ConditionalOnMissingBean(MethodContainer.class)
+    @Bean("DefaultCraneKeyMethodContainer")
+    public MethodContainer methodContainer(ApplicationContext applicationContext) {
+        MethodContainer container = new MethodContainer();
+        Map<String, Object> beans = applicationContext.getBeansWithAnnotation(ContainerMethodBean.class);
+        CollUtils.foreach(beans, (name, bean) -> container.register(bean));
+        return container;
     }
 
     // ==================== 执行器 ====================
