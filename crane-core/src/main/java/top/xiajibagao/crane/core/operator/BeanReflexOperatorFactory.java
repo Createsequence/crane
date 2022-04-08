@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.core.operator;
 
+import top.xiajibagao.crane.core.handler.AssembleHandlerChain;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
@@ -13,8 +14,8 @@ public class BeanReflexOperatorFactory implements OperatorFactory {
     private final Assembler assembler;
     private final Disassembler disassembler;
 
-    public BeanReflexOperatorFactory() {
-        this.assembler = new BeanReflexAssembler();
+    public BeanReflexOperatorFactory(AssembleHandlerChain assembleHandlerChain) {
+        this.assembler = new BeanReflexAssembler(assembleHandlerChain);
         this.disassembler =  new BeanReflexDisassembler();
     }
 

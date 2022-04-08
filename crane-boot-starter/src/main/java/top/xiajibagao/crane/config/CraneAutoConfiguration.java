@@ -11,6 +11,7 @@ import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
 import top.xiajibagao.crane.core.executor.SequentialOperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
+import top.xiajibagao.crane.core.handler.*;
 import top.xiajibagao.crane.core.helper.EnumDict;
 import top.xiajibagao.crane.core.operator.BeanReflexOperatorFactory;
 import top.xiajibagao.crane.core.parser.BeanOperateConfigurationParser;
@@ -42,10 +43,23 @@ public class CraneAutoConfiguration {
     // ==================== 操作者 ====================
 
     @Order
+    @ConditionalOnMissingBean(OrderlyAssembleHandlerChain.class)
+    @Bean("DefaultCraneOrderlyAssembleHandlerChain")
+    public OrderlyAssembleHandlerChain orderlyAssembleHandlerChain() {
+        OrderlyAssembleHandlerChain assembleHandlerChain = new OrderlyAssembleHandlerChain();
+        assembleHandlerChain.addHandler(new MapAssembleHandler())
+            .addHandler(new CollectionAssembleHandler(assembleHandlerChain))
+            .addHandler(new ArrayAssembleHandler(assembleHandlerChain))
+            .addHandler(new MapAssembleHandler())
+            .addHandler(new BeanAssembleHandler());
+        return assembleHandlerChain;
+    }
+
+    @Order
     @ConditionalOnMissingBean(BeanReflexOperatorFactory.class)
     @Bean("DefaultCraneBeanReflexOperatorFactory")
-    public BeanReflexOperatorFactory reflexOperatorFactory() {
-        return new BeanReflexOperatorFactory();
+    public BeanReflexOperatorFactory reflexOperatorFactory(AssembleHandlerChain assembleHandlerChain) {
+        return new BeanReflexOperatorFactory(assembleHandlerChain);
     }
 
 

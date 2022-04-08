@@ -1,20 +1,18 @@
 package top.xiajibagao.crane.core.operator;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import top.xiajibagao.crane.core.exception.CraneException;
-import top.xiajibagao.crane.core.helper.BeanProperty;
+import top.xiajibagao.crane.core.handler.AssembleHandlerChain;
 import top.xiajibagao.crane.core.helper.ReflexUtils;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author huangchengxing
@@ -24,121 +22,24 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BeanReflexAssembler implements Assembler {
 
+    private final AssembleHandlerChain assembleHandlerChain;
+
     @Override
     public void execute(Object target, Object source, AssembleOperation operation) {
         if (Objects.isNull(target) || Objects.isNull(source)) {
             return;
         }
         checkType(target, operation);
-
-        Class<?> targetClass = target.getClass();
-        if (CollectionUtils.isEmpty(operation.getProperties())) {
-            processIfNonProperties(targetClass, target, source, operation);
-            return;
-        }
-
-        // TODO 此处字段处理策略应当可以自定义，或改为从特定容器中获取
-        Class<?> sourceClass = source.getClass();
-        operation.getProperties().forEach(p -> {
-            if (sourceClass.isAssignableFrom(Collection.class)) {
-                processIfCollectionSource(targetClass, target, (Collection<?>)source, p, operation);
-            } else if (sourceClass.isArray()) {
-                processIfArraySource(targetClass, target, (Object[])source, p, operation);
-            } else {
-                processIfObjectSource(targetClass, target, sourceClass, source, p, operation);
+        List<AssembleProperty> properties = CollUtil.defaultIfEmpty(
+            operation.getProperties(), Collections.singletonList(AssembleProperty.empty())
+        );
+        for (AssembleProperty property : properties) {
+            Object sourceData = assembleHandlerChain.readFromSource(source, property, operation);
+            if (Objects.isNull(sourceData)) {
+                return;
             }
-        });
-    }
-
-    /**
-     * 若未配置任何字段，则直接使用数据源填充注解字段
-     *
-     * @param targetClass 目标类型
-     * @param target 目标实例
-     * @param source 受教育
-     * @param operation 操作配置
-     * @author huangchengxing
-     * @date 2022/3/2 16:01
-     */
-    protected void processIfNonProperties(Class<?> targetClass, Object target, Object source, AssembleOperation operation) {
-        ReflexUtils.findProperty(targetClass, operation.getTargetProperty().getName())
-            .ifPresent(c -> c.setValue(target, source));
-    }
-
-    /**
-     * 若数据源类型为对象或Map集合：
-     * 1.若数据源存在引用字段，则将数据源对应字段的值填充至目标实例的指定属性中；
-     * 2.若数据源不存在引用字段，则将数据源对象填充至目标实例指定属性中；
-     *
-     * @param targetClass 目标类型
-     * @param target 目标实例
-     * @param sourceClass 数据源类型
-     * @param source 数据源
-     * @param property 字段配置
-     * @param operation 操作配置
-     * @author huangchengxing
-     * @date 2022/3/2 16:01
-     */
-    protected void processIfObjectSource(Class<?> targetClass, Object target, Class<?> sourceClass, Object source, AssembleProperty property, AssembleOperation operation) {
-        Optional<BeanProperty> targetProperty = ReflexUtils.findProperty(targetClass, property.getReference());
-        if (!targetProperty.isPresent()) {
-            return;
+            assembleHandlerChain.writeToTarget(sourceData, target, property, operation);
         }
-
-        // 未设置引用字段
-        if (!StringUtils.hasText(property.getResource())) {
-            targetProperty.get().setValue(target, source);
-            return;
-        }
-
-        // 若设置了引用字段，且数据源为Map集合
-        if (source instanceof Map) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> sourceMap = (Map<String, Object>) source;
-            Object val = sourceMap.get(property.getResource());
-            if (Objects.nonNull(val)) {
-                targetProperty.ifPresent(t -> t.setValue(target, val));
-            }
-            return;
-        }
-
-        // 若设置了引用字段，且数据源为对象
-        ReflexUtils.findProperty(sourceClass, property.getResource())
-            .ifPresent(sourceProperty -> targetProperty.get().setValue(
-                target, sourceProperty.getValue(source)
-            ));
-    }
-
-    /**
-     * 若数据源类型为集合，则将数组值填充至目标实例的指定属性中
-     *
-     * @param targetClass 目标类型
-     * @param target 目标实例
-     * @param source 数据源
-     * @param property 字段配置
-     * @param operation 操作配置
-     * @author huangchengxing
-     * @date 2022/3/2 16:01
-     */
-    protected void processIfCollectionSource(Class<?> targetClass, Object target, Collection<?> source, AssembleProperty property, AssembleOperation operation) {
-        ReflexUtils.findProperty(targetClass, property.getReference())
-            .ifPresent(c -> c.setValue(target, source));
-    }
-    
-    /**
-     * 若数据源类型为数组，则将数组值填充至目标实例的指定属性中
-     *
-     * @param targetClass 目标类型
-     * @param target 目标实例
-     * @param source 受教育
-     * @param property 字段配置
-     * @param operation 操作配置
-     * @author huangchengxing
-     * @date 2022/3/2 16:01
-     */
-    protected void processIfArraySource(Class<?> targetClass, Object target, Object[] source, AssembleProperty property, AssembleOperation operation) {
-        ReflexUtils.findProperty(targetClass, property.getReference())
-            .ifPresent(c -> c.setValue(target, source));
     }
 
     @Override
