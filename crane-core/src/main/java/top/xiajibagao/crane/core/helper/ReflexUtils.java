@@ -181,7 +181,7 @@ public class ReflexUtils {
      * 从指定类及其父类中寻找指定属性的getter方法
      * <ul>
      *     <li>优先寻找格式为“getFieldName”，并且没有参数的方法；</li>
-     *     <li>若找不到，再寻找格式为“fieldName”，并且没有参数的；</li>
+     *     <li>若找不到，再寻找格式为“fieldName”，并且没有参数的方法；</li>
      * </ul>
      *
      * @param targetClass 类
@@ -216,7 +216,7 @@ public class ReflexUtils {
      * 从指定类及其父类中寻找指定属性的getter方法
      * <ul>
      *     <li>优先寻找格式为“getFieldName”，并且没有参数的方法；</li>
-     *     <li>若找不到，再寻找格式为“fieldName”，并且没有参数的；</li>
+     *     <li>若找不到，再寻找格式为“fieldName”，并且没有参数的方法；</li>
      * </ul>
      *
      * @param targetClass 类
