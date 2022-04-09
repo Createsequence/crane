@@ -1,10 +1,12 @@
 package top.xiajibagao.crane.core.container;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.MultiValueMap;
 import top.xiajibagao.crane.core.helper.EnumDict;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -15,7 +17,7 @@ import java.util.function.Function;
  * @date 2022/03/02 13:20
  */
 @RequiredArgsConstructor
-public class EnumDictContainer implements Container {
+public class EnumDictContainer extends BaseNamespaceContainer<String, EnumDict.EnumDictItem<?>> implements Container {
 
     private final EnumDict enumDict;
 
@@ -28,19 +30,19 @@ public class EnumDictContainer implements Container {
     }
 
     @Override
-    public void process(List<Object> targets, List<AssembleOperation> operations) {
-        for (AssembleOperation operation : operations) {
-            targets.forEach(target -> {
-                Object key = operation.getAssembler().getKey(target, operation);
-                if (Objects.isNull(key)) {
-                    return;
-                }
-                EnumDict.EnumDictItem<?> val = enumDict.getItem(operation.getNamespace(), key.toString());
-                if (Objects.nonNull(val)) {
-                    operation.getAssembler().execute(target, val.getBeanMap(), operation);
-                }
-            });
-        }
+    protected Map<String, Map<String, EnumDict.EnumDictItem<?>>> getSources(MultiValueMap<String, String> namespaceAndKeys) {
+        Table<String, String, EnumDict.EnumDictItem<?>> results = HashBasedTable.create();
+        namespaceAndKeys.forEach((namespace, keys) -> keys.forEach(key -> {
+            EnumDict.EnumDictItem<?> item = enumDict.getItem(namespace, key);
+            if (Objects.nonNull(item)) {
+                results.put(namespace, key, item);
+            }
+        }));
+        return results.rowMap();
     }
 
+    @Override
+    protected String parseKey(Object key) {
+        return String.valueOf(key);
+    }
 }

@@ -3,11 +3,9 @@ package top.xiajibagao.crane.core.container;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.springframework.util.CollectionUtils;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
+import org.springframework.util.MultiValueMap;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 通过命名空间与键值获取唯一值的{@link Container}实现
@@ -15,7 +13,7 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/03/02 13:19
  */
-public class KeyValueContainer implements Container {
+public class KeyValueContainer extends BaseNamespaceContainer<String, Object> implements Container {
 
     /**
      * 数据缓存
@@ -52,20 +50,8 @@ public class KeyValueContainer implements Container {
     }
 
     @Override
-    public void process(List<Object> targets, List<AssembleOperation> operations) {
-        if (CollectionUtils.isEmpty(targets) || CollectionUtils.isEmpty(operations)) {
-            return;
-        }
-        targets.forEach(t -> operations.forEach(o -> {
-            Object key = o.getAssembler().getKey(t, o);
-            if (Objects.isNull(key)) {
-                return;
-            }
-            Object val = get(o.getNamespace(), key.toString());
-            if (Objects.nonNull(val)) {
-                o.getAssembler().execute(t, val, o);
-            }
-        }));
+    protected Map<String, Map<String, Object>> getSources(MultiValueMap<String, String> namespaceAndKeys) {
+        return cache.rowMap();
     }
 
 }
