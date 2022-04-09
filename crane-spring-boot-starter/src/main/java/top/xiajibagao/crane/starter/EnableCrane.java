@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.config;
+package top.xiajibagao.crane.starter;
 
 import org.springframework.context.annotation.Import;
 

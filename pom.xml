@@ -53,7 +53,7 @@
     <module>crane-annotation</module>
     <module>crane-core</module>
     <module>crane-extension</module>
-    <module>crane-boot-starter</module>
+    <module>crane-spring-boot-starter</module>
   </modules>
 
   <dependencyManagement>

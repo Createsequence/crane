@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.config;
+package top.xiajibagao.crane.starter;
 
 import cn.hutool.core.collection.CollUtil;
 import org.springframework.beans.factory.BeanFactory;
