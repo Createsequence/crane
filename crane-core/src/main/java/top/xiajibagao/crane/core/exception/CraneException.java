@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.core.exception;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
 
 /**
@@ -9,6 +10,10 @@ import cn.hutool.core.util.ArrayUtil;
 public class CraneException extends RuntimeException {
 
     public CraneException() {
+    }
+
+    public CraneException(String message, Object...args) {
+        super(CharSequenceUtil.format(message, args));
     }
 
     public CraneException(String message) {
@@ -21,10 +26,6 @@ public class CraneException extends RuntimeException {
 
     public CraneException(Throwable cause) {
         super(cause);
-    }
-
-    public CraneException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 
     public static void throwOf(String template, Object... params) {

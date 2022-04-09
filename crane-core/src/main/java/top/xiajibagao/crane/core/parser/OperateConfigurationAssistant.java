@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.core.parser;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -179,6 +180,13 @@ public class OperateConfigurationAssistant<T> {
 
         public AssembleOperationBuilder<T> namespace(String namespace) {
             this.namespace = CharSequenceUtil.blankToDefault(namespace, "");
+            return this;
+        }
+
+        public AssembleOperationBuilder<T> properties(Collection<AssembleProperty> properties) {
+            if (CollUtil.isNotEmpty(properties)) {
+                this.properties.addAll(properties);
+            }
             return this;
         }
 
