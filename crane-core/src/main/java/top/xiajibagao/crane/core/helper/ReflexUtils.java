@@ -24,11 +24,13 @@ import java.util.function.Predicate;
  */
 public class ReflexUtils {
 
-    private ReflexUtils() {}
-
     private static final Table<Class<?>, String, BeanProperty> CACHE_TABLE = HashBasedTable.create();
     public static final String GET_PREFIX = "get";
     public static final String SET_PREFIX = "set";
+    public static final String IS_PREFIX = "is";
+
+    private ReflexUtils() {
+    }
 
     /**
      * 从类中查找指定方法
@@ -181,7 +183,8 @@ public class ReflexUtils {
      * 从指定类及其父类中寻找指定属性的getter方法
      * <ul>
      *     <li>优先寻找格式为“getFieldName”，并且没有参数的方法；</li>
-     *     <li>若找不到，再寻找格式为“fieldName”，并且没有参数的方法；</li>
+     *     <li>若找不到，再寻找格式为“isFieldName”，并且没有参数的方法；</li>
+     *     <li>仍然找不到，再寻找格式为“fieldName”，并且没有参数的方法；</li>
      * </ul>
      *
      * @param targetClass 类
@@ -193,19 +196,24 @@ public class ReflexUtils {
     @Nullable
     public static Method findGetterMethod(Class<?> targetClass, String fieldName) {
         // 尝试获取"getFieldName"方法
-        String standardMethodName = getStandardMethodName(GET_PREFIX, fieldName);
         Method getter = findFromClass(
-            targetClass,
-            Class::getDeclaredMethods,
-            method -> Objects.equals(method.getName(), standardMethodName)
+            targetClass, Class::getDeclaredMethods,
+            method -> Objects.equals(method.getName(), getStandardMethodName(GET_PREFIX, fieldName))
                 && method.getParameterTypes().length == 0
         );
         if (Objects.nonNull(getter)) {
             return getter;
         }
 
-        // 找不到则尝试寻找"fieldName()"方法
-        return findFromClass(
+        // 找不到则尝试寻找"isFieldName"方法
+        getter = findFromClass(
+            targetClass, Class::getDeclaredMethods,
+            method -> Objects.equals(method.getName(), getStandardMethodName(IS_PREFIX, fieldName))
+                && method.getParameterTypes().length == 0
+        );
+
+        // 仍然获取不到，则尝试寻找“fieldName()”方法
+        return Objects.nonNull(getter) ? getter : findFromClass(
             targetClass, Class::getDeclaredMethods,
             method -> Objects.equals(method.getName(), fieldName)
                 && method.getParameterTypes().length == 0
@@ -216,7 +224,8 @@ public class ReflexUtils {
      * 从指定类及其父类中寻找指定属性的getter方法
      * <ul>
      *     <li>优先寻找格式为“getFieldName”，并且没有参数的方法；</li>
-     *     <li>若找不到，再寻找格式为“fieldName”，并且没有参数的方法；</li>
+     *     <li>若找不到，再寻找格式为“isFieldName”，并且没有参数的方法；</li>
+     *     <li>仍然找不到，再寻找格式为“fieldName”，并且没有参数的方法；</li>
      * </ul>
      *
      * @param targetClass 类
@@ -275,7 +284,7 @@ public class ReflexUtils {
     }
 
     /**
-     * 获取标准的“getXXX”与“setXXX”方法
+     * 获取标准的“prefixXXX”方法
      */
     private static String getStandardMethodName(String prefix, String key) {
         return prefix + Character.toUpperCase(key.charAt(0)) + key.substring(1);
