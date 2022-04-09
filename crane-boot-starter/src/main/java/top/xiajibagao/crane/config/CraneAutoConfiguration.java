@@ -9,17 +9,23 @@ import org.springframework.core.annotation.Order;
 import top.xiajibagao.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
+import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.SequentialOperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
 import top.xiajibagao.crane.core.handler.*;
 import top.xiajibagao.crane.core.helper.EnumDict;
 import top.xiajibagao.crane.core.operator.BeanReflexOperatorFactory;
+import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
+import top.xiajibagao.crane.core.parser.BeanGlobalConfiguration;
 import top.xiajibagao.crane.core.parser.BeanOperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
+import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
+import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 import top.xiajibagao.crane.extension.aop.MethodResultProcessAspect;
 import top.xiajibagao.crane.extension.cache.ConfigurationCache;
 import top.xiajibagao.crane.extension.cache.OperationConfigurationCache;
 import top.xiajibagao.crane.extension.container.MethodSourceContainer;
+import top.xiajibagao.crane.extension.helper.OperateHelper;
 
 import java.util.Map;
 
@@ -30,6 +36,13 @@ import java.util.Map;
  * @date 2022/03/03 13:36
  */
 public class CraneAutoConfiguration {
+
+    @Order
+    @ConditionalOnMissingBean(GlobalConfiguration.class)
+    @Bean("DefaultCraneGlobalConfiguration")
+    public GlobalConfiguration globalConfiguration() {
+        return new BeanGlobalConfiguration();
+    }
     
     // ==================== 解析器 ====================
 
@@ -115,19 +128,30 @@ public class CraneAutoConfiguration {
     }
     
     // ==================== 扩展 ====================
-    
+
     @Order
     @ConditionalOnMissingBean(OperationConfigurationCache.class)
     @Bean("DefaultCraneOperationConfigurationCache")
-   public OperationConfigurationCache operationConfigurationCache() {
+    public OperationConfigurationCache operationConfigurationCache() {
         return new OperationConfigurationCache();
-   }
+    }
     
     @Order
     @ConditionalOnMissingBean(MethodResultProcessAspect.class)
     @Bean("DefaultCraneMethodResultProcessAspect")
     public MethodResultProcessAspect methodResultProcessAspect(BeanFactory beanFactory, ConfigurationCache configurationCache) {
         return new MethodResultProcessAspect(beanFactory, configurationCache);
+    }
+
+    @Order
+    @ConditionalOnMissingBean(OperateHelper.class)
+    @Bean("DefaultCraneOperateHelper")
+    public OperateHelper operateHelper(
+        ConfigurationCache configurationCache,
+        OperatorFactory defaultOperatorFactory,
+        OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
+        OperationExecutor defaultOperationExecutor) {
+        return new OperateHelper(configurationCache, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor);
     }
 
 }
