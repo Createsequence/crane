@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.core.parser.interfaces;
 
+import org.springframework.lang.NonNull;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public interface OperationConfiguration {
      * @author huangchengxing
      * @date 2022/3/3 14:09
      */
+    @NonNull
     GlobalConfiguration getGlobalConfiguration();
 
     /**
@@ -28,6 +30,7 @@ public interface OperationConfiguration {
      * @author huangchengxing
      * @date 2022/3/1 15:02
      */
+    @NonNull
     Class<?> getTargetClass();
 
     /**
@@ -37,6 +40,7 @@ public interface OperationConfiguration {
      * @author huangchengxing
      * @date 2022/3/1 15:52
      */
+    @NonNull
     OperatorFactory getOperatorFactory();
 
     /**
@@ -46,6 +50,7 @@ public interface OperationConfiguration {
      * @author huangchengxing
      * @date 2022/3/1 15:01
      */
+    @NonNull
     List<AssembleOperation> getAssembleOperations();
 
     /**
@@ -55,6 +60,7 @@ public interface OperationConfiguration {
      * @author huangchengxing
      * @date 2022/3/1 15:02
      */
+    @NonNull
     List<DisassembleOperation> getDisassembleOperations();
 
 }
