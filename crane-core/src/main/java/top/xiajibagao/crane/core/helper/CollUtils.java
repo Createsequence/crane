@@ -104,9 +104,11 @@ public final class CollUtils {
 	/**
 	 * 将Object数据适配为Collection集合
 	 * <ul>
+	 *     <li>null: 返回{@link Collections#emptyList()}</li>
 	 *     <li>Object: 适配为{@link Collections#singletonList(Object)}</li>
 	 *     <li>Map: 适配为{@link Map#entrySet()}；</li>
 	 *     <li>Collection: 强转为Collection集合</li>
+	 *     <li>Array: 使用{@link Arrays#asList(Object[])}转为集合；</li>
 	 * </ul>
 	 *
 	 * @param target 目标数据
@@ -115,13 +117,19 @@ public final class CollUtils {
 	 * @date 2021/12/8 16:26
 	 */
 	public static Collection<?> adaptToCollection(Object target) {
+		if (Objects.isNull(target)) {
+			return Collections.emptyList();
+		}
 		if (target instanceof Collection) {
 			return (Collection<?>) target;
-		} else if (target instanceof Map) {
-			return ((Map<?, ?>) target).entrySet();
-		} else {
-			return Collections.singletonList(target);
 		}
+		if (target instanceof Map) {
+			return ((Map<?, ?>) target).entrySet();
+		}
+		if(target.getClass().isArray()) {
+			return Arrays.asList((Object[])target);
+		}
+		return Collections.singletonList(target);
 	}
 
 }
