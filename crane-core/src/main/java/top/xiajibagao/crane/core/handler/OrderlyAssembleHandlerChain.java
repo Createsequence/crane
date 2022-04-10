@@ -18,7 +18,7 @@ public class OrderlyAssembleHandlerChain implements AssembleHandlerChain {
 
     @Override
     public List<AssembleHandler> handlers() {
-        return CollUtil.sort(handlers(), Comparator.comparing(AssembleHandler::order));
+        return CollUtil.sort(handlers, Comparator.comparing(AssembleHandler::order));
     }
 
     @Override

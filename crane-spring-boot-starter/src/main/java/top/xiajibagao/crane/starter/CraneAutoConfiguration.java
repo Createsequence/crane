@@ -2,6 +2,7 @@ package top.xiajibagao.crane.starter;
 
 import cn.hutool.core.collection.CollUtil;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -147,10 +148,10 @@ public class CraneAutoConfiguration {
     @ConditionalOnMissingBean(OperateHelper.class)
     @Bean("DefaultCraneOperateHelper")
     public OperateHelper operateHelper(
-        ConfigurationCache configurationCache,
-        OperatorFactory defaultOperatorFactory,
-        OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
-        OperationExecutor defaultOperationExecutor) {
+        @Qualifier("DefaultCraneOperationConfigurationCache") ConfigurationCache configurationCache,
+        @Qualifier("DefaultCraneBeanReflexOperatorFactory") OperatorFactory defaultOperatorFactory,
+        @Qualifier("DefaultCraneBeanOperateConfigurationParser") OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
+        @Qualifier("DefaultCraneUnorderedOperationExecutor") OperationExecutor defaultOperationExecutor) {
         return new OperateHelper(configurationCache, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor);
     }
 

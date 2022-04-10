@@ -288,7 +288,7 @@ public class ReflexUtils {
      * 获取标准的“prefixXXX”方法
      */
     private static String getStandardMethodName(String prefix, String name) {
-        return prefix + CharSequenceUtil.upperFirstAndAddPre(name, prefix);
+        return CharSequenceUtil.upperFirstAndAddPre(name, prefix);
     }
 
 }

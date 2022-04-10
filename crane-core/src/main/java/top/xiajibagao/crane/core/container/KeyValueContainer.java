@@ -6,6 +6,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 通过命名空间与键值获取唯一值的{@link Container}实现
@@ -54,4 +55,8 @@ public class KeyValueContainer extends BaseNamespaceContainer<String, Object> im
         return cache.rowMap();
     }
 
+    @Override
+    protected String parseKey(Object key) {
+        return Objects.toString(key);
+    }
 }

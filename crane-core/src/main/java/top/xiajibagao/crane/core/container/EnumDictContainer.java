@@ -43,6 +43,6 @@ public class EnumDictContainer extends BaseNamespaceContainer<String, EnumDict.E
 
     @Override
     protected String parseKey(Object key) {
-        return String.valueOf(key);
+        return Objects.toString(key);
     }
 }
