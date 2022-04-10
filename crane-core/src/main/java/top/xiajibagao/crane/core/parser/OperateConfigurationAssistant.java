@@ -13,7 +13,10 @@ import top.xiajibagao.crane.core.helper.FuncUtils;
 import top.xiajibagao.crane.core.helper.ReflexUtils;
 import top.xiajibagao.crane.core.helper.SFunc;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
-import top.xiajibagao.crane.core.parser.interfaces.*;
+import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
+import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
+import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -29,6 +32,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class OperateConfigurationAssistant<T> {
 
+    @Getter
     private final OperationConfiguration configuration;
 
     /**
@@ -115,10 +119,6 @@ public class OperateConfigurationAssistant<T> {
         return buildDisassembler(FuncUtils.getPropertyName(propertyFunc), targetOperateConfiguration);
     }
 
-    public OperationConfiguration build() {
-        return this.configuration;
-    }
-
     @Getter
     @RequiredArgsConstructor
     public static class DisassembleOperationBuilder<T> {
@@ -192,8 +192,8 @@ public class OperateConfigurationAssistant<T> {
 
         public AssembleOperationBuilder<T> property(String resource, String reference) {
             properties.add(new BeanAssembleProperty(
-                CharSequenceUtil.blankToDefault(resource, ""),
-                CharSequenceUtil.blankToDefault(reference, "")
+                CharSequenceUtil.blankToDefault(reference, ""),
+                CharSequenceUtil.blankToDefault(resource, "")
             ));
             return this;
         }
@@ -203,14 +203,23 @@ public class OperateConfigurationAssistant<T> {
         }
 
         public <S> AssembleOperationBuilder<T> property(SFunc<S, ?> resource, SFunc<T, ?> reference) {
-            return property(
-                FuncUtils.getPropertyName(resource), FuncUtils.getPropertyName(reference)
-            );
+            return property(FuncUtils.getPropertyName(resource), FuncUtils.getPropertyName(reference));
         }
 
-        public OperateConfigurationAssistant<T> build(Function<AssembleOperationBuilder<T>, AssembleOperation> operationFactory) {
-            builder.configuration.getAssembleOperations().add(operationFactory.apply(this));
-            return builder;
+        public AssembleOperationBuilder<T> onlyRefProperty(SFunc<T, ?> reference) {
+            return property("", FuncUtils.getPropertyName(reference));
+        }
+
+        public AssembleOperationBuilder<T> onlyRefProperty(String reference) {
+            return property("", reference);
+        }
+
+        public <S> AssembleOperationBuilder<T> onlySrcProperty(SFunc<S, ?> resource) {
+            return property(FuncUtils.getPropertyName(resource), "");
+        }
+
+        public AssembleOperationBuilder<T> onlySrcProperty(String resource) {
+            return property(resource, "");
         }
 
         public OperateConfigurationAssistant<T> build() {
