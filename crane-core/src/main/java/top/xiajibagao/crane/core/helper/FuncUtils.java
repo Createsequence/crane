@@ -4,7 +4,9 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ReflectUtil;
 
 import java.lang.invoke.SerializedLambda;
+import java.lang.ref.WeakReference;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -13,9 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author huangchengxing
  * @date 2022/04/09 21:38
  */
-public abstract class FuncUtils {
+public class FuncUtils {
 
-    private static final Map<String , SerializedLambda> SERIALIZED_LAMBDA_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String , WeakReference<SerializedLambda>> SERIALIZED_LAMBDA_CACHE = new ConcurrentHashMap<>();
     private static final String WRITE_REPLACE = "writeReplace";
 
     private FuncUtils() {}
@@ -64,9 +66,13 @@ public abstract class FuncUtils {
      * @date 2022/4/9 21:43
      */
     public static <P> SerializedLambda resolve(SFunc<P, ?> func) {
-        return SERIALIZED_LAMBDA_CACHE.computeIfAbsent(
-            func.getClass().getName(), f -> ReflectUtil.invoke(func, WRITE_REPLACE)
-        );
+        return Optional.ofNullable(SERIALIZED_LAMBDA_CACHE.get(func.getClass().getName()))
+            .map(WeakReference::get)
+            .orElseGet(() -> {
+                SerializedLambda lambda = ReflectUtil.invoke(func, WRITE_REPLACE);
+                SERIALIZED_LAMBDA_CACHE.put(func.getClass().getName(), new WeakReference<>(lambda));
+                return lambda;
+            });
     }
 
 }

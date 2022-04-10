@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.core.helper;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -286,8 +287,8 @@ public class ReflexUtils {
     /**
      * 获取标准的“prefixXXX”方法
      */
-    private static String getStandardMethodName(String prefix, String key) {
-        return prefix + Character.toUpperCase(key.charAt(0)) + key.substring(1);
+    private static String getStandardMethodName(String prefix, String name) {
+        return prefix + CharSequenceUtil.upperFirstAndAddPre(name, prefix);
     }
 
 }
