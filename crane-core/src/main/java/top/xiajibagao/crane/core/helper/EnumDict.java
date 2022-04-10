@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.core.helper;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.lang.NonNull;
@@ -225,12 +226,12 @@ public class EnumDict {
      * @author huangchengxing
      * @date 2022/1/7 15:44
      */
+    @EqualsAndHashCode(callSuper = false)
     @Getter
-    public static class EnumDictItem<T extends Enum<?>> {
+    public static class EnumDictItem<T extends Enum<?>> extends HashMap<String, Object> {
         private final EnumDictType<T> type;
         private final T target;
         private final String name;
-        private final Map<String, Object> beanMap;
 
         @SuppressWarnings("unchecked")
         protected EnumDictItem(EnumDictType<T> type, T target, String name) {
@@ -238,9 +239,9 @@ public class EnumDict {
             this.name = name;
             this.target = target;
 
-            Map<String, Object> properties = BeanMap.create(target);
-            this.beanMap = new HashMap<>(properties);
-            this.beanMap.remove("declaringClass");
+            Map<String, Object> properties = new HashMap<>(BeanMap.create(target));
+            properties.remove("declaringClass");
+            putAll(properties);
         }
 
     }
