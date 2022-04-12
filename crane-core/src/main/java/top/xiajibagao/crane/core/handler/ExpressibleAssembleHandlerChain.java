@@ -12,17 +12,17 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * 带SpEL表达式的字段处理器 <br />
- * 该处理器允许被被视为执行器链的代理类，亦或者视为一个处理器节点，此时该节点总是应当在处理器链的最前端。
- * 当向待处理对象写入数据时，该处理器将拦截数据并执行表达式获取返回值作为新的数据源，
- * 并再次调用处理器链尝试写入该值
+ * SpEL表达式装配处理器链 <br />
+ * 该类可视为执行器链的代理类，在被代理的原处理器链的基础上，当向待处理对象写入数据时，
+ * 该处理器将拦截数据并执行表达式获取返回值作为新的数据源，并再次调用处理器链尝试写入该值。
+ * 此外，其他行为皆与原处理器链保持一致。
  *
  * @author huangchengxing
  * @date 2022/04/13 0:06
  */
 @Getter
 @RequiredArgsConstructor
-public class ExpressionAssembleHandler implements AssembleHandler, AssembleHandlerChain {
+public class ExpressibleAssembleHandlerChain implements AssembleHandlerChain {
 
     private final AssembleHandlerChain handlerChain;
     private final Supplier<StandardEvaluationContext> contextFactory;

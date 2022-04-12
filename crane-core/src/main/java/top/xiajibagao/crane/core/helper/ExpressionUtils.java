@@ -2,13 +2,13 @@ package top.xiajibagao.crane.core.helper;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.text.CharSequenceUtil;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.lang.NonNull;
-import org.springframework.util.StringUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
@@ -76,7 +76,7 @@ public class ExpressionUtils {
      * @date 2021/10/11 16:09
      */
     public static <T> T execute(String exp, Class<T> resultType, boolean cached) {
-        return !StringUtils.hasText(exp) ? null : parseExp(exp, cached).getValue(resultType);
+        return CharSequenceUtil.isBlank(exp) ? null : parseExp(exp, cached).getValue(resultType);
     }
 
     /**
@@ -91,7 +91,7 @@ public class ExpressionUtils {
      * @date 2021/10/11 16:09
      */
     public static <T> T execute(String exp, EvaluationContext context, Class<T> resultType, boolean cached) {
-        return !StringUtils.hasText(exp) ? null : parseExp(exp, cached).getValue(context, resultType);
+        return CharSequenceUtil.isBlank(exp) ? null : parseExp(exp, cached).getValue(context, resultType);
     }
 
     /**
