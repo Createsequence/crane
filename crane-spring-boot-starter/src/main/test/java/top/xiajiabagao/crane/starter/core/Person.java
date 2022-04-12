@@ -17,7 +17,7 @@ import java.util.List;
  * @author huangchengxing
  * @date 2022/04/09 20:23
  */
-@EqualsAndHashCode(exclude = {"relatives", "relativeNames"})
+@EqualsAndHashCode(exclude = "relatives")
 @Accessors(chain = true)
 @Data
 public class Person {
@@ -44,7 +44,5 @@ public class Person {
 
     @Disassemble(Person.class)
     List<Person> relatives;
-
-    List<String> relativeNames;
 
 }
