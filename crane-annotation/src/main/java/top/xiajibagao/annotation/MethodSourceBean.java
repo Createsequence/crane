@@ -52,9 +52,9 @@ public @interface MethodSourceBean {
     @interface Method {
 
         /**
-         * 容器名称
+         * 方法名称
          */
-        String name();
+        String name() default "";
 
         /**
          * 容器名称

@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * 键值对对象
@@ -47,6 +49,22 @@ public class PairEntry<K, V> implements Map.Entry<K, V> {
 
     public boolean hasValue() {
         return !nonValue();
+    }
+
+    public <N> PairEntry<K, N> mapValue(Function<V, N> valueMapper) {
+        return new PairEntry<>(key, valueMapper.apply(value));
+    }
+
+    public <N> PairEntry<N, V> mapKey(Function<K, N> keyMapper) {
+        return new PairEntry<>(keyMapper.apply(key), value);
+    }
+
+    public void peekValue(Consumer<V> consumer) {
+        consumer.accept(value);
+    }
+
+    public void peekKey(Consumer<K> consumer) {
+        consumer.accept(key);
     }
 
     public static <K, V> PairEntry<K, V> of(K key, V val) {

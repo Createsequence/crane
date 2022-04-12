@@ -1,6 +1,7 @@
 package top.xiajibagao.crane.extension.container;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -47,14 +48,17 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         }
         MethodSourceBean.Method[] classMethods = annotation.methods();
         for (MethodSourceBean.Method classMethod : classMethods) {
+            if (CharSequenceUtil.isBlank(classMethod.name())) {
+                continue;
+            }
             Method method = ReflexUtils.findMethod(targetClass, classMethod.name(),
                 true, classMethod.returnType(), classMethod.paramTypes()
             );
             if (Objects.nonNull(method)) {
                 checkMethod(method, classMethod.namespace());
                 ReflexUtils.findProperty(classMethod.sourceType(), classMethod.sourceKey())
-                    .ifPresent(pc -> {
-                        MethodSource cache = new MethodSource(classMethod.mappingType(), methodSourceBean, targetClass, classMethod.namespace(), method, pc);
+                    .ifPresent(property -> {
+                        MethodSource cache = new MethodSource(classMethod.mappingType(), methodSourceBean, targetClass, classMethod.namespace(), method, property);
                         methodCache.put(classMethod.namespace(), cache);
                     });
             }

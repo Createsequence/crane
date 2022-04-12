@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.starter;
 
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -10,6 +11,7 @@ import java.lang.annotation.*;
  * @author huangchengxing
  * @date 2022/03/03 13:41
  */
+@EnableAspectJAutoProxy
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
