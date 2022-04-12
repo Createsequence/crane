@@ -1,7 +1,7 @@
 package top.xiajibagao.annotation;
 
-import cn.hutool.core.collection.CollUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -19,15 +19,16 @@ public enum MappingType {
     /**
      * 一个key对应多个数据源对象
      */
-    ONE_TO_ONE((sources, keyMapper) -> CollUtil.isNotEmpty(sources) ? sources.stream()
+    ONE_TO_ONE((sources, keyMapper) -> CollectionUtils.isEmpty(sources) ?
+        Collections.emptyMap() : sources.stream()
         .filter(Objects::nonNull)
-        .collect(Collectors.toMap(keyMapper, Function.identity())) : Collections.emptyMap()),
+        .collect(Collectors.toMap(keyMapper, Function.identity()))),
 
     /**
      * 一个key对应一个数据源对象
      */
     ONE_TO_MORE((sources, keyMapper) -> {
-        if (CollUtil.isEmpty(sources)) {
+        if (CollectionUtils.isEmpty(sources)) {
             return Collections.emptyMap();
         }
         Map<Object, Object> results = new HashMap<>();

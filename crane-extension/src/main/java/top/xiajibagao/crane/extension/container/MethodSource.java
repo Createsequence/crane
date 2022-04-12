@@ -1,7 +1,9 @@
 package top.xiajibagao.crane.extension.container;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.ReflectionUtils;
+import top.xiajibagao.annotation.MappingType;
 import top.xiajibagao.crane.core.helper.BeanProperty;
 
 import java.lang.reflect.Method;
@@ -14,8 +16,12 @@ import java.util.*;
 @RequiredArgsConstructor
 public class MethodSource {
 
+    @Getter
+    private final MappingType mappingType;
     private final Object target;
+    @Getter
     private final Class<?> targetClass;
+    @Getter
     private final String containerName;
     private final Method sourceGetter;
     private final BeanProperty sourceKeyProperty;
@@ -29,7 +35,7 @@ public class MethodSource {
         return (Collection<Object>)ReflectionUtils.invokeMethod(sourceGetter, target, params);
     }
 
-    public Object getSourceKeyProperty(Object source) {
+    public Object getSourceKeyPropertyValue(Object source) {
         return ReflectionUtils.invokeMethod(sourceKeyProperty.getter(), source);
     }
 
