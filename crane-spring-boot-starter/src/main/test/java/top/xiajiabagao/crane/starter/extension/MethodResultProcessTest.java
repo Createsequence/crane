@@ -97,7 +97,7 @@ public class MethodResultProcessTest {
                     getActualMember(2).setName("老李"),
                     getActualMember(2).setName("老白")
                 ))
-                .setStudentNames(Arrays.asList("老王", "老白"))
+                .setStudentNames(Arrays.asList("老李", "老白"))
                 .setTeachers(Arrays.asList(
                     getActualMember(2).setName("小明").setSexName("男"),
                     getActualMember(2).setName("小明").setSexName("男")
@@ -105,6 +105,7 @@ public class MethodResultProcessTest {
         );
         List<Classroom> actualAfter = testService.listClassroom(true);
         System.out.println("after: " + objectMapper.writeValueAsString(actualAfter));
+        System.out.println("after: " + objectMapper.writeValueAsString(expectedAfter));
         Assertions.assertEquals(expectedAfter, actualAfter);
     }
 
