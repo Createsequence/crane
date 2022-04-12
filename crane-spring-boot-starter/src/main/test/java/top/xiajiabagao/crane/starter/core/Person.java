@@ -8,6 +8,7 @@ import top.xiajiabagao.crane.starter.common.TestContainer;
 import top.xiajibagao.annotation.Assemble;
 import top.xiajibagao.annotation.Disassemble;
 import top.xiajibagao.annotation.Prop;
+import top.xiajibagao.annotation.PropsTemplate;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
 
@@ -34,15 +35,18 @@ public class Person {
     private Integer sex;
     private String sexName;
 
-    @Assemble(container = EnumDictContainer.class, namespace = "gender", props = {
-        @Prop(src = "id", ref = "genderId"),
-        @Prop(src = "name", ref = "genderName")
-    })
+    @Assemble(container = EnumDictContainer.class, namespace = "gender", propTemplates = GenderTemplate.class)
     private Gender gender;
     private Integer genderId;
     private String genderName;
 
     @Disassemble(Person.class)
     List<Person> relatives;
+
+    @PropsTemplate({
+        @Prop(src = "id", ref = "genderId"),
+        @Prop(src = "name", ref = "genderName")
+    })
+    public interface GenderTemplate {}
 
 }
