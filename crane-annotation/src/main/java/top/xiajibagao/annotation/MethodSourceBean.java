@@ -81,6 +81,11 @@ public @interface MethodSourceBean {
          */
         Class[] paramTypes() default Collection.class;
 
+        /**
+         * sourceKey与数据源对象的对应关系
+         */
+        MappingType mappingType() default MappingType.ONE_TO_ONE;
+
     }
 
 }
