@@ -21,6 +21,13 @@
         </dependency>
 
         <dependency>
+            <groupId>top.xiajibagao</groupId>
+            <artifactId>crane-jackson-implement</artifactId>
+            <version>${project.parent.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
@@ -47,13 +54,15 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <scope>test</scope>
+            <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <scope>test</scope>
+            <optional>true</optional>
         </dependency>
+
     </dependencies>
 
 </project>

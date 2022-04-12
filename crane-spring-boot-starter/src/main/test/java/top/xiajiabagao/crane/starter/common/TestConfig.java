@@ -14,7 +14,7 @@ import top.xiajibagao.crane.starter.EnableCrane;
 @Configuration
 public class TestConfig {
 
-    @Bean
+    @Bean("TestObjectMapper")
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);

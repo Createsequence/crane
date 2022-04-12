@@ -1,11 +1,16 @@
 package top.xiajibagao.crane.starter;
 
 import cn.hutool.core.collection.CollUtil;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import top.xiajibagao.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
@@ -27,6 +32,11 @@ import top.xiajibagao.crane.extension.cache.ConfigurationCache;
 import top.xiajibagao.crane.extension.cache.OperationConfigurationCache;
 import top.xiajibagao.crane.extension.container.MethodSourceContainer;
 import top.xiajibagao.crane.extension.helper.OperateHelper;
+import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeAssembleHandler;
+import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeAssembleHandler;
+import top.xiajibagao.crane.jackson.impl.handler.ValueNodeAssembleHandler;
+import top.xiajibagao.crane.jackson.impl.module.DynamicJsonNodeModule;
+import top.xiajibagao.crane.jackson.impl.operator.JacksonOperatorFactory;
 
 import java.util.Map;
 
@@ -153,6 +163,62 @@ public class CraneAutoConfiguration {
         @Qualifier("DefaultCraneBeanOperateConfigurationParser") OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
         @Qualifier("DefaultCraneUnorderedOperationExecutor") OperationExecutor defaultOperationExecutor) {
         return new OperateHelper(configurationCache, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor);
+    }
+
+    @AutoConfigureAfter(CraneAutoConfiguration.class)
+    @ConditionalOnClass(JacksonOperatorFactory.class)
+    @Configuration
+    public static class CraneJacksonAutoConfiguration {
+
+        @Order
+        @Bean("DefaultCraneJacksonObjectMapper")
+        public ObjectMapper objectMapper() {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            return objectMapper;
+        }
+
+        @Order
+        @ConditionalOnMissingBean(OrderlyAssembleHandlerChain.class)
+        @Bean("DefaultCraneJacksonOrderlyAssembleHandlerChain")
+        public OrderlyAssembleHandlerChain orderlyAssembleHandlerChain(@Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper) {
+            OrderlyAssembleHandlerChain assembleHandlerChain = new OrderlyAssembleHandlerChain();
+            assembleHandlerChain.addHandler(new ArrayNodeAssembleHandler(objectMapper, assembleHandlerChain))
+                .addHandler(new ObjectNodeAssembleHandler(objectMapper))
+                .addHandler(new ValueNodeAssembleHandler(objectMapper));
+            return assembleHandlerChain;
+        }
+
+        @Order
+        @ConditionalOnMissingBean(BeanReflexOperatorFactory.class)
+        @Bean("DefaultCraneJacksonOperatorFactory")
+        public JacksonOperatorFactory jacksonOperatorFactory(
+            @Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper,
+            @Qualifier("DefaultCraneJacksonOrderlyAssembleHandlerChain") AssembleHandlerChain assembleHandlerChain) {
+            return new JacksonOperatorFactory(objectMapper, assembleHandlerChain);
+        }
+
+        @Order
+        @Bean("DefaultCraneJacksonDynamicJsonNodeModule")
+        public DynamicJsonNodeModule dynamicJsonNodeModule(
+            BeanFactory beanFactory,
+            @Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper defaultObjectMapper,
+            @Qualifier("DefaultCraneJacksonOperatorFactory") OperatorFactory defaultOperatorFactory,
+            @Qualifier("DefaultCraneBeanOperateConfigurationParser") OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
+            @Qualifier("DefaultCraneUnorderedOperationExecutor") OperationExecutor defaultOperationExecutor) {
+            return new DynamicJsonNodeModule(
+                beanFactory, defaultObjectMapper, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor
+            );
+        }
+
+        @Order
+        @Bean("DefaultCraneJacksonSerializeObjectMapper")
+        public ObjectMapper serializeObjectMapper(DynamicJsonNodeModule dynamicJsonNodeModule) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(dynamicJsonNodeModule);
+            return objectMapper;
+        }
+
     }
 
 }

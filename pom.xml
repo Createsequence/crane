@@ -54,6 +54,7 @@
     <module>crane-core</module>
     <module>crane-extension</module>
     <module>crane-spring-boot-starter</module>
+    <module>crane-jackson-implement</module>
   </modules>
 
   <dependencyManagement>

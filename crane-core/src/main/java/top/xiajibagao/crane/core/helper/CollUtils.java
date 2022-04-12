@@ -8,6 +8,7 @@ import org.springframework.lang.NonNull;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * {@link Collection}与{@link Map}集合工具类 <br />
@@ -18,6 +19,10 @@ import java.util.stream.Collectors;
 public final class CollUtils {
 
 	private CollUtils() {
+	}
+
+	public static <T> Stream<T> of(Collection<T> source) {
+		return CollUtil.defaultIfEmpty(source, Collections.emptyList()).stream();
 	}
 
 	@SafeVarargs

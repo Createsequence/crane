@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import top.xiajiabagao.crane.starter.common.Gender;
@@ -33,6 +34,7 @@ import java.util.Map;
 @SpringBootTest(classes = TestConfig.class)
 public class ProcessByOperateConfigurationAssistantTest {
 
+    @Qualifier("TestObjectMapper")
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -49,6 +51,7 @@ public class ProcessByOperateConfigurationAssistantTest {
     // 解析器
     @Autowired
     private GlobalConfiguration globalConfiguration;
+    @Qualifier("DefaultCraneBeanReflexOperatorFactory")
     @Autowired
     private OperatorFactory operatorFactory;
 
