@@ -62,6 +62,7 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
+        <optional>true</optional>
       </dependency>
 
       <dependency>
@@ -90,6 +91,7 @@
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
         <scope>test</scope>
+        <optional>true</optional>
       </dependency>
 
       <dependency>
@@ -98,6 +100,7 @@
         <version>${springboot.version}</version>
         <type>pom</type>
         <scope>import</scope>
+        <optional>true</optional>
       </dependency>
     </dependencies>
 
@@ -139,6 +142,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
+      <optional>true</optional>
     </dependency>
 
   </dependencies>
