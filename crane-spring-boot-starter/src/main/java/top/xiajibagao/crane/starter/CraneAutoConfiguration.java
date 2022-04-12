@@ -30,6 +30,7 @@ import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 import top.xiajibagao.crane.extension.aop.MethodResultProcessAspect;
 import top.xiajibagao.crane.extension.cache.ConfigurationCache;
 import top.xiajibagao.crane.extension.cache.OperationConfigurationCache;
+import top.xiajibagao.crane.extension.container.IntrospectContainer;
 import top.xiajibagao.crane.extension.container.MethodSourceContainer;
 import top.xiajibagao.crane.extension.helper.OperateHelper;
 import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeAssembleHandler;
@@ -120,6 +121,13 @@ public class CraneAutoConfiguration {
             beans.forEach((name, bean) -> container.register(bean));
         }
         return container;
+    }
+
+    @Order
+    @ConditionalOnMissingBean(MethodSourceContainer.class)
+    @Bean("DefaultCraneIntrospectContainer")
+    public IntrospectContainer introspectContainer() {
+        return new IntrospectContainer();
     }
 
     // ==================== 执行器 ====================
