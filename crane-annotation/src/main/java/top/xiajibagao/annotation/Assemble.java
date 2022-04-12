@@ -44,6 +44,11 @@ public @interface Assemble {
     Class<?> container() default Void.class;
 
     /**
+     * 容器实例在spring中的名称，当{@link #value()}或{@link #container()}有值时将用于一起查找容器
+     */
+    String containerName() default "";
+
+    /**
      * 指定容器中数据源对应的命名空间
      */
     String namespace() default "";

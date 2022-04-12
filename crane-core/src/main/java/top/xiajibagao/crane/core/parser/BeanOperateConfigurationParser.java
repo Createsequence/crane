@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import top.xiajibagao.annotation.Assemble;
 import top.xiajibagao.annotation.Disassemble;
@@ -117,7 +118,17 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
      */
     protected AssembleOperation createAssembleOperation(Field property, Assemble annotation, BeanOperationConfiguration configuration) {
         Set<String> aliases = CollUtils.toSet(Arrays.asList(annotation.aliases()));
-        Container container = (Container)beanFactory.getBean(annotation.container());
+        Container container;
+        if (CharSequenceUtil.isNotBlank(annotation.containerName())) {
+            if (ClassUtils.isAssignable(Container.class, annotation.container())) {
+                container = (Container)beanFactory.getBean(annotation.containerName(), annotation.container());
+            } else {
+                container = (Container)beanFactory.getBean(annotation.containerName());
+            }
+        } else {
+            container = (Container)beanFactory.getBean(annotation.container());
+        }
+
         // 解析属性配置
         List<AssembleProperty> properties = new ArrayList<>(CollStreamUtil.toList(
             Arrays.asList(annotation.props()), p -> new BeanAssembleProperty(p.value(), p.src())
