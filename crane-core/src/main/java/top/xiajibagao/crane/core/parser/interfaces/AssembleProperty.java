@@ -18,18 +18,15 @@ public interface AssembleProperty {
     static AssembleProperty empty() {
         return new AssembleProperty() {
             @Override
-            public String getReference() {
-                return "";
-            }
+            public String getReference() { return ""; }
             @Override
-            public boolean hasReference() {
-                return false;
-            }
+            public boolean hasReference() { return false; }
             @Override
-            public boolean hasResource() {
-                return false;
-            }
-
+            public boolean hasResource() { return false; }
+            @Override
+            public String getExp() { return ""; }
+            @Override
+            public Class<?> getExpType() { return Void.class; }
             @Override
             public String getResource() {
                 return "";
@@ -76,5 +73,23 @@ public interface AssembleProperty {
     default boolean hasResource() {
         return CharSequenceUtil.isNotBlank(getResource());
     }
+
+    /**
+     * 表达式
+     *
+     * @return java.lang.String
+     * @author huangchengxing
+     * @date 2022/4/13 0:08
+     */
+    String getExp();
+
+    /**
+     * 表达式返回值类型
+     *
+     * @return java.lang.Class<?>
+     * @author huangchengxing
+     * @date 2022/4/13 0:08
+     */
+    Class<?> getExpType();
 
 }

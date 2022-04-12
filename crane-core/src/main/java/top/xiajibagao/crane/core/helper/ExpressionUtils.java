@@ -1,7 +1,7 @@
-package top.xiajibagao.crane.extension.helper;
+package top.xiajibagao.crane.core.helper;
 
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.reflect.MethodSignature;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -10,8 +10,10 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 
+import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -29,7 +31,7 @@ public class ExpressionUtils {
      * 表达式解析器
      */
     private static final ExpressionParser PARSER = new SpelExpressionParser();
-    private static final Map<String, Expression> EXPRESSION_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, WeakReference<Expression>> EXPRESSION_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 获取通用表达式解析器
@@ -52,14 +54,15 @@ public class ExpressionUtils {
      * @date 2021/10/11 14:24
      */
     public static Expression parseExp(@NonNull String exp, boolean cached) {
-        Expression expression = EXPRESSION_CACHE.get(exp);
-        if (Objects.isNull(expression)) {
-            expression = PARSER.parseExpression(exp);
-            if (cached) {
-                EXPRESSION_CACHE.put(exp, expression);
-            }
-        }
-        return expression;
+        return Optional.ofNullable(EXPRESSION_CACHE.get(exp))
+            .map(WeakReference::get)
+            .orElseGet(() -> {
+                Expression expression = PARSER.parseExpression(exp);
+                if (cached) {
+                    EXPRESSION_CACHE.put(exp, new WeakReference<>(expression));
+                }
+                return expression;
+            });
     }
 
     /**
@@ -90,23 +93,25 @@ public class ExpressionUtils {
     public static <T> T execute(String exp, EvaluationContext context, Class<T> resultType, boolean cached) {
         return !StringUtils.hasText(exp) ? null : parseExp(exp, cached).getValue(context, resultType);
     }
-    
+
     /**
      * 注册方法参数
      *
-     * @param joinPoint 切点
-     * @param methodSignature 方法签名
+     * @param paramNames 参数名
+     * @param args 参数
      * @param context 上下文
      * @return org.springframework.expression.EvaluationContext
      * @author huangchengxing
      * @date 2022/3/23 21:01
      */
-    public static EvaluationContext registerMethodArgs(JoinPoint joinPoint, MethodSignature methodSignature, StandardEvaluationContext context) {
-        String[] paramNames = methodSignature.getParameterNames();
-        Object[] params = joinPoint.getArgs();
-        for (int i = 0; i < params.length; i++) {
-            context.setVariable(paramNames[i], params[i]);
-        }
+    public static EvaluationContext registerMethodArgs(
+        @NonNull Collection<String> paramNames, @NonNull Collection<Object> args, StandardEvaluationContext context) {
+        Assert.isTrue(
+            CollUtil.size(paramNames) == CollUtil.size(args),
+            "参数名与参数个数不一致: [{}]/[{}]",
+            CollUtil.size(paramNames), CollUtil.size(args)
+        );
+        CollUtil.zip(paramNames, args).forEach(context::setVariable);
         return context;
     }
 

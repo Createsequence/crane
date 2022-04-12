@@ -131,7 +131,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
 
         // 解析属性配置
         List<AssembleProperty> properties = new ArrayList<>(CollStreamUtil.toList(
-            Arrays.asList(annotation.props()), p -> new BeanAssembleProperty(p.value(), p.src())
+            Arrays.asList(annotation.props()), p -> new BeanAssembleProperty(p.value(), p.src(), p.exp(), p.expType())
         ));
         // 若存在属性模板，则解析模板，并将属性配置加入当前配置
         Stream.of(annotation.propTemplates())
@@ -166,7 +166,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
             return Collections.emptyList();
         }
         return Stream.of(annotation.value())
-            .map(p -> new BeanAssembleProperty(p.value(), p.src()))
+            .map(p -> new BeanAssembleProperty(p.value(), p.src(), p.exp(), p.expType()))
             .collect(Collectors.toList());
     }
 

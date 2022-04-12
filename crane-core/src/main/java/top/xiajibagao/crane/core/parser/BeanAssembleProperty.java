@@ -14,5 +14,7 @@ public class BeanAssembleProperty implements AssembleProperty {
 
     private final String reference;
     private final String resource;
+    private final String exp;
+    private final Class<?> expType;
 
 }

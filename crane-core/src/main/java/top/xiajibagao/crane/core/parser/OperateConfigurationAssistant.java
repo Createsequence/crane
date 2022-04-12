@@ -191,9 +191,14 @@ public class OperateConfigurationAssistant<T> {
         }
 
         public AssembleOperationBuilder<T> property(String resource, String reference) {
+            return property(resource, reference, "", Void.class);
+        }
+
+        public AssembleOperationBuilder<T> property(String resource, String reference, String exp, Class<?> expType) {
             properties.add(new BeanAssembleProperty(
                 CharSequenceUtil.blankToDefault(reference, ""),
-                CharSequenceUtil.blankToDefault(resource, "")
+                CharSequenceUtil.blankToDefault(resource, ""),
+                exp, expType
             ));
             return this;
         }

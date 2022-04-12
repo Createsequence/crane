@@ -10,11 +10,12 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import top.xiajibagao.crane.core.helper.ExpressionUtils;
 import top.xiajibagao.crane.extension.cache.ConfigurationCache;
 import top.xiajibagao.crane.extension.helper.ConfigOptionAnnotationProcessor;
-import top.xiajibagao.crane.extension.helper.ExpressionUtils;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -53,7 +54,9 @@ public class MethodResultProcessAspect extends ConfigOptionAnnotationProcessor<M
         // 先执行表达式
         Boolean isProcess = Boolean.TRUE;
         StandardEvaluationContext context = new StandardEvaluationContext();
-        ExpressionUtils.registerMethodArgs(joinPoint, methodSignature, context);
+        String[] paramNames = methodSignature.getParameterNames();
+        Object[] params = joinPoint.getArgs();
+        ExpressionUtils.registerMethodArgs(Arrays.asList(paramNames), Arrays.asList(params), context);
         context.setVariable("result", result);
         try {
             isProcess = ExpressionUtils.execute(condition, context, Boolean.class, true);
