@@ -1,10 +1,12 @@
 package top.xiajibagao.crane.core.helper;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.func.Consumer3;
+import cn.hutool.core.stream.StreamUtil;
 import org.springframework.lang.NonNull;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 /**
@@ -18,6 +20,103 @@ public final class CollUtils {
 	private CollUtils() {
 	}
 
+	@SafeVarargs
+	public static <T> List<T> asList(T... targets) {
+		return ObjectUtils.computeIfNotNull(targets, Arrays::asList, Collections.emptyList());
+	}
+
+	/**
+	 * 集合中的非空元素是否有任意一项符合条件，若集合为空，则返回false
+	 *
+	 * @param source 源集合
+	 * @param predicate 校验
+	 * @param ifEmpty 当集合为空的时返回值
+	 * @return boolean
+	 * @author huangchengxing
+	 * @date 2022/4/11 10:09
+	 */
+	public static <T> boolean anyMatch(Collection<T> source, Predicate<T> predicate, boolean ifEmpty) {
+		return CollUtil.isNotEmpty(source) ? source.stream()
+			.filter(Objects::nonNull)
+			.anyMatch(predicate) : ifEmpty;
+	}
+
+	/**
+	 * 集合中的非空元素是否有任意一项符合条件，若集合为空，则返回false
+	 *
+	 * @param targets 源集合
+	 * @param predicate 校验
+	 * @param ifEmpty 当集合为空的时返回值
+	 * @return boolean
+	 * @author huangchengxing
+	 * @date 2022/4/11 10:09
+	 */
+	@SafeVarargs
+	public static <T> boolean anyMatch(Predicate<T> predicate, boolean ifEmpty, T... targets) {
+		return anyMatch(asList(targets), predicate, ifEmpty);
+	}
+
+	/**
+	 * 集合中的非空元素是否全部符合条件，若集合为空，则返回false
+	 *
+	 * @param source 源集合
+	 * @param predicate 校验
+	 * @param ifEmpty 当集合为空的时返回值
+	 * @return boolean
+	 * @author huangchengxing
+	 * @date 2022/4/11 10:09
+	 */
+	public static <T> boolean allMatch(Collection<T> source, Predicate<T> predicate, boolean ifEmpty) {
+		return CollUtil.isNotEmpty(source) ? source.stream()
+			.filter(Objects::nonNull)
+			.allMatch(predicate) : ifEmpty;
+	}
+
+	/**
+	 * 集合中的非空元素是否全部符合条件，若集合为空，则返回false
+	 *
+	 * @param targets 源集合
+	 * @param predicate 校验
+	 * @param ifEmpty 当集合为空的时返回值
+	 * @return boolean
+	 * @author huangchengxing
+	 * @date 2022/4/11 10:09
+	 */
+	@SafeVarargs
+	public static <T> boolean allMatch(Predicate<T> predicate, boolean ifEmpty, T... targets) {
+		return anyMatch(asList(targets), predicate, ifEmpty);
+	}
+
+	/**
+	 * 集合中的非空元素是否全部不符合条件，若集合为空，则返回true
+	 *
+	 * @param source 源集合
+	 * @param predicate 校验
+	 * @param ifEmpty 当集合为空的时返回值
+	 * @return boolean
+	 * @author huangchengxing
+	 * @date 2022/4/11 10:09
+	 */
+	public static <T> boolean noneMatch(Collection<T> source, Predicate<T> predicate, boolean ifEmpty) {
+		return CollUtil.isNotEmpty(source) ? source.stream()
+			.filter(Objects::nonNull)
+			.noneMatch(predicate) : ifEmpty;
+	}
+
+	/**
+	 * 集合中的非空元素是否全部不符合条件，若集合为空，则返回true
+	 *
+	 * @param predicate 校验
+	 * @param ifEmpty 当集合为空的时返回值
+	 * @param targets 源集合
+	 * @return boolean
+	 * @author huangchengxing
+	 * @date 2022/4/11 10:09
+	 */
+	@SafeVarargs
+	public static <T> boolean noneMatch(Predicate<T> predicate, boolean ifEmpty, T... targets) {
+		return noneMatch(asList(targets), predicate, ifEmpty);
+	}
 
 	/**
 	 * 将一个集合转为另一指定集合, 总是过滤转换源集合与转换后的集合中为null的元素 <br />
@@ -130,6 +229,104 @@ public final class CollUtils {
 			return Arrays.asList((Object[])target);
 		}
 		return Collections.singletonList(target);
+	}
+
+	/**
+	 * 遍历集合中的非空元素
+	 *
+	 * @param source 源集合
+	 * @param consumer 操作
+	 * @author huangchengxing
+	 * @date 2022/4/11 10:12
+	 */
+	public static <T> void forEach(Iterable<T> source, Consumer<T> consumer) {
+		if (CollUtil.isEmpty(source)) {
+			return;
+		}
+		for (T t : source) {
+			if (Objects.nonNull(t)) {
+				consumer.accept(t);
+			}
+		}
+	}
+
+	/**
+	 * 遍历集合中的非空元素
+	 *
+	 * @param source 源集合
+	 * @param consumer 操作
+	 * @author huangchengxing
+	 * @date 2022/4/11 10:12
+	 */
+	public static <T> void flatForEach(Iterable<Iterable<T>> source, Consumer<T> consumer) {
+		if (CollUtil.isEmpty(source)) {
+			return;
+		}
+		StreamUtil.of(source)
+			.filter(CollUtil::isNotEmpty)
+			.flatMap(StreamUtil::of)
+			.filter(Objects::nonNull)
+			.forEach(consumer);
+	}
+
+	/**
+	 * 遍历两个集合中的非空元素
+	 *
+	 * @param source1 源集合1
+	 * @param source2 源集合2
+	 * @param consumer 操作
+	 * @author huangchengxing
+	 * @date 2022/4/11 10:12
+	 */
+	public static <T, R> void biForEach(Iterable<T> source1, Iterable<R> source2, BiConsumer<T, R> consumer) {
+		if (CollUtil.isEmpty(source1) || CollUtil.isEmpty(source2)) {
+			return;
+		}
+		for (T t : source1) {
+			if (Objects.isNull(t)) {
+				continue;
+			}
+			for (R r : source2) {
+				if (Objects.isNull(r)) {
+					continue;
+				}
+				consumer.accept(t, r);
+			}
+		}
+	}
+
+	/**
+	 * 遍历两个集合中的非空元素
+	 *
+	 * @param source 源集合
+	 * @param consumer 操作
+	 * @author huangchengxing
+	 * @date 2022/4/11 10:12
+	 */
+	public static <R, C, V> void forEach(Map<R, ? extends Map<C, V>> source, Consumer3<R, C, V> consumer) {
+		if (CollUtil.isEmpty(source)) {
+			return;
+		}
+		source.forEach((rowKey, colMap) -> colMap.forEach((colKey, val) -> consumer.accept(rowKey, colKey, val)));
+	}
+
+	/**
+	 * 遍历集合中的非空元素
+	 *
+	 * @param source 源集合
+	 * @param consumer 操作
+	 * @author huangchengxing
+	 * @date 2022/4/11 10:12
+	 */
+	public static <K, V> void forEach(Map<K, ? extends Collection<V>> source, BiConsumer<K, V> consumer) {
+		if (CollUtil.isEmpty(source)) {
+			return;
+		}
+		source.forEach((k ,vs) -> vs.forEach(v -> {
+			if (Objects.nonNull(k) && Objects.nonNull(v)) {
+				consumer.accept(k, v);
+			}
+		}));
 	}
 
 }

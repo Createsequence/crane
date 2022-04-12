@@ -4,6 +4,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.MultiValueMap;
+import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.EnumDict;
 
 import java.util.Map;
@@ -32,12 +33,12 @@ public class EnumDictContainer extends BaseNamespaceContainer<String, EnumDict.E
     @Override
     protected Map<String, Map<String, EnumDict.EnumDictItem<?>>> getSources(MultiValueMap<String, String> namespaceAndKeys) {
         Table<String, String, EnumDict.EnumDictItem<?>> results = HashBasedTable.create();
-        namespaceAndKeys.forEach((namespace, keys) -> keys.forEach(key -> {
+        CollUtils.forEach(namespaceAndKeys, (namespace, key) -> {
             EnumDict.EnumDictItem<?> item = enumDict.getItem(namespace, key);
             if (Objects.nonNull(item)) {
                 results.put(namespace, key, item);
             }
-        }));
+        });
         return results.rowMap();
     }
 

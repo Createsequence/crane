@@ -8,6 +8,8 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * 函数式接口工具类
@@ -73,6 +75,18 @@ public class FuncUtils {
                 SERIALIZED_LAMBDA_CACHE.put(func.getClass().getName(), new WeakReference<>(lambda));
                 return lambda;
             });
+    }
+
+    public static <T> Consumer<T> doNothing() {
+        return t -> {};
+    }
+
+    public static <T, R> Function<T, R> alwaysNull() {
+        return t -> null;
+    }
+
+    public static <T, R> Function<T, R> always(R defaultValue) {
+        return t -> defaultValue;
     }
 
 }

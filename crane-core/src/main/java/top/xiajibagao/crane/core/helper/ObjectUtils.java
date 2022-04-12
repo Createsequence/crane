@@ -27,7 +27,21 @@ public class ObjectUtils {
     public static <T> T defaultIfNull(T target, T def) {
         return Objects.isNull(target) ? def : target;
     }
-    
+
+    /**
+     * 若指定值不为空，则对其机芯操作
+     *
+     * @param target 指定值
+     * @param consumer 操作
+     * @author huangchengxing
+     * @date 2022/3/1 13:39
+     */
+    public static <T> void acceptIfNotNull(T target, Consumer<T> consumer) {
+        if (Objects.nonNull(target)) {
+            consumer.accept(target);
+        }
+    }
+
     /**
      * 若指定值不为空，则将其映射另一值并返回，若前者或后者为空则都将返回默认值
      *
@@ -99,7 +113,7 @@ public class ObjectUtils {
     public static void tryAction(Runnable runnable, Consumer<Throwable> failAction) {
         try {
             runnable.run();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             failAction.accept(e);
         }
     }
@@ -116,7 +130,7 @@ public class ObjectUtils {
         T result = null;
         try {
             result = supplier.get();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             failAction.accept(e);
         }
         return result;
@@ -134,9 +148,27 @@ public class ObjectUtils {
         try {
             T result = supplier.get();
             successAction.accept(result);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             failAction.accept(e);
         }
+    }
+    
+    /**
+     * 目标对象为指定类型或其子类的实例，则将其转为指定类型并追加操作
+     *
+     * @param target 目标对象
+     * @param targetClass 指定类型
+     * @param consumer 消费者
+     * @return boolean 目标对象为指定类型或其子类的实例
+     * @author huangchengxing
+     * @date 2022/4/10 9:24
+     */
+    public static <T> boolean instanceOf(Object target, Class<T> targetClass, Consumer<T> consumer) {
+        if (Objects.isNull(target) || !target.getClass().isAssignableFrom(targetClass)) {
+            return false;
+        }
+        consumer.accept(targetClass.cast(target));
+        return true;
     }
 
 }

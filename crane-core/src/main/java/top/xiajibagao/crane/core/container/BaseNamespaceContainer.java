@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
@@ -40,23 +41,21 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
         if (CollUtil.isEmpty(sources)) {
             return;
         }
-        for (Object target : targets) {
-            for (AssembleOperation operation : operations) {
-                Map<K, ?> keyMap = sources.get(operation.getNamespace());
-                if (CollUtil.isEmpty(keyMap)) {
-                    return;
-                }
-                Object key = operation.getAssembler().getKey(target, operation);
-                Object source = keyMap.get(parseKey(key));
-                if (Objects.isNull(source)) {
-                    return;
-                }
-                ObjectUtils.tryAction(
-                    () -> operation.getAssembler().execute(target, source, operation),
-                    x -> log.error("字段[{}]处理失败，错误原因：{}", operation.getTargetProperty(), x.getMessage())
-                );
+        CollUtils.biForEach(targets, operations, (target, operation) -> {
+            Map<K, ?> keyMap = sources.get(operation.getNamespace());
+            if (CollUtil.isEmpty(keyMap)) {
+                return;
             }
-        }
+            Object key = operation.getAssembler().getKey(target, operation);
+            Object source = keyMap.get(parseKey(key));
+            if (Objects.isNull(source)) {
+                return;
+            }
+            ObjectUtils.tryAction(
+                () -> operation.getAssembler().execute(target, source, operation),
+                x -> log.error("字段[{}]处理失败，错误原因：{}", operation.getTargetProperty(), x.getMessage())
+            );
+        });
     }
 
     /**

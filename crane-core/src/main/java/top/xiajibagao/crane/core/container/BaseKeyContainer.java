@@ -3,6 +3,7 @@ package top.xiajibagao.crane.core.container;
 import cn.hutool.core.collection.CollUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
@@ -41,18 +42,16 @@ public abstract class BaseKeyContainer<K> implements Container {
         if (CollUtil.isEmpty(sources)) {
             return;
         }
-        for (Object target : targets) {
-            operations.forEach(operation -> {
-                Object key = operation.getAssembler().getKey(target, operation);
-                Object source = sources.get(parseKey(key));
-                if (Objects.nonNull(source)) {
-                    ObjectUtils.tryAction(
-                        () -> operation.getAssembler().execute(target, source, operation),
-                        x -> log.error("字段[{}]处理失败，错误原因：{}", operation.getTargetProperty(), x.getMessage())
-                    );
-                }
-            });
-        }
+        CollUtils.biForEach(targets, operations, (target, operation) -> {
+            Object key = operation.getAssembler().getKey(target, operation);
+            Object source = sources.get(parseKey(key));
+            if (Objects.nonNull(source)) {
+                ObjectUtils.tryAction(
+                    () -> operation.getAssembler().execute(target, source, operation),
+                    x -> log.error("字段[{}]处理失败，错误原因：{}", operation.getTargetProperty(), x.getMessage())
+                );
+            }
+        });
     }
 
     /**
@@ -63,7 +62,7 @@ public abstract class BaseKeyContainer<K> implements Container {
      * @author huangchengxing
      * @date 2022/3/21 12:17
      */
-    protected abstract Map<K, ?> getSources(Set<K> keys);
+    protected abstract Map<K, Object> getSources(Set<K> keys);
 
     /**
      * 从对象中获取所需要的数据源id

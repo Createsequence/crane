@@ -17,7 +17,7 @@ public class TestContainer extends BaseKeyContainer<Integer> {
     private Map<Integer, Object> mockDatas = new HashMap<>();
 
     @Override
-    protected Map<Integer, ?> getSources(Set<Integer> keys) {
+    protected Map<Integer, Object> getSources(Set<Integer> keys) {
         return mockDatas;
     }
 
