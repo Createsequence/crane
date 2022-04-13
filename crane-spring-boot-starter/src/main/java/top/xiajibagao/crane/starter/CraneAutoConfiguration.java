@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import top.xiajibagao.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
@@ -70,14 +71,14 @@ public class CraneAutoConfiguration {
     @Order
     @ConditionalOnMissingBean(OrderlyAssembleHandlerChain.class)
     @Bean("DefaultCraneOrderlyAssembleHandlerChain")
-    public OrderlyAssembleHandlerChain orderlyAssembleHandlerChain() {
+    public AssembleHandlerChain orderlyAssembleHandlerChain() {
         OrderlyAssembleHandlerChain assembleHandlerChain = new OrderlyAssembleHandlerChain();
         assembleHandlerChain.addHandler(new MapAssembleHandler())
             .addHandler(new CollectionAssembleHandler(assembleHandlerChain))
             .addHandler(new ArrayAssembleHandler(assembleHandlerChain))
             .addHandler(new MapAssembleHandler())
             .addHandler(new BeanAssembleHandler());
-        return assembleHandlerChain;
+        return new ExpressibleAssembleHandlerChain(assembleHandlerChain, StandardEvaluationContext::new);
     }
 
     @Order
@@ -189,12 +190,12 @@ public class CraneAutoConfiguration {
         @Order
         @ConditionalOnMissingBean(OrderlyAssembleHandlerChain.class)
         @Bean("DefaultCraneJacksonOrderlyAssembleHandlerChain")
-        public OrderlyAssembleHandlerChain orderlyAssembleHandlerChain(@Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper) {
+        public AssembleHandlerChain orderlyAssembleHandlerChain(@Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper) {
             OrderlyAssembleHandlerChain assembleHandlerChain = new OrderlyAssembleHandlerChain();
             assembleHandlerChain.addHandler(new ArrayNodeAssembleHandler(objectMapper, assembleHandlerChain))
                 .addHandler(new ObjectNodeAssembleHandler(objectMapper))
                 .addHandler(new ValueNodeAssembleHandler(objectMapper));
-            return assembleHandlerChain;
+            return new ExpressibleAssembleHandlerChain(assembleHandlerChain, StandardEvaluationContext::new);
         }
 
         @Order

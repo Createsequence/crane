@@ -69,7 +69,7 @@ public class ExpressibleAssembleHandlerChain implements AssembleHandlerChain {
         context.setVariable("key", operation.getAssembler().getKey(target, operation));
         context.setVariable("src", property.getResource());
         context.setVariable("ref", property.getReference());
-        sourceData = ExpressionUtils.execute(property.getExp(), property.getExpType(), true);
+        sourceData = ExpressionUtils.execute(property.getExp(), context, property.getExpType(), true);
         handlerChain.writeToTarget(sourceData, target, property, operation);
     }
 }
