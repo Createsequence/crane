@@ -20,6 +20,11 @@ import top.xiajibagao.crane.extension.aop.ProcessResult;
 import java.util.*;
 
 /**
+ * 测试扩展功能：
+ * 1、方法拦截切面能否正确处理方法单个/多个的嵌套/非嵌套返回值数据；
+ * 2、方法拦截切面的条件表达式是否能正确生效；
+ * 3、方法调用是否能正确从数据源容器根据命名空间获取数据源；
+ *
  * @author huangchengxing
  * @date 2022/04/10 22:33
  */
@@ -55,6 +60,9 @@ public class MethodResultProcessTest {
             .put(1, mockData);
     }
 
+    /**
+     * 返回值为单个嵌套对象
+     */
     @SneakyThrows
     @Test
     public void testSingleResultMethodAop() {
@@ -76,6 +84,9 @@ public class MethodResultProcessTest {
         System.out.println("after: " + objectMapper.writeValueAsString(actualAfter));
     }
 
+    /**
+     * 返回值为多个嵌套对象
+     */
     @SneakyThrows
     @Test
     public void testMultiResultsMethodAop() {
@@ -116,11 +127,17 @@ public class MethodResultProcessTest {
     @MethodSourceBean
     public static class TestService {
 
+        /**
+         * 方法返回单个Classroom对象，isHandler为false时应当不对返回值做处理
+         */
         @ProcessResult(targetClass = Classroom.class, condition = "#isHandler")
         public Classroom getClassroom(Boolean isHandler) {
             return getActualClassroom(1);
         }
 
+        /**
+         * 方法返回Classroom对象集合，isHandler为false时应当不对返回值做处理
+         */
         @ProcessResult(targetClass = Classroom.class, condition = "#isHandler")
         public List<Classroom> listClassroom(Boolean isHandler) {
             return Arrays.asList(
@@ -129,6 +146,9 @@ public class MethodResultProcessTest {
             );
         }
 
+        /**
+         * 数据源方法，提供命名空间为student，返回值为Member，且分组id为classroomId, 与待处理对象关系为多对一的数据源
+         */
         @MethodSourceBean.Method(namespace = "student", sourceType = Member.class, sourceKey = "classroomId", mappingType = MappingType.ONE_TO_MORE)
         public List<Member> listStudents(Set<Integer> classroomIds) {
             return Arrays.asList(

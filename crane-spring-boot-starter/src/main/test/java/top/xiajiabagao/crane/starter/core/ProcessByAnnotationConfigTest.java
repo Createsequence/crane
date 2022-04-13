@@ -26,7 +26,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 测试javaBean基于注解的操作
+ * 测试javaBean基于注解配置
+ * 1、是否能正确处理单个/多个的嵌套/非嵌套对象；
+ * 2、是否能正确处理字段映射模板；
  *
  * @author huangchengxing
  * @date 2022/04/10 15:15

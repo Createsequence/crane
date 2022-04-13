@@ -16,6 +16,7 @@ import top.xiajiabagao.crane.starter.common.TestConfig;
 import top.xiajiabagao.crane.starter.common.TestContainer;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
+import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.OperateConfigurationAssistant;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
@@ -27,14 +28,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 测试基于手动配置，是否能正确处理单个/多个的嵌套/非嵌套对象
+ * 表达式测试
+ * 1、测试是字段映射配置的SpEL表达式是否能正确执行；
+ * 2、测试是使用顺序执行器时，是否能按照排序正确执行；
  *
  * @author huangchengxing
- * @date 2022/04/10 17:56
+ * @date 2022/04/13 12:55
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConfig.class)
-public class ProcessByOperateConfigurationAssistantTest {
+public class ExpressionTest {
 
     @Qualifier("TestObjectMapper")
     @Autowired
@@ -56,6 +59,9 @@ public class ProcessByOperateConfigurationAssistantTest {
     @Qualifier("DefaultCraneBeanReflexOperatorFactory")
     @Autowired
     private OperatorFactory operatorFactory;
+    @Qualifier("DefaultCraneSequentialOperationExecutor")
+    @Autowired
+    OperationExecutor operationExecutor;
 
     private static Person getActualPerson() {
         return new Person()
@@ -72,14 +78,18 @@ public class ProcessByOperateConfigurationAssistantTest {
             .namespace("gender")
             .property("id", Person::getGenderId)
             .property("name", Person::getGenderName)
+            .sort(2)
             .build();
         assistant.buildAssembler(Person::getSex, keyValueContainer)
             .namespace("sex")
-            .onlyRefProperty(Person::getSexName)
+            .property("", "sexName", "#source == '男' ? 'male' : 'female'", String.class)
+            .property("", "name", "#source == '男' ? #target.name + '先生' : #target.name + '女士'", String.class)
+            .sort(1)
             .build();
         assistant.buildAssembler(Person::getId, testContainer)
             .property("beanName", "name")
             .property("beanAge", "age")
+            .sort(0)
             .build();
         assistant.buildDisassembler(Person::getRelatives, assistant.getConfiguration()).build();
         return assistant.getConfiguration();
@@ -91,8 +101,8 @@ public class ProcessByOperateConfigurationAssistantTest {
             .setSex(1)
             .setGender(Gender.MALE)
             .setAge(35)
-            .setName("小明")
-            .setSexName("男")
+            .setName("小明先生")
+            .setSexName("male")
             .setGenderId(Gender.MALE.getId())
             .setGenderName(Gender.MALE.getName());
     }
@@ -100,7 +110,7 @@ public class ProcessByOperateConfigurationAssistantTest {
     private void processAndLog(Object actual) throws JsonProcessingException {
         OperationConfiguration configuration = getConfiguration();
         System.out.println("before: " + objectMapper.writeValueAsString(actual));
-        operateHelper.process(actual, configuration);
+        operateHelper.process(actual, configuration, operationExecutor);
         System.out.println("after: " + objectMapper.writeValueAsString(actual));
     }
 
@@ -185,4 +195,5 @@ public class ProcessByOperateConfigurationAssistantTest {
         };
         Assertions.assertEquals(Arrays.asList(expected), Arrays.asList(actual));
     }
+
 }
