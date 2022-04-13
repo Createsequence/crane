@@ -819,17 +819,14 @@ public class BeanPerson {
 
 - [x] 改造为多模块项目，分离注解模块、核心模块与 Json 和普通 JavaBean 等功能实现模块；
 
-- [x] 操作者中的具体字段处理支持自定义或者通过类似 MessageConverter 的机制进行集中配置；
+- [x] 操作者中的具体字段处理支持自定义或者通过类似 MessageConverter 的责任链或策略机制进行集中配置；
 
-- [ ] 字段配置支持 SpEL 表达式，比如：
+- [x] 字段配置支持 SpEL 表达式，比如：
 
   ~~~java
   @Assemble(
       container = DBContainer.class,
-      props = {
-          @Prop(src = "src.dept.?name", ref = "deptName"),
-          @Prop(exp = "src.role = ref.roleInfo")
-      }
+      props = @Prop(src = "sex", ref = "name", exp = "#source == '男' ? #target.name + '先生' : #target.name + '小姐'")
   )
   private Integer userId;
   ~~~
@@ -891,3 +888,5 @@ public class BeanPerson {
 - [ ] 增加一些全局配置项，比如字段解析异常时是否继续对当前对象解析等；
 
 - [ ] 完善测试用例；
+  
+- [ ] 发布v1.0.0版本，并提供完整的文档；
