@@ -3,14 +3,10 @@ package top.xiajibagao.crane.jackson.impl.operator;
 import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.ValueNode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.StringUtils;
-import top.xiajibagao.crane.core.exception.CraneException;
-import top.xiajibagao.crane.core.handler.OperateHandlerChain;
+import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.PairEntry;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -18,9 +14,7 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @author huangchengxing
@@ -43,96 +37,9 @@ public class JacksonAssembler implements Assembler {
             (JsonNode)source : objectMapper.valueToTree(source);
         CollUtil.defaultIfEmpty(operation.getProperties(), Collections.singletonList(AssembleProperty.empty()))
             .stream()
-            .map(property -> PairEntry.of(property, handlerChain.readFromSource(source, property, operation)))
+            .map(property -> PairEntry.of(property, handlerChain.readFromSource(sourceNode, property, operation)))
             .filter(PairEntry::hasValue)
-            .forEach(pair -> handlerChain.writeToTarget(pair.getValue(), target, pair.getKey(), operation));
-
-
-
-
-
-
-        // 存在字段配置
-        // TODO 此处字段处理策略应当可以自定义，或改为从特定容器中获取
-        operation.getProperties().forEach(prop -> {
-            if (sourceNode.isObject()) {
-                processPropertyIfObjectSourceNode(targetNode, (ObjectNode) sourceNode, prop, operation);
-            } else if (sourceNode.isValueNode()) {
-                processPropertyIfValueSourceNode(targetNode, (ValueNode) sourceNode, prop, operation);
-            } else if (sourceNode.isArray()) {
-                processPropertyIfArraySourceNode(targetNode, (ArrayNode) sourceNode, prop, operation);
-            } else {
-                CraneException.throwOf("节点[%s]为无法处理的节点类型:[%s]", sourceNode, sourceNode.getNodeType());
-            }
-        });
-    }
-
-    /**
-     * 若无具体字段配置，则将注解字段以及别名在目标节点中对应的字段节点全部替换为从容器中获取的数据源对应节点
-     *
-     * @param target 目标节点
-     * @param source 数据源节点
-     * @param operation 操作配置
-     * @author huangchengxing
-     * @date 2022/2/26 10:47
-     */
-    protected void processIfNonProperties(ObjectNode target, JsonNode source, AssembleOperation operation) {
-        Set<String> searchNames = new HashSet<>(operation.getTargetPropertyAliases());
-        searchNames.add(getTranslatedKeyPropertyName(operation));
-        for (String alias : searchNames) {
-            target.replace(alias, source);
-        }
-    }
-
-    /**
-     * 若数据源节点为对象类型，则根据字段配置将其字段替换或追加到当前目标节点中
-     *
-     * @param target 目标节点
-     * @param source 数据源节点
-     * @param property 字段配置
-     * @param operation 操作配置
-     * @author huangchengxing
-     * @date 2022/2/26 10:47
-     */
-    protected void processPropertyIfObjectSourceNode(ObjectNode target, ObjectNode source, AssembleProperty property, AssembleOperation operation) {
-        String targetProperty = translatePropertyName(property.getReference());
-        if (StringUtils.hasText(property.getResource())) {
-            // 设置了引用字段
-            String sourceProperty = translatePropertyName(property.getResource());
-            target.set(targetProperty, source.get(sourceProperty));
-        } else {
-            target.set(targetProperty, source);
-        }
-    }
-
-    /**
-     * 若数据源节点为值类型，则根据字段配置将其字段替换或追加到当前目标节点中
-     *
-     * @param target 目标节点
-     * @param source 数据源节点
-     * @param property 字段配置
-     * @param operation 操作配置
-     * @author huangchengxing
-     * @date 2022/2/26 10:47
-     */
-    protected void processPropertyIfValueSourceNode(ObjectNode target, ValueNode source, AssembleProperty property, AssembleOperation operation) {
-        String targetProperty = translatePropertyName(property.getReference());
-        target.set(targetProperty, source);
-    }
-
-    /**
-     * 若数据源节点为集合类型，则根据字段配置将其字段替换或追加到当前目标节点中
-     *
-     * @param target 目标节点
-     * @param source 数据源节点
-     * @param property 字段配置
-     * @param operation 操作配置
-     * @author huangchengxing
-     * @date 2022/2/26 10:47
-     */
-    protected void processPropertyIfArraySourceNode(ObjectNode target, ArrayNode source, AssembleProperty property, AssembleOperation operation) {
-        String targetProperty = translatePropertyName(property.getReference());
-        target.set(targetProperty, source);
+            .forEach(pair -> handlerChain.writeToTarget(pair.getValue(), targetNode, pair.getKey(), operation));
     }
 
     /**

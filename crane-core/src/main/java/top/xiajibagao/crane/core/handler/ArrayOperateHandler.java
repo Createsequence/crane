@@ -1,8 +1,11 @@
 package top.xiajibagao.crane.core.handler;
 
 import cn.hutool.core.util.ArrayUtil;
+import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
+import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.Operation;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -20,7 +23,7 @@ public class ArrayOperateHandler extends CollectionOperateHandler implements Ope
     }
 
     @Override
-    public boolean sourceCanRead(Object source, AssembleProperty property, AssembleOperation operation) {
+    public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
         return ArrayUtil.isArray(source);
     }
 
@@ -30,7 +33,7 @@ public class ArrayOperateHandler extends CollectionOperateHandler implements Ope
     }
 
     @Override
-    public Object readFromSource(Object source, AssembleProperty property, AssembleOperation operation) {
+    public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
         if (Objects.isNull(source) || ArrayUtil.isEmpty(source)) {
             return null;
         }

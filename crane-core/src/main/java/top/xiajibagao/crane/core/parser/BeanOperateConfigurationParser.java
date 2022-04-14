@@ -100,7 +100,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
 
         CraneException.throwIfFalse(
             CollectionUtils.isEmpty(operations) || !AnnotatedElementUtils.hasAnnotation(property, Disassemble.class),
-            "[%s]属性[$s]无法同时被%s和%s注解标记",
+            "[{}]属性[{}]无法同时被{}和{}注解标记",
             configuration.getTargetClass(), property, Assemble.class, Disassemble.class
         );
         return operations;

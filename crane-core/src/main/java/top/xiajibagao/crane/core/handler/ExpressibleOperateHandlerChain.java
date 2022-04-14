@@ -4,9 +4,12 @@ import cn.hutool.core.text.CharSequenceUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
+import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.ExpressionUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.Operation;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -43,7 +46,7 @@ public class ExpressibleOperateHandlerChain implements OperateHandlerChain {
     }
 
     @Override
-    public boolean sourceCanRead(Object source, AssembleProperty property, AssembleOperation operation) {
+    public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
         return handlerChain.sourceCanRead(source, property, operation);
     }
 
@@ -53,7 +56,7 @@ public class ExpressibleOperateHandlerChain implements OperateHandlerChain {
     }
 
     @Override
-    public Object readFromSource(Object source, AssembleProperty property, AssembleOperation operation) {
+    public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
         return handlerChain.readFromSource(source, property, operation);
     }
 

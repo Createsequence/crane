@@ -1,8 +1,10 @@
 package top.xiajibagao.crane.core.handler;
 
 import org.springframework.util.ClassUtils;
+import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.Operation;
 
 import java.util.Map;
 import java.util.Objects;
@@ -16,7 +18,7 @@ import java.util.Objects;
 public class MapOperateHandler implements OperateHandler {
 
     @Override
-    public boolean sourceCanRead(Object source, AssembleProperty property, AssembleOperation operation) {
+    public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
         return ClassUtils.isAssignable(Map.class, source.getClass());
     }
 
@@ -26,7 +28,7 @@ public class MapOperateHandler implements OperateHandler {
     }
 
     @Override
-    public Object readFromSource(Object source, AssembleProperty property, AssembleOperation operation) {
+    public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
         if (Objects.isNull(source)) {
             return null;
         }

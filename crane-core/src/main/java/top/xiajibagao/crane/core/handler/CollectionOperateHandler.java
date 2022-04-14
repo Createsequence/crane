@@ -2,8 +2,11 @@ package top.xiajibagao.crane.core.handler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.ClassUtils;
+import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
+import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.Operation;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -21,7 +24,7 @@ public class CollectionOperateHandler implements OperateHandler {
     private final OperateHandlerChain handlerChain;
 
     @Override
-    public boolean sourceCanRead(Object source, AssembleProperty property, AssembleOperation operation) {
+    public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
         return ClassUtils.isAssignable(Collection.class, source.getClass());
     }
 
@@ -31,7 +34,7 @@ public class CollectionOperateHandler implements OperateHandler {
     }
 
     @Override
-    public Object readFromSource(Object source, AssembleProperty property, AssembleOperation operation) {
+    public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
         if (Objects.isNull(source)) {
             return null;
         }

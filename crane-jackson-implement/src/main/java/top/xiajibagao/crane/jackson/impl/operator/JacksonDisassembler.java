@@ -42,7 +42,7 @@ public class JacksonDisassembler implements Disassembler {
             results.add(targetPropertyNode);
         } else {
             CraneException.throwOf(
-                "对象[%s]的节点[%s]，无法拆卸为json数组或json对象",
+                "对象[{}]的节点[{}]，无法拆卸为json数组或json对象",
                 targetNode, targetPropertyNode
             );
         }

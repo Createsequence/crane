@@ -30,7 +30,7 @@ public class CraneException extends RuntimeException {
 
     public static void throwOf(String template, Object... params) {
         if (ArrayUtil.isNotEmpty(params)) {
-            throw new CraneException(String.format(template, params));
+            throw new CraneException(CharSequenceUtil.format(template, params));
         } else {
             throw new CraneException(template);
         }

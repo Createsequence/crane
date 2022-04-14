@@ -1,8 +1,10 @@
 package top.xiajibagao.crane.core.handler;
 
+import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.helper.ReflexUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.Operation;
 
 /**
  * 处理对象类型数据源与待处理对象，也是用于兜底的处理器
@@ -13,7 +15,7 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 public class BeanOperateHandler implements OperateHandler {
 
     @Override
-    public boolean sourceCanRead(Object source, AssembleProperty property, AssembleOperation operation) {
+    public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
         return true;
     }
 
@@ -23,7 +25,7 @@ public class BeanOperateHandler implements OperateHandler {
     }
 
     @Override
-    public Object readFromSource(Object source, AssembleProperty property, AssembleOperation operation) {
+    public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
         // 若指定数据源字段，则尝试从数据源上获取数据
         if (property.hasResource()) {
             return ReflexUtils.findProperty(source.getClass(), property.getResource())

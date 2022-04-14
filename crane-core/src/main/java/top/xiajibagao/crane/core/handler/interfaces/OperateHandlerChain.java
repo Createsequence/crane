@@ -1,8 +1,9 @@
-package top.xiajibagao.crane.core.handler;
+package top.xiajibagao.crane.core.handler.interfaces;
 
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.Operation;
 
 import java.util.List;
 
@@ -47,7 +48,7 @@ public interface OperateHandlerChain extends OperateHandler {
      * @date 2022/4/8 21:04
      */
     @Override
-    default boolean sourceCanRead(Object source, AssembleProperty property, AssembleOperation operation) {
+    default boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
         return handlers().stream().anyMatch(h -> h.sourceCanRead(source, property, operation));
     }
 
@@ -78,7 +79,7 @@ public interface OperateHandlerChain extends OperateHandler {
      * @date 2022/4/8 21:05
      */
     @Override
-    default Object readFromSource(Object source, AssembleProperty property, AssembleOperation operation) {
+    default Object readFromSource(Object source, AssembleProperty property, Operation operation) {
         return handlers()
             .stream()
             .filter(h -> h.sourceCanRead(source, property, operation))

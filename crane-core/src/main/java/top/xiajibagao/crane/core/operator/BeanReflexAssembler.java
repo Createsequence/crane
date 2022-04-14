@@ -4,9 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.exception.CraneException;
-import top.xiajibagao.crane.core.handler.OperateHandlerChain;
-import top.xiajibagao.crane.core.helper.ReflexUtils;
+import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
+import top.xiajibagao.crane.core.parser.BeanAssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 
@@ -45,9 +45,10 @@ public class BeanReflexAssembler implements Assembler {
     @Override
     public Object getKey(Object target, AssembleOperation operation) {
         checkType(target, operation);
-        return ReflexUtils.findProperty(operation.getOwner().getTargetClass(), operation.getTargetProperty().getName())
-            .map(dc -> dc.getValue(target))
-            .orElse(null);
+        return handlerChain.readFromSource(
+            target, new BeanAssembleProperty(null, operation.getTargetProperty().getName(), "", Void.class),
+            operation
+        );
     }
     
     /**
@@ -61,7 +62,7 @@ public class BeanReflexAssembler implements Assembler {
     private void checkType(Object target, AssembleOperation operation) {
         CraneException.throwIfFalse(
             operation.getOwner().getTargetClass().isAssignableFrom(target.getClass()),
-            "操作配置类型为[%s]，但待处理数据类型为[%s]",
+            "操作配置类型为[{}]，但待处理数据类型为[{}]",
             operation.getOwner().getTargetClass(), target.getClass()
         );
     }

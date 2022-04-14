@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import org.springframework.util.ClassUtils;
-import top.xiajibagao.crane.core.handler.OperateHandler;
+import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
 import java.util.Objects;
@@ -22,7 +23,7 @@ public class ValueNodeOperateHandler extends AbstractJacksonNodeOperateHandler i
     }
 
     @Override
-    public boolean sourceCanRead(Object source, AssembleProperty property, AssembleOperation operation) {
+    public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
         return Objects.nonNull(source) && ClassUtils.isAssignable(ValueNode.class, source.getClass());
     }
 
@@ -32,7 +33,7 @@ public class ValueNodeOperateHandler extends AbstractJacksonNodeOperateHandler i
     }
 
     @Override
-    public Object readFromSource(Object source, AssembleProperty property, AssembleOperation operation) {
+    public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
         if (Objects.isNull(source) || !(source instanceof ValueNode) || JacksonUtils.isNull((ValueNode)source)) {
             return NullNode.getInstance();
         }
