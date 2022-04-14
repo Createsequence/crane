@@ -10,7 +10,7 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
  * @author huangchengxing
  * @date 2022/04/08 16:44
  */
-public class BeanAssembleHandler implements AssembleHandler {
+public class BeanOperateHandler implements OperateHandler {
 
     @Override
     public boolean sourceCanRead(Object source, AssembleProperty property, AssembleOperation operation) {

@@ -1,7 +1,7 @@
 package top.xiajibagao.crane.jackson.impl.operator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import top.xiajibagao.crane.core.handler.AssembleHandlerChain;
+import top.xiajibagao.crane.core.handler.OperateHandlerChain;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
@@ -15,7 +15,7 @@ public class JacksonOperatorFactory implements OperatorFactory {
     private final Assembler assembler;
     private final Disassembler disassembler;
 
-    public JacksonOperatorFactory(ObjectMapper objectMapper, AssembleHandlerChain assembleHandlerChain) {
+    public JacksonOperatorFactory(ObjectMapper objectMapper, OperateHandlerChain assembleHandlerChain) {
         this.assembler = new JacksonAssembler(objectMapper, assembleHandlerChain);
         this.disassembler = new JacksonDisassembler(objectMapper);
     }

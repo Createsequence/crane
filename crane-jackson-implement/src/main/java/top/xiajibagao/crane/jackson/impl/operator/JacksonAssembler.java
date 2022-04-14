@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 import top.xiajibagao.crane.core.exception.CraneException;
-import top.xiajibagao.crane.core.handler.AssembleHandlerChain;
+import top.xiajibagao.crane.core.handler.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.PairEntry;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -31,7 +31,7 @@ import java.util.Set;
 public class JacksonAssembler implements Assembler {
 
     protected final ObjectMapper objectMapper;
-    private final AssembleHandlerChain assembleHandlerChain;
+    private final OperateHandlerChain handlerChain;
 
     @Override
     public void execute(Object target, Object source, AssembleOperation operation) {
@@ -43,9 +43,9 @@ public class JacksonAssembler implements Assembler {
             (JsonNode)source : objectMapper.valueToTree(source);
         CollUtil.defaultIfEmpty(operation.getProperties(), Collections.singletonList(AssembleProperty.empty()))
             .stream()
-            .map(property -> PairEntry.of(property, assembleHandlerChain.readFromSource(source, property, operation)))
+            .map(property -> PairEntry.of(property, handlerChain.readFromSource(source, property, operation)))
             .filter(PairEntry::hasValue)
-            .forEach(pair -> assembleHandlerChain.writeToTarget(pair.getValue(), target, pair.getKey(), operation));
+            .forEach(pair -> handlerChain.writeToTarget(pair.getValue(), target, pair.getKey(), operation));
 
 
 

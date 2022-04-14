@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.util.ClassUtils;
-import top.xiajibagao.crane.core.handler.AssembleHandler;
-import top.xiajibagao.crane.core.handler.AssembleHandlerChain;
+import top.xiajibagao.crane.core.handler.OperateHandler;
+import top.xiajibagao.crane.core.handler.OperateHandlerChain;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
@@ -19,11 +19,11 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/04/12 13:07
  */
-public class ArrayNodeAssembleHandler extends AbstractJacksonNodeAssembleHandler implements AssembleHandler {
+public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler implements OperateHandler {
 
-    private final AssembleHandlerChain handlerChain;
+    private final OperateHandlerChain handlerChain;
 
-    public ArrayNodeAssembleHandler(ObjectMapper objectMapper, AssembleHandlerChain assembleHandlerChain) {
+    public ArrayNodeOperateHandler(ObjectMapper objectMapper, OperateHandlerChain assembleHandlerChain) {
         super(objectMapper);
         this.handlerChain = assembleHandlerChain;
     }

@@ -22,9 +22,9 @@ import java.util.function.Supplier;
  */
 @Getter
 @RequiredArgsConstructor
-public class ExpressibleAssembleHandlerChain implements AssembleHandlerChain {
+public class ExpressibleOperateHandlerChain implements OperateHandlerChain {
 
-    private final AssembleHandlerChain handlerChain;
+    private final OperateHandlerChain handlerChain;
     private final Supplier<StandardEvaluationContext> contextFactory;
 
     @Override
@@ -33,12 +33,12 @@ public class ExpressibleAssembleHandlerChain implements AssembleHandlerChain {
     }
 
     @Override
-    public List<AssembleHandler> handlers() {
+    public List<OperateHandler> handlers() {
         return handlerChain.handlers();
     }
 
     @Override
-    public AssembleHandlerChain addHandler(AssembleHandler handler) {
+    public OperateHandlerChain addHandler(OperateHandler handler) {
         return handlerChain.addHandler(handler);
     }
 

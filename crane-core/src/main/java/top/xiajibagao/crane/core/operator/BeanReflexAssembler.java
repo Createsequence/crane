@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.exception.CraneException;
-import top.xiajibagao.crane.core.handler.AssembleHandlerChain;
+import top.xiajibagao.crane.core.handler.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.ReflexUtils;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -22,7 +22,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class BeanReflexAssembler implements Assembler {
 
-    private final AssembleHandlerChain assembleHandlerChain;
+    private final OperateHandlerChain handlerChain;
 
     @Override
     public void execute(Object target, Object source, AssembleOperation operation) {
@@ -34,11 +34,11 @@ public class BeanReflexAssembler implements Assembler {
             operation.getProperties(), Collections.singletonList(AssembleProperty.empty())
         );
         for (AssembleProperty property : properties) {
-            Object sourceData = assembleHandlerChain.readFromSource(source, property, operation);
+            Object sourceData = handlerChain.readFromSource(source, property, operation);
             if (Objects.isNull(sourceData)) {
                 return;
             }
-            assembleHandlerChain.writeToTarget(sourceData, target, property, operation);
+            handlerChain.writeToTarget(sourceData, target, property, operation);
         }
     }
 

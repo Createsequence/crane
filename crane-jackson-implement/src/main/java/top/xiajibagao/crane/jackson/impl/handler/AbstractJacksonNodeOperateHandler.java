@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import top.xiajibagao.crane.core.handler.AssembleHandler;
+import top.xiajibagao.crane.core.handler.OperateHandler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
@@ -15,7 +15,7 @@ import java.util.Collection;
  * @date 2022/04/12 13:23
  */
 @RequiredArgsConstructor
-public abstract class AbstractJacksonNodeAssembleHandler implements AssembleHandler {
+public abstract class AbstractJacksonNodeOperateHandler implements OperateHandler {
 
     protected final ObjectMapper objectMapper;
 

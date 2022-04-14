@@ -15,26 +15,26 @@ import java.util.List;
  * @author huangchengxing
  * @date 2022/04/08 20:35
  */
-public interface AssembleHandlerChain extends AssembleHandler {
+public interface OperateHandlerChain extends OperateHandler {
 
     /**
      * 获取处理器链
      *
-     * @return java.util.List<top.xiajibagao.crane.core.handlers.AssembleHandler>
+     * @return java.util.List<top.xiajibagao.crane.core.handlers.OperateHandler>
      * @author huangchengxing
      * @date 2022/4/8 20:35
      */
-    List<AssembleHandler> handlers();
+    List<OperateHandler> handlers();
 
     /**
      * 添加处理器节点
      *
      * @param handler 处理器节点
-     * @return top.xiajibagao.crane.core.handlers.AssembleHandlerChain
+     * @return top.xiajibagao.crane.core.handlers.OperateHandlerChain
      * @author huangchengxing
      * @date 2022/4/8 21:08
      */
-    AssembleHandlerChain addHandler(AssembleHandler handler);
+    OperateHandlerChain addHandler(OperateHandler handler);
     
     /**
      * 处理器链中是否存在可以从数据源中获取数据的节点

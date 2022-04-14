@@ -13,7 +13,7 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/04/08 9:54
  */
-public class MapAssembleHandler implements AssembleHandler {
+public class MapOperateHandler implements OperateHandler {
 
     @Override
     public boolean sourceCanRead(Object source, AssembleProperty property, AssembleOperation operation) {

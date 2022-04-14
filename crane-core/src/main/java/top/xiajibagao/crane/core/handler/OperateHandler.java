@@ -1,18 +1,17 @@
 package top.xiajibagao.crane.core.handler;
 
-import top.xiajibagao.crane.core.operator.interfaces.Assembler;
+import top.xiajibagao.crane.core.operator.interfaces.Operator;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 
 /**
- * 装配处理器 <br />
- * 用于在{@link Assembler}中用于从不同类型的数据源中根据配置获取所需要的数据，
- * 并将数据填充到不同类型的对象中。
+ * 操作处理器 <br />
+ * 用于在{@link Operator}中从不同类型的数据结构中读取或写入所需数据
  *
  * @author huangchengxing
  * @date 2022/04/06 19:55
  */
-public interface AssembleHandler {
+public interface OperateHandler {
 
     /**
      * 排序，越小越靠前

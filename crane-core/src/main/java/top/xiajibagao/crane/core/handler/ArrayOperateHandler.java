@@ -13,9 +13,9 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/04/08 16:39
  */
-public class ArrayAssembleHandler extends CollectionAssembleHandler  implements AssembleHandler {
+public class ArrayOperateHandler extends CollectionOperateHandler implements OperateHandler {
 
-    public ArrayAssembleHandler(AssembleHandlerChain handlerChain) {
+    public ArrayOperateHandler(OperateHandlerChain handlerChain) {
         super(handlerChain);
     }
 

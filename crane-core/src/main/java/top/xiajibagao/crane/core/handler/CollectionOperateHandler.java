@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
  * @date 2022/04/08 10:24
  */
 @RequiredArgsConstructor
-public class CollectionAssembleHandler implements AssembleHandler {
+public class CollectionOperateHandler implements OperateHandler {
 
-    private final AssembleHandlerChain handlerChain;
+    private final OperateHandlerChain handlerChain;
 
     @Override
     public boolean sourceCanRead(Object source, AssembleProperty property, AssembleOperation operation) {

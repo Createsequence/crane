@@ -34,9 +34,9 @@ import top.xiajibagao.crane.extension.cache.OperationConfigurationCache;
 import top.xiajibagao.crane.extension.container.IntrospectContainer;
 import top.xiajibagao.crane.extension.container.MethodSourceContainer;
 import top.xiajibagao.crane.extension.helper.OperateHelper;
-import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeAssembleHandler;
-import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeAssembleHandler;
-import top.xiajibagao.crane.jackson.impl.handler.ValueNodeAssembleHandler;
+import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
+import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
+import top.xiajibagao.crane.jackson.impl.handler.ValueNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.module.DynamicJsonNodeModule;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonOperatorFactory;
 
@@ -69,22 +69,22 @@ public class CraneAutoConfiguration {
     // ==================== 操作者 ====================
 
     @Order
-    @ConditionalOnMissingBean(OrderlyAssembleHandlerChain.class)
-    @Bean("DefaultCraneOrderlyAssembleHandlerChain")
-    public AssembleHandlerChain orderlyAssembleHandlerChain() {
-        OrderlyAssembleHandlerChain assembleHandlerChain = new OrderlyAssembleHandlerChain();
-        assembleHandlerChain.addHandler(new MapAssembleHandler())
-            .addHandler(new CollectionAssembleHandler(assembleHandlerChain))
-            .addHandler(new ArrayAssembleHandler(assembleHandlerChain))
-            .addHandler(new MapAssembleHandler())
-            .addHandler(new BeanAssembleHandler());
-        return new ExpressibleAssembleHandlerChain(assembleHandlerChain, StandardEvaluationContext::new);
+    @ConditionalOnMissingBean(OrderlyOperateHandlerChain.class)
+    @Bean("DefaultCraneOrderlyOperateHandlerChain")
+    public OperateHandlerChain orderlyOperateHandlerChain() {
+        OrderlyOperateHandlerChain operateHandlerChain = new OrderlyOperateHandlerChain();
+        operateHandlerChain.addHandler(new MapOperateHandler())
+            .addHandler(new CollectionOperateHandler(operateHandlerChain))
+            .addHandler(new ArrayOperateHandler(operateHandlerChain))
+            .addHandler(new MapOperateHandler())
+            .addHandler(new BeanOperateHandler());
+        return new ExpressibleOperateHandlerChain(operateHandlerChain, StandardEvaluationContext::new);
     }
 
     @Order
     @ConditionalOnMissingBean(BeanReflexOperatorFactory.class)
     @Bean("DefaultCraneBeanReflexOperatorFactory")
-    public BeanReflexOperatorFactory reflexOperatorFactory(AssembleHandlerChain assembleHandlerChain) {
+    public BeanReflexOperatorFactory reflexOperatorFactory(OperateHandlerChain assembleHandlerChain) {
         return new BeanReflexOperatorFactory(assembleHandlerChain);
     }
 
@@ -188,14 +188,14 @@ public class CraneAutoConfiguration {
         }
 
         @Order
-        @ConditionalOnMissingBean(OrderlyAssembleHandlerChain.class)
-        @Bean("DefaultCraneJacksonOrderlyAssembleHandlerChain")
-        public AssembleHandlerChain orderlyAssembleHandlerChain(@Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper) {
-            OrderlyAssembleHandlerChain assembleHandlerChain = new OrderlyAssembleHandlerChain();
-            assembleHandlerChain.addHandler(new ArrayNodeAssembleHandler(objectMapper, assembleHandlerChain))
-                .addHandler(new ObjectNodeAssembleHandler(objectMapper))
-                .addHandler(new ValueNodeAssembleHandler(objectMapper));
-            return new ExpressibleAssembleHandlerChain(assembleHandlerChain, StandardEvaluationContext::new);
+        @ConditionalOnMissingBean(OrderlyOperateHandlerChain.class)
+        @Bean("DefaultCraneJacksonOrderlyOperateHandlerChain")
+        public OperateHandlerChain orderlyOperateHandlerChain(@Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper) {
+            OrderlyOperateHandlerChain assembleHandlerChain = new OrderlyOperateHandlerChain();
+            assembleHandlerChain.addHandler(new ArrayNodeOperateHandler(objectMapper, assembleHandlerChain))
+                .addHandler(new ObjectNodeOperateHandler(objectMapper))
+                .addHandler(new ValueNodeOperateHandler(objectMapper));
+            return new ExpressibleOperateHandlerChain(assembleHandlerChain, StandardEvaluationContext::new);
         }
 
         @Order
@@ -203,7 +203,7 @@ public class CraneAutoConfiguration {
         @Bean("DefaultCraneJacksonOperatorFactory")
         public JacksonOperatorFactory jacksonOperatorFactory(
             @Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper,
-            @Qualifier("DefaultCraneJacksonOrderlyAssembleHandlerChain") AssembleHandlerChain assembleHandlerChain) {
+            @Qualifier("DefaultCraneJacksonOrderlyOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
             return new JacksonOperatorFactory(objectMapper, assembleHandlerChain);
         }
 
