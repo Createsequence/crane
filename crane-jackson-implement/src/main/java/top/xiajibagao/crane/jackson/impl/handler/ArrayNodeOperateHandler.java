@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.util.ClassUtils;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
@@ -36,7 +35,7 @@ public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler i
 
     @Override
     public boolean targetCanWrite(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
-        return Objects.nonNull(target) && ClassUtils.isAssignable(ObjectNode.class, target.getClass());
+        return Objects.nonNull(target) && ClassUtils.isAssignable(ArrayNode.class, target.getClass());
     }
 
     @Override

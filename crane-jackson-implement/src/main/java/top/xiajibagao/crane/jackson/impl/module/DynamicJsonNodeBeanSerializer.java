@@ -39,7 +39,7 @@ public class DynamicJsonNodeBeanSerializer<T> extends StdSerializer<T> {
             return;
         }
         JsonNode jsonNode = objectMapper.valueToTree(value);
-        operationExecutor.execute(CollUtils.adaptToCollection(value), operationConfiguration);
+        operationExecutor.execute(CollUtils.adaptToCollection(jsonNode), operationConfiguration);
         objectMapper.writeTree(gen, jsonNode);
     }
 

@@ -1,11 +1,17 @@
 package top.xiajibagao.annotation;
 
+import java.lang.annotation.*;
+
 /**
  * 表明注解对象在通过jackson序列化时，需要进行数据填充
  *
  * @author huangchengxing
  * @date 2022/04/12 17:52
  */
+@MateAnnotation
+@Target(ElementType.TYPE_USE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface ProcessJacksonNode {
 
     /**

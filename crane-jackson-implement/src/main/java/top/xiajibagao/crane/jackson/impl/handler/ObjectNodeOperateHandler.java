@@ -55,6 +55,7 @@ public class ObjectNodeOperateHandler extends AbstractJacksonNodeOperateHandler 
         if (property.hasReference()) {
             String translatedReferenceName = translatePropertyName(property.getReference());
             parse(target).set(translatedReferenceName, (JsonNode)sourceData);
+            return;
         }
         // 未指定引用字段
         String nodeName = findNodeName(targetNode, operation.getTargetProperty().getName(), operation.getTargetPropertyAliases());
