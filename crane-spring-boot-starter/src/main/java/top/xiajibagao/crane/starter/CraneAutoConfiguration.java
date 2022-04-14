@@ -49,136 +49,148 @@ import java.util.Map;
  * @author huangchengxing
  * @date 2022/03/03 13:36
  */
+@Configuration
 public class CraneAutoConfiguration {
 
-    @Order
-    @ConditionalOnMissingBean(GlobalConfiguration.class)
-    @Bean("DefaultCraneGlobalConfiguration")
-    public GlobalConfiguration globalConfiguration() {
-        return new BeanGlobalConfiguration();
-    }
-    
-    // ==================== 解析器 ====================
+    /**
+     * 基础配置
+     */
+    @Configuration
+    public static class DefaultCraneAutoConfiguration {
 
-    @Order
-    @ConditionalOnMissingBean(BeanOperateConfigurationParser.class)
-    @Bean("DefaultCraneBeanOperateConfigurationParser")
-    public BeanOperateConfigurationParser beanOperateConfigurationParser(GlobalConfiguration configuration, BeanFactory beanFactory) {
-        return new BeanOperateConfigurationParser(configuration, beanFactory);
-    }
-
-    // ==================== 操作者 ====================
-
-    @Order
-    @ConditionalOnMissingBean(OrderlyOperateHandlerChain.class)
-    @Bean("DefaultCraneOrderlyOperateHandlerChain")
-    public OperateHandlerChain orderlyOperateHandlerChain() {
-        OrderlyOperateHandlerChain operateHandlerChain = new OrderlyOperateHandlerChain();
-        operateHandlerChain.addHandler(new MapOperateHandler())
-            .addHandler(new CollectionOperateHandler(operateHandlerChain))
-            .addHandler(new ArrayOperateHandler(operateHandlerChain))
-            .addHandler(new MapOperateHandler())
-            .addHandler(new BeanOperateHandler());
-        return new ExpressibleOperateHandlerChain(operateHandlerChain, StandardEvaluationContext::new);
-    }
-
-    @Order
-    @ConditionalOnMissingBean(BeanReflexOperatorFactory.class)
-    @Bean("DefaultCraneBeanReflexOperatorFactory")
-    public BeanReflexOperatorFactory reflexOperatorFactory(OperateHandlerChain assembleHandlerChain) {
-        return new BeanReflexOperatorFactory(assembleHandlerChain);
-    }
-
-
-    // ==================== 容器 ====================
-
-    @Order
-    @ConditionalOnMissingBean(EnumDict.class)
-    @Bean("DefaultCraneEnumDict")
-    public EnumDict enumDict() {
-        return EnumDict.instance();
-    }
-
-    @Order
-    @ConditionalOnMissingBean(EnumDictContainer.class)
-    @Bean("DefaultCraneEnumDictContainer")
-    public EnumDictContainer enumDictContainer(EnumDict enumDict) {
-        return new EnumDictContainer(enumDict);
-    }
-
-    @Order
-    @ConditionalOnMissingBean(KeyValueContainer.class)
-    @Bean("DefaultCraneKeyValueContainer")
-    public KeyValueContainer simpleKeyValueActuator() {
-        return new KeyValueContainer();
-    }
-    
-    @Order
-    @ConditionalOnMissingBean(MethodSourceContainer.class)
-    @Bean("DefaultCraneMethodSourceContainer")
-    public MethodSourceContainer methodSourceContainer(ApplicationContext applicationContext) {
-        MethodSourceContainer container = new MethodSourceContainer();
-        Map<String, Object> beans = applicationContext.getBeansWithAnnotation(MethodSourceBean.class);
-        if (CollUtil.isNotEmpty(beans)) {
-            beans.forEach((name, bean) -> container.register(bean));
+        @Order
+        @ConditionalOnMissingBean(GlobalConfiguration.class)
+        @Bean("DefaultCraneGlobalConfiguration")
+        public GlobalConfiguration globalConfiguration() {
+            return new BeanGlobalConfiguration();
         }
-        return container;
+
+        // ==================== 解析器 ====================
+
+        @Order
+        @ConditionalOnMissingBean(BeanOperateConfigurationParser.class)
+        @Bean("DefaultCraneBeanOperateConfigurationParser")
+        public BeanOperateConfigurationParser beanOperateConfigurationParser(GlobalConfiguration configuration, BeanFactory beanFactory) {
+            return new BeanOperateConfigurationParser(configuration, beanFactory);
+        }
+
+        // ==================== 操作者 ====================
+
+        @Order
+        @ConditionalOnMissingBean(OrderlyOperateHandlerChain.class)
+        @Bean("DefaultCraneOrderlyOperateHandlerChain")
+        public OperateHandlerChain orderlyOperateHandlerChain() {
+            OrderlyOperateHandlerChain operateHandlerChain = new OrderlyOperateHandlerChain();
+            operateHandlerChain.addHandler(new MapOperateHandler())
+                .addHandler(new CollectionOperateHandler(operateHandlerChain))
+                .addHandler(new ArrayOperateHandler(operateHandlerChain))
+                .addHandler(new MapOperateHandler())
+                .addHandler(new BeanOperateHandler());
+            return new ExpressibleOperateHandlerChain(operateHandlerChain, StandardEvaluationContext::new);
+        }
+
+        @Order
+        @ConditionalOnMissingBean(BeanReflexOperatorFactory.class)
+        @Bean("DefaultCraneBeanReflexOperatorFactory")
+        public BeanReflexOperatorFactory reflexOperatorFactory(@Qualifier("DefaultCraneOrderlyOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
+            return new BeanReflexOperatorFactory(assembleHandlerChain);
+        }
+
+        // ==================== 容器 ====================
+
+        @Order
+        @ConditionalOnMissingBean(EnumDict.class)
+        @Bean("DefaultCraneEnumDict")
+        public EnumDict enumDict() {
+            return EnumDict.instance();
+        }
+
+        @Order
+        @ConditionalOnMissingBean(EnumDictContainer.class)
+        @Bean("DefaultCraneEnumDictContainer")
+        public EnumDictContainer enumDictContainer(EnumDict enumDict) {
+            return new EnumDictContainer(enumDict);
+        }
+
+        @Order
+        @ConditionalOnMissingBean(KeyValueContainer.class)
+        @Bean("DefaultCraneKeyValueContainer")
+        public KeyValueContainer simpleKeyValueActuator() {
+            return new KeyValueContainer();
+        }
+
+        // ==================== 执行器 ====================
+
+        @Order
+        @ConditionalOnMissingBean(UnorderedOperationExecutor.class)
+        @Bean("DefaultCraneUnorderedOperationExecutor")
+        public UnorderedOperationExecutor unorderedOperationExecutor() {
+            return new UnorderedOperationExecutor();
+        }
+
+        @Order
+        @ConditionalOnMissingBean(SequentialOperationExecutor.class)
+        @Bean("DefaultCraneSequentialOperationExecutor")
+        public SequentialOperationExecutor operationExecutor() {
+            return new SequentialOperationExecutor();
+        }
+
     }
 
-    @Order
-    @ConditionalOnMissingBean(MethodSourceContainer.class)
-    @Bean("DefaultCraneIntrospectContainer")
-    public IntrospectContainer introspectContainer() {
-        return new IntrospectContainer();
+    @AutoConfigureAfter(DefaultCraneAutoConfiguration.class)
+    @Configuration
+    public static class DefaultCraneExtensionAutoConfiguration {
+
+        @Order
+        @ConditionalOnMissingBean(MethodSourceContainer.class)
+        @Bean("DefaultCraneMethodSourceContainer")
+        public MethodSourceContainer methodSourceContainer(ApplicationContext applicationContext) {
+            MethodSourceContainer container = new MethodSourceContainer();
+            Map<String, Object> beans = applicationContext.getBeansWithAnnotation(MethodSourceBean.class);
+            if (CollUtil.isNotEmpty(beans)) {
+                beans.forEach((name, bean) -> container.register(bean));
+            }
+            return container;
+        }
+
+        @Order
+        @ConditionalOnMissingBean(MethodSourceContainer.class)
+        @Bean("DefaultCraneIntrospectContainer")
+        public IntrospectContainer introspectContainer() {
+            return new IntrospectContainer();
+        }
+
+        @Order
+        @ConditionalOnMissingBean(OperationConfigurationCache.class)
+        @Bean("DefaultCraneOperationConfigurationCache")
+        public OperationConfigurationCache operationConfigurationCache() {
+            return new OperationConfigurationCache();
+        }
+
+        @Order
+        @ConditionalOnMissingBean(MethodResultProcessAspect.class)
+        @Bean("DefaultCraneMethodResultProcessAspect")
+        public MethodResultProcessAspect methodResultProcessAspect(BeanFactory beanFactory, @Qualifier("DefaultCraneOperationConfigurationCache") ConfigurationCache configurationCache) {
+            return new MethodResultProcessAspect(beanFactory, configurationCache);
+        }
+
+        @Order
+        @ConditionalOnMissingBean(OperateHelper.class)
+        @Bean("DefaultCraneOperateHelper")
+        public OperateHelper operateHelper(
+            @Qualifier("DefaultCraneOperationConfigurationCache") ConfigurationCache configurationCache,
+            @Qualifier("DefaultCraneBeanReflexOperatorFactory") OperatorFactory defaultOperatorFactory,
+            @Qualifier("DefaultCraneBeanOperateConfigurationParser") OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
+            @Qualifier("DefaultCraneUnorderedOperationExecutor") OperationExecutor defaultOperationExecutor) {
+            return new OperateHelper(configurationCache, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor);
+        }
+
     }
 
-    // ==================== 执行器 ====================
-
-    @Order
-    @ConditionalOnMissingBean(UnorderedOperationExecutor.class)
-    @Bean("DefaultCraneUnorderedOperationExecutor")
-    public UnorderedOperationExecutor unorderedOperationExecutor() {
-        return new UnorderedOperationExecutor();
-    }
-
-    @Order
-    @ConditionalOnMissingBean(SequentialOperationExecutor.class)
-    @Bean("DefaultCraneSequentialOperationExecutor")
-    public SequentialOperationExecutor operationExecutor() {
-        return new SequentialOperationExecutor();
-    }
-    
-    // ==================== 扩展 ====================
-
-    @Order
-    @ConditionalOnMissingBean(OperationConfigurationCache.class)
-    @Bean("DefaultCraneOperationConfigurationCache")
-    public OperationConfigurationCache operationConfigurationCache() {
-        return new OperationConfigurationCache();
-    }
-    
-    @Order
-    @ConditionalOnMissingBean(MethodResultProcessAspect.class)
-    @Bean("DefaultCraneMethodResultProcessAspect")
-    public MethodResultProcessAspect methodResultProcessAspect(BeanFactory beanFactory, ConfigurationCache configurationCache) {
-        return new MethodResultProcessAspect(beanFactory, configurationCache);
-    }
-
-    @Order
-    @ConditionalOnMissingBean(OperateHelper.class)
-    @Bean("DefaultCraneOperateHelper")
-    public OperateHelper operateHelper(
-        @Qualifier("DefaultCraneOperationConfigurationCache") ConfigurationCache configurationCache,
-        @Qualifier("DefaultCraneBeanReflexOperatorFactory") OperatorFactory defaultOperatorFactory,
-        @Qualifier("DefaultCraneBeanOperateConfigurationParser") OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
-        @Qualifier("DefaultCraneUnorderedOperationExecutor") OperationExecutor defaultOperationExecutor) {
-        return new OperateHelper(configurationCache, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor);
-    }
-
-    @AutoConfigureAfter(CraneAutoConfiguration.class)
+    @AutoConfigureAfter(DefaultCraneAutoConfiguration.class)
     @ConditionalOnClass(JacksonOperatorFactory.class)
     @Configuration
-    public static class CraneJacksonAutoConfiguration {
+    public static class DefaultCraneJacksonAutoConfiguration {
 
         @Order
         @Bean("DefaultCraneJacksonObjectMapper")
@@ -223,7 +235,7 @@ public class CraneAutoConfiguration {
 
         @Order
         @Bean("DefaultCraneJacksonSerializeObjectMapper")
-        public ObjectMapper serializeObjectMapper(DynamicJsonNodeModule dynamicJsonNodeModule) {
+        public ObjectMapper serializeObjectMapper(@Qualifier("DefaultCraneJacksonDynamicJsonNodeModule")DynamicJsonNodeModule dynamicJsonNodeModule) {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(dynamicJsonNodeModule);
             return objectMapper;
