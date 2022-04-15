@@ -7,6 +7,9 @@ import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,7 +26,7 @@ public abstract class BaseKeyContainer<K> implements Container {
 
     @Override
     public void process(List<Object> targets, List<AssembleOperation> operations) {
-        if (Objects.isNull(targets) || targets.isEmpty()) {
+        if (CollUtil.isEmpty(targets) || CollUtil.isEmpty(operations)) {
             return;
         }
         // 获取key值
@@ -70,7 +73,8 @@ public abstract class BaseKeyContainer<K> implements Container {
      * @author huangchengxing
      * @date 2022/3/21 12:17
      */
-    protected abstract Map<K, Object> getSources(Set<K> keys);
+    @Nonnull
+    protected abstract Map<K, Object> getSources(@Nonnull Set<K> keys);
 
     /**
      * 从对象中获取所需要的数据源id
@@ -81,7 +85,8 @@ public abstract class BaseKeyContainer<K> implements Container {
      * @author huangchengxing
      * @date 2022/3/21 12:17
      */
-    protected Set<K> getTargetIds(Object target, List<AssembleOperation> operations) {
+    @Nonnull
+    protected Set<K> getTargetIds(@Nonnull Object target, @Nonnull List<AssembleOperation> operations) {
         return operations.stream()
                 .map(operation -> operation.getAssembler().getKey(target, operation))
                 .filter(Objects::nonNull)
@@ -99,7 +104,8 @@ public abstract class BaseKeyContainer<K> implements Container {
      * @author huangchengxing
      * @date 2022/3/21 12:17
      */
-    protected Set<K> getTargetIds(List<Object> targets, List<AssembleOperation> operations) {
+    @Nonnull
+    protected Set<K> getTargetIds(@Nonnull List<Object> targets, @Nonnull List<AssembleOperation> operations) {
         return targets.stream()
                 .filter(Objects::nonNull)
                 .map(t -> getTargetIds(t, operations))
@@ -116,8 +122,9 @@ public abstract class BaseKeyContainer<K> implements Container {
      * @author huangchengxing
      * @date 2022/3/21 12:16
      */
+    @CheckForNull
     @SuppressWarnings("unchecked")
-    protected K parseKey(Object key) {
+    protected K parseKey(@Nullable Object key) {
         return (K) key;
     }
 

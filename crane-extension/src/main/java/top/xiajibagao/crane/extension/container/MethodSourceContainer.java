@@ -12,6 +12,7 @@ import top.xiajibagao.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.container.BaseNamespaceContainer;
 import top.xiajibagao.crane.core.helper.ReflexUtils;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -101,8 +102,9 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         );
     }
 
+    @Nonnull
     @Override
-    protected Map<String, Map<Object, Object>> getSources(MultiValueMap<String, Object> namespaceAndKeys) {
+    protected Map<String, Map<Object, Object>> getSources(@Nonnull MultiValueMap<String, Object> namespaceAndKeys) {
         Map<String, Map<Object, Object>> results = new HashMap<>(namespaceAndKeys.size());
         namespaceAndKeys.forEach((namespace, keys) -> {
             MethodSource method = methodCache.get(namespace);

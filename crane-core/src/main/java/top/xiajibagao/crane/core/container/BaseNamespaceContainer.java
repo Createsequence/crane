@@ -8,6 +8,9 @@ import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,7 +28,7 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
 
     @Override
     public void process(List<Object> targets, List<AssembleOperation> operations) {
-        if (Objects.isNull(targets) || targets.isEmpty() || CollUtil.isEmpty(operations)) {
+        if (CollUtil.isEmpty(targets) || CollUtil.isEmpty(operations)) {
             return;
         }
         // 获取key值与命名空间
@@ -74,7 +77,8 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
      * @author huangchengxing
      * @date 2022/3/21 12:17
      */
-    protected abstract Map<String, Map<K, T>> getSources(MultiValueMap<String, K> namespaceAndKeys);
+    @Nonnull
+    protected abstract Map<String, Map<K, T>> getSources(@Nonnull MultiValueMap<String, K> namespaceAndKeys);
 
     /**
      * 将对象集合转为所需要的namespace与key集合
@@ -85,7 +89,8 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
      * @author huangchengxing
      * @date 2022/3/21 12:17
      */
-    protected MultiValueMap<String, K> getKeyAndNamespaceFromTarget(Object target, List<AssembleOperation> operations) {
+    @Nonnull
+    protected MultiValueMap<String, K> getKeyAndNamespaceFromTarget(@Nonnull Object target, @Nonnull List<AssembleOperation> operations) {
         MultiValueMap<String, K> results = new LinkedMultiValueMap<>();
         for (AssembleOperation operation : operations) {
             Object key = operation.getAssembler().getKey(target, operation);
@@ -106,7 +111,8 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
      * @author huangchengxing
      * @date 2022/3/21 12:17
      */
-    protected MultiValueMap<String, K> getNamespaceAndKeyFromTargets(List<Object> targets, List<AssembleOperation> operations) {
+    @Nonnull
+    protected MultiValueMap<String, K> getNamespaceAndKeyFromTargets(@Nonnull List<Object> targets, @Nonnull List<AssembleOperation> operations) {
         MultiValueMap<String, K> results = new LinkedMultiValueMap<>();
         targets.stream()
             .filter(Objects::nonNull)
@@ -124,8 +130,9 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
      * @author huangchengxing
      * @date 2022/3/21 12:16
      */
+    @CheckForNull
     @SuppressWarnings("unchecked")
-    protected K parseKey(Object key) {
+    protected K parseKey(@Nullable Object key) {
         return (K) key;
     }
 

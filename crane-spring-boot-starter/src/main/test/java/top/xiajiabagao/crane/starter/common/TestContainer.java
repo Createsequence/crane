@@ -3,6 +3,7 @@ package top.xiajiabagao.crane.starter.common;
 import lombok.Getter;
 import top.xiajibagao.crane.core.container.BaseKeyContainer;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -16,8 +17,9 @@ public class TestContainer extends BaseKeyContainer<Integer> {
 
     private Map<Integer, Object> mockDatas = new HashMap<>();
 
+    @Nonnull
     @Override
-    protected Map<Integer, Object> getSources(Set<Integer> keys) {
+    protected Map<Integer, Object> getSources(@Nonnull Set<Integer> keys) {
         return mockDatas;
     }
 

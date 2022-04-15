@@ -7,6 +7,8 @@ import org.springframework.util.MultiValueMap;
 import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.EnumDict;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -30,8 +32,9 @@ public class EnumDictContainer extends BaseNamespaceContainer<String, EnumDict.E
         enumDict.register(targetClass);
     }
 
+    @Nonnull
     @Override
-    protected Map<String, Map<String, EnumDict.EnumDictItem<?>>> getSources(MultiValueMap<String, String> namespaceAndKeys) {
+    protected Map<String, Map<String, EnumDict.EnumDictItem<?>>> getSources(@Nonnull MultiValueMap<String, String> namespaceAndKeys) {
         Table<String, String, EnumDict.EnumDictItem<?>> results = HashBasedTable.create();
         CollUtils.forEach(namespaceAndKeys, (namespace, key) -> {
             EnumDict.EnumDictItem<?> item = enumDict.getItem(namespace, key);
@@ -43,7 +46,7 @@ public class EnumDictContainer extends BaseNamespaceContainer<String, EnumDict.E
     }
 
     @Override
-    protected String parseKey(Object key) {
+    protected String parseKey(@Nullable Object key) {
         return Objects.toString(key);
     }
 }

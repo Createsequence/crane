@@ -5,6 +5,8 @@ import com.google.common.collect.Table;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
 
@@ -50,13 +52,14 @@ public class KeyValueContainer extends BaseNamespaceContainer<String, Object> im
         return (T) cache.get(namespace, key);
     }
 
+    @Nonnull
     @Override
-    protected Map<String, Map<String, Object>> getSources(MultiValueMap<String, String> namespaceAndKeys) {
+    protected Map<String, Map<String, Object>> getSources(@Nonnull MultiValueMap<String, String> namespaceAndKeys) {
         return cache.rowMap();
     }
 
     @Override
-    protected String parseKey(Object key) {
+    protected String parseKey(@Nullable Object key) {
         return Objects.toString(key);
     }
 }
