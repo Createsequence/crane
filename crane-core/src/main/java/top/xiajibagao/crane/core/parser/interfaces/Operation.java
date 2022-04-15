@@ -1,5 +1,7 @@
 package top.xiajibagao.crane.core.parser.interfaces;
 
+import top.xiajibagao.crane.core.helper.Orderly;
+
 import java.lang.reflect.Field;
 import java.util.Set;
 
@@ -9,21 +11,7 @@ import java.util.Set;
  * @author huangchengxing
  * @date 2022/04/14 13:31
  */
-public interface Operation extends Comparable<Operation> {
-
-    @Override
-    default int compareTo(Operation o) {
-        return Integer.compare(this.getSort(), o.getSort());
-    }
-
-    /**
-     * 获取排序
-     *
-     * @return int
-     * @author huangchengxing
-     * @date 2022/3/5 11:46
-     */
-    int getSort();
+public interface Operation extends Orderly {
 
     /**
      * 获取注解字段

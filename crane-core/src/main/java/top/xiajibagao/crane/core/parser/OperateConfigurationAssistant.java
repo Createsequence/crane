@@ -164,7 +164,7 @@ public class OperateConfigurationAssistant<T> {
         private final Set<String> aliases = new HashSet<>();
         private final List<AssembleProperty> properties = new ArrayList<>();
         private String namespace = "";
-        private int sort = 0;
+        private int order = 0;
 
         public AssembleOperationBuilder<T> aliases(String... aliases) {
             if (ArrayUtil.isNotEmpty(aliases)) {
@@ -173,8 +173,8 @@ public class OperateConfigurationAssistant<T> {
             return this;
         }
 
-        public AssembleOperationBuilder<T> sort(int sort) {
-            this.sort = sort;
+        public AssembleOperationBuilder<T> sort(int order) {
+            this.order = order;
             return this;
         }
 
@@ -229,7 +229,7 @@ public class OperateConfigurationAssistant<T> {
 
         public OperateConfigurationAssistant<T> build() {
             builder.configuration.getAssembleOperations().add(new BeanAssembleOperation(
-                sort,
+                order,
                 builder.configuration,
                 targetField, aliases,
                 namespace, container,

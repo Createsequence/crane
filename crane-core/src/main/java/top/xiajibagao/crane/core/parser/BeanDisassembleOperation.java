@@ -17,7 +17,7 @@ import java.util.Set;
 @Getter
 public class BeanDisassembleOperation implements DisassembleOperation {
 
-    private final int sort;
+    private final int order;
     private final OperationConfiguration owner;
     private final Disassembler disassembler;
     private final OperationConfiguration targetOperateConfiguration;

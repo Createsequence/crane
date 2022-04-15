@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.core.handler.interfaces;
 
+import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.operator.interfaces.Operator;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
@@ -14,18 +15,7 @@ import javax.annotation.Nullable;
  * @author huangchengxing
  * @date 2022/04/06 19:55
  */
-public interface OperateHandler {
-
-    /**
-     * 排序，越小越靠前
-     *
-     * @return int
-     * @author huangchengxing
-     * @date 2022/4/8 20:30
-     */
-    default int order() {
-        return 0;
-    }
+public interface OperateHandler extends Orderly {
 
     /**
      * 是否支持读取数据源

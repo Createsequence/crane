@@ -20,7 +20,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class BeanAssembleOperation implements AssembleOperation {
 
-    private final int sort;
+    private final int order;
     private final OperationConfiguration owner;
     private final Field targetProperty;
     private final Set<String> targetPropertyAliases;

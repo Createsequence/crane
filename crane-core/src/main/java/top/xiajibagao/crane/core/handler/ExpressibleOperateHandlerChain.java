@@ -31,7 +31,7 @@ public class ExpressibleOperateHandlerChain implements OperateHandlerChain {
     private final Supplier<StandardEvaluationContext> contextFactory;
 
     @Override
-    public int order() {
+    public int getOrder() {
         return -1;
     }
 

@@ -1,6 +1,7 @@
 package top.xiajibagao.crane.core.executor;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.stream.StreamUtil;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.CollectionUtils;
@@ -15,13 +16,12 @@ import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * <p>有序的{@link OperationExecutor}同步实现。
  *
  * <p>处理时按照每种数据对应的类操作配置分组，因此会按照统一配操作配置中的
- * {@link AssembleOperation#getSort()}或{@link DisassembleOperation#getSort()}的大小顺序执行处理。<br />
+ * {@link AssembleOperation#getOrder()}或{@link DisassembleOperation#getOrder()}的大小顺序执行处理。<br />
  * 一次执行中，每个容器可能会被访问多次。
  *
  * @author huangchengxing
@@ -34,8 +34,7 @@ public class SequentialOperationExecutor implements OperationExecutor {
         if (CollUtil.isEmpty(targets) || Objects.isNull(configuration)) {
             return;
         }
-        List<Object> targetsList = StreamSupport.stream(targets.spliterator(), false)
-            .collect(Collectors.toList());
+        List<Object> targetsList = StreamUtil.of(targets).collect(Collectors.toList());
 
         // 解析配置
         MultiValueMap<OperationConfiguration, Object> collectedConfigurations = collectOperationConfigurations(

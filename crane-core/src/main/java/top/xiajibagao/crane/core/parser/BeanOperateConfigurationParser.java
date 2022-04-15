@@ -6,14 +6,15 @@ import cn.hutool.core.text.CharSequenceUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import top.xiajibagao.annotation.Assemble;
 import top.xiajibagao.annotation.Disassemble;
 import top.xiajibagao.annotation.PropsTemplate;
-import top.xiajibagao.annotation.Sort;
 import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.exception.CraneException;
 import top.xiajibagao.crane.core.helper.CollUtils;
@@ -142,8 +143,8 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
 
         return new BeanAssembleOperation(
             ObjectUtils.computeIfNotNull(
-                AnnotatedElementUtils.getMergedAnnotation(property, Sort.class),
-                Sort::value, Integer.MAX_VALUE
+                AnnotatedElementUtils.getMergedAnnotation(property, Order.class),
+                Order::value, Ordered.LOWEST_PRECEDENCE
             ),
             configuration,
             property, aliases,
@@ -227,8 +228,8 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
         Set<String> aliases = CollUtils.toSet(Arrays.asList(annotation.aliases()));
         return new BeanDisassembleOperation(
             ObjectUtils.computeIfNotNull(
-                AnnotatedElementUtils.getMergedAnnotation(property, Sort.class),
-                Sort::value, Integer.MAX_VALUE
+                AnnotatedElementUtils.getMergedAnnotation(property, Order.class),
+                Order::value, Ordered.LOWEST_PRECEDENCE
             ),
             configuration,
             disassembler,

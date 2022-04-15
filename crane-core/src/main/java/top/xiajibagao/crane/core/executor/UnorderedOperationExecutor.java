@@ -21,7 +21,7 @@ import java.util.stream.StreamSupport;
 /**
  * <p>无序的{@link OperationExecutor}同步实现。
  *
- * <p>处理时按照每个操作的容器分组，因此将不严格按照{@link AssembleOperation#getSort()}或{@link DisassembleOperation#getSort()}
+ * <p>处理时按照每个操作的容器分组，因此将不严格按照{@link AssembleOperation#getOrder()}或{@link DisassembleOperation#getOrder()}
  * 的大小顺序执行处理。<br />
  * 一次执行中，每个容器仅需被访问一次。
  *
