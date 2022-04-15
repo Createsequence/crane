@@ -42,16 +42,24 @@ public abstract class BaseKeyContainer<K> implements Container {
         if (CollUtil.isEmpty(sources)) {
             return;
         }
-        CollUtils.biForEach(targets, operations, (target, operation) -> {
-            Object key = operation.getAssembler().getKey(target, operation);
-            Object source = sources.get(parseKey(key));
-            if (Objects.nonNull(source)) {
-                ObjectUtils.tryAction(
-                    () -> operation.getAssembler().execute(target, source, operation),
-                    x -> log.error("字段[{}]处理失败，错误原因：{}", operation.getTargetProperty(), x.getMessage())
-                );
-            }
-        });
+        CollUtils.biForEach(targets, operations, (target, operation) -> writeToTargets(sources, target, operation));
+    }
+
+    /**
+     * 将数据源写入对象
+     */
+    protected void writeToTargets(@Nonnull Map<K, ?> sources, @Nullable Object target, @Nonnull AssembleOperation operation) {
+        if (Objects.isNull(target)) {
+            return;
+        }
+        Object key = operation.getAssembler().getKey(target, operation);
+        Object source = sources.get(parseKey(key));
+        if (Objects.nonNull(source)) {
+            ObjectUtils.tryAction(
+                () -> operation.getAssembler().execute(target, source, operation),
+                x -> log.error("字段[{}]处理失败，错误原因：{}", operation.getTargetProperty(), x.getMessage())
+            );
+        }
     }
 
     /**

@@ -41,21 +41,29 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
         if (CollUtil.isEmpty(sources)) {
             return;
         }
-        CollUtils.biForEach(targets, operations, (target, operation) -> {
-            Map<K, ?> keyMap = sources.get(operation.getNamespace());
-            if (CollUtil.isEmpty(keyMap)) {
-                return;
-            }
-            Object key = operation.getAssembler().getKey(target, operation);
-            Object source = keyMap.get(parseKey(key));
-            if (Objects.isNull(source)) {
-                return;
-            }
-            ObjectUtils.tryAction(
-                () -> operation.getAssembler().execute(target, source, operation),
-                x -> log.error("字段[{}]处理失败，错误原因：{}", operation.getTargetProperty(), x.getMessage())
-            );
-        });
+        CollUtils.biForEach(targets, operations, (target, operation) -> writeToTargets(sources, target, operation));
+    }
+
+    /**
+     * 将数据源写入待处理对象
+     */
+    protected void writeToTargets(@Nonnull Map<String, Map<K, T>> sources, @CheckForNull Object target, @Nonnull AssembleOperation operation) {
+        if (Objects.isNull(target)) {
+            return;
+        }
+        Map<K, ?> keyMap = sources.get(operation.getNamespace());
+        if (CollUtil.isEmpty(keyMap)) {
+            return;
+        }
+        Object key = operation.getAssembler().getKey(target, operation);
+        Object source = keyMap.get(parseKey(key));
+        if (Objects.isNull(source)) {
+            return;
+        }
+        ObjectUtils.tryAction(
+            () -> operation.getAssembler().execute(target, source, operation),
+            x -> log.error("字段[{}]处理失败，错误原因：{}", operation.getTargetProperty(), x.getMessage())
+        );
     }
 
     /**
