@@ -1,6 +1,7 @@
 package top.xiajibagao.crane.core.executor;
 
 import cn.hutool.core.collection.CollStreamUtil;
+import cn.hutool.core.collection.CollUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -10,6 +11,7 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +32,7 @@ public class UnorderedOperationExecutor implements OperationExecutor {
 
     @Override
     public void execute(Iterable<?> targets, OperationConfiguration configuration) {
-        if (Objects.isNull(targets) || !targets.iterator().hasNext()) {
+        if (CollUtil.isEmpty(targets) || Objects.isNull(configuration)) {
             return;
         }
         List<?> targetsList = StreamSupport.stream(targets.spliterator(), false)
@@ -42,7 +44,7 @@ public class UnorderedOperationExecutor implements OperationExecutor {
         execute(pendingOperations);
     }
 
-    protected void execute(MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations) {
+    protected void execute(@Nonnull MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations) {
         // 按执行器分批待处理进程
         pendingOperations.forEach((container, pairs) -> container.process(
             CollStreamUtil.toList(pairs, PairEntry::getValue), CollStreamUtil.toList(pairs, PairEntry::getKey)
@@ -64,9 +66,9 @@ public class UnorderedOperationExecutor implements OperationExecutor {
     }
 
     protected void processAssembleOperations(
-        Collection<?> targets,
-        OperationConfiguration configuration,
-        MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingProcessors) {
+        @Nonnull Collection<?> targets,
+        @Nonnull OperationConfiguration configuration,
+        @Nonnull MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingProcessors) {
 
         List<AssembleOperation> operations = configuration.getAssembleOperations();
         if (CollectionUtils.isEmpty(operations)) {
@@ -79,9 +81,9 @@ public class UnorderedOperationExecutor implements OperationExecutor {
     }
 
     protected void processDisassembleOperations(
-        Collection<?> targets,
-        OperationConfiguration configuration,
-        MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations) {
+        @Nonnull Collection<?> targets,
+        @Nonnull OperationConfiguration configuration,
+        @Nonnull MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations) {
 
         List<DisassembleOperation> disassembleOperations = configuration.getDisassembleOperations();
         if (CollectionUtils.isEmpty(disassembleOperations)) {

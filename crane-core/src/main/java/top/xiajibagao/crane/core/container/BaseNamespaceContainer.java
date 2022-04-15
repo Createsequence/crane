@@ -130,7 +130,7 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
      * @author huangchengxing
      * @date 2022/3/21 12:16
      */
-    @CheckForNull
+    @Nullable
     @SuppressWarnings("unchecked")
     protected K parseKey(@Nullable Object key) {
         return (K) key;

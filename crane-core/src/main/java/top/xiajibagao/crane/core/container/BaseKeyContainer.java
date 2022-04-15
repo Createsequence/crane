@@ -7,7 +7,6 @@ import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
@@ -122,7 +121,7 @@ public abstract class BaseKeyContainer<K> implements Container {
      * @author huangchengxing
      * @date 2022/3/21 12:16
      */
-    @CheckForNull
+    @Nullable
     @SuppressWarnings("unchecked")
     protected K parseKey(@Nullable Object key) {
         return (K) key;

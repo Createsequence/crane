@@ -7,6 +7,7 @@ import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.helper.PairEntry;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +26,7 @@ public class AsyncUnorderedOperationExecutor extends UnorderedOperationExecutor 
     
     @SuppressWarnings("unchecked")
     @Override
-    protected void execute(MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations) {
+    protected void execute(@Nonnull MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations) {
         int index = 0;
         CompletableFuture<Void>[] tasks = new CompletableFuture[pendingOperations.entrySet().size()];
         for (Map.Entry<Container, List<PairEntry<AssembleOperation, ?>>> entry : pendingOperations.entrySet()) {

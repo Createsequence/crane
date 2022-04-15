@@ -12,6 +12,7 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -30,7 +31,7 @@ public class SequentialOperationExecutor implements OperationExecutor {
 
     @Override
     public void execute(Iterable<?> targets, OperationConfiguration configuration) {
-        if (Objects.isNull(targets) || !targets.iterator().hasNext()) {
+        if (CollUtil.isEmpty(targets) || Objects.isNull(configuration)) {
             return;
         }
         List<Object> targetsList = StreamSupport.stream(targets.spliterator(), false)
@@ -44,7 +45,7 @@ public class SequentialOperationExecutor implements OperationExecutor {
         execute(collectedConfigurations);
     }
 
-    protected void execute(MultiValueMap<OperationConfiguration, Object> collectedConfigurations) {
+    protected void execute(@Nonnull MultiValueMap<OperationConfiguration, Object> collectedConfigurations) {
         // TODO 优化算法
         // 获取操作配置，并按类配置分别将全部的操作配置与待处理数据装入桶中，然后对同一桶中的操作按sort排序
         Set<Bucket> buckets = collectedConfigurations.entrySet().stream()
@@ -92,8 +93,9 @@ public class SequentialOperationExecutor implements OperationExecutor {
      * @author huangchengxing
      * @date 2022/3/5 14:58
      */
+    @Nonnull
     protected MultiValueMap<OperationConfiguration, Object> collectOperationConfigurations(
-        List<Object> targets, OperationConfiguration configuration, MultiValueMap<OperationConfiguration, Object> collectedConfigurations) {
+        @Nonnull List<Object> targets, @Nonnull OperationConfiguration configuration, @Nonnull MultiValueMap<OperationConfiguration, Object> collectedConfigurations) {
         // 若无待操作数据则结束解析
         if (CollectionUtils.isEmpty(targets)) {
             return collectedConfigurations;
