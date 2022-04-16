@@ -90,7 +90,13 @@ public class ReflexUtils {
     public static Optional<BeanProperty> findProperty(Class<?> targetClass, String fieldName) {
         BeanProperty cache = CACHE_TABLE.get(targetClass, fieldName);
         if (Objects.isNull(cache)) {
-            cache = createProperty(targetClass, fieldName);
+            synchronized (ReflexUtils.class) {
+                cache = CACHE_TABLE.get(targetClass, fieldName);
+                if (Objects.isNull(cache)) {
+                    BeanProperty property = createProperty(targetClass, fieldName);
+                    CACHE_TABLE.put(targetClass, fieldName, property);
+                }
+            }
         }
         return Optional.ofNullable(cache);
     }
