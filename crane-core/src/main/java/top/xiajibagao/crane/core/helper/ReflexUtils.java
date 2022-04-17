@@ -88,17 +88,17 @@ public class ReflexUtils {
      * @date 2022/4/1 13:50
      */
     public static Optional<BeanProperty> findProperty(Class<?> targetClass, String fieldName) {
-        BeanProperty cache = CACHE_TABLE.get(targetClass, fieldName);
-        if (Objects.isNull(cache)) {
+        BeanProperty property = CACHE_TABLE.get(targetClass, fieldName);
+        if (Objects.isNull(property)) {
             synchronized (ReflexUtils.class) {
-                cache = CACHE_TABLE.get(targetClass, fieldName);
-                if (Objects.isNull(cache)) {
-                    BeanProperty property = createProperty(targetClass, fieldName);
+                property = CACHE_TABLE.get(targetClass, fieldName);
+                if (Objects.isNull(property)) {
+                    property = createProperty(targetClass, fieldName);
                     CACHE_TABLE.put(targetClass, fieldName, property);
                 }
             }
         }
-        return Optional.ofNullable(cache);
+        return Optional.ofNullable(property);
     }
 
     /**
