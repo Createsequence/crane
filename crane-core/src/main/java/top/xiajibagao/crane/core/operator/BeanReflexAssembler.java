@@ -7,6 +7,7 @@ import top.xiajibagao.crane.core.exception.CraneException;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.BeanAssembleProperty;
+import top.xiajibagao.crane.core.parser.EmptyAssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 
@@ -31,7 +32,7 @@ public class BeanReflexAssembler implements Assembler {
         }
         checkType(target, operation);
         List<AssembleProperty> properties = CollUtil.defaultIfEmpty(
-            operation.getProperties(), Collections.singletonList(AssembleProperty.empty())
+            operation.getProperties(), Collections.singletonList(EmptyAssembleProperty.instance())
         );
         for (AssembleProperty property : properties) {
             Object sourceData = handlerChain.readFromSource(source, property, operation);
