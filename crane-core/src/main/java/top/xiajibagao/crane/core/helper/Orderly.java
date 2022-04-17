@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 /**
- * 表明实现类允许排序，{@link #getOrder()}返回值越小，则优先级越高，排序时越靠前
+ * 表明实现类之间允许根据优先级排序，{@link #getOrder()}返回值越小，则优先级越高，排序时越靠前
  *
  * @see Ordered
  * @author huangchengxing

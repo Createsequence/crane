@@ -5,7 +5,8 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 /**
- * 数据拆卸注解。注解在嵌套字段上，将会在处理数据时将注解字段一并递归处理
+ * 数据装卸注解
+ * <p>注解在嵌套字段上，将会在处理数据时将注解字段递归并展开为复数需要进行装配操作的对象
  *
  * @author huangchengxing
  * @date 2022/02/28 18:00

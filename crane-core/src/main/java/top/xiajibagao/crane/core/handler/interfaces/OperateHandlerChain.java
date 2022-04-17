@@ -38,7 +38,7 @@ public interface OperateHandlerChain extends OperateHandler {
     OperateHandlerChain addHandler(OperateHandler handler);
     
     /**
-     * 处理器链中是否存在可以从数据源中获取数据的节点
+     * 处理器链中是否存在可以从数据源中读取数据的节点
      *
      * @param source 数据源
      * @param property 待处理字段
@@ -53,7 +53,7 @@ public interface OperateHandlerChain extends OperateHandler {
     }
 
     /**
-     * 是否支持写入对象数据
+     * 处理器链中是否存在可以将数据源数据写入待处理对象的节点
      *
      * @param sourceData 从数据源获取的数据
      * @param target 待处理对象

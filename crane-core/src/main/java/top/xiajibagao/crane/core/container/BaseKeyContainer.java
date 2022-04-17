@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 容器基类，用于提供针对“使用id获取数据源并操作”的模板代码
+ * 容器基类，用于提供针对“使用key获取数据源并操作”的模板代码
  *
  * @param <K> 数据源key类型
  * @author huangchengxing
@@ -49,6 +49,12 @@ public abstract class BaseKeyContainer<K> implements Container {
 
     /**
      * 将数据源写入对象
+     *
+     * @param sources 数据源
+     * @param target 待处理对象
+     * @param operation 装配配置
+     * @author huangchengxing
+     * @date 2022/4/18 0:16
      */
     protected void writeToTargets(@Nonnull Map<K, ?> sources, @Nullable Object target, @Nonnull AssembleOperation operation) {
         if (Objects.isNull(target)) {
@@ -65,7 +71,7 @@ public abstract class BaseKeyContainer<K> implements Container {
     }
 
     /**
-     * 根据数据源id，获取根据id分组的数据源
+     * 根据装配的key字段值获取与key字段值对应的数据源对象集合
      *
      * @param keys id集合
      * @return java.util.Map<K, T>
@@ -76,9 +82,9 @@ public abstract class BaseKeyContainer<K> implements Container {
     protected abstract Map<K, Object> getSources(@Nonnull Set<K> keys);
 
     /**
-     * 从对象中获取所需要的数据源id
+     * 从待处理对象中获取所需要的key字段值
      *
-     * @param target     对象
+     * @param target 对象
      * @param operations 操作配置
      * @return java.util.Set<K>
      * @author huangchengxing
@@ -95,9 +101,9 @@ public abstract class BaseKeyContainer<K> implements Container {
     }
 
     /**
-     * 将对象集合转为所需要的数据源id
+     * 从待处理对象中获取所需要的key字段值
      *
-     * @param targets    对象集合
+     * @param targets 对象集合
      * @param operations 操作配置
      * @return java.util.Set<K>
      * @author huangchengxing
@@ -114,7 +120,7 @@ public abstract class BaseKeyContainer<K> implements Container {
     }
 
     /**
-     * 将通过操作装配器获取的key转为所需要的类型
+     * 将获取的key字段值转为所需要的类型
      *
      * @param key key
      * @return K

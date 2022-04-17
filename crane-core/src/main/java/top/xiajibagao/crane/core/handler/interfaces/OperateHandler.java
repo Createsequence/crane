@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 public interface OperateHandler extends Orderly {
 
     /**
-     * 是否支持读取数据源
+     * 是否支持从数据源中读取数据
      *
      * @param source 数据源
      * @param property 待处理字段
@@ -30,7 +30,7 @@ public interface OperateHandler extends Orderly {
     boolean sourceCanRead(@Nullable Object source, AssembleProperty property, Operation operation);
 
     /**
-     * 是否支持写入对象数据
+     * 是否支持将数据源数据写入待处理对象
      *
      * @param sourceData 从数据源获取的数据
      * @param target 待处理对象
@@ -43,7 +43,7 @@ public interface OperateHandler extends Orderly {
     boolean targetCanWrite(@Nullable Object sourceData, @Nullable Object target, AssembleProperty property, AssembleOperation operation);
 
     /**
-     * 获取数据源数据 <br />
+     * 从数据源中读取数据 <br />
      * source必须是{@link #sourceCanRead(Object, AssembleProperty, Operation)}所支持的类型
      *
      * @param source 数据源
@@ -56,7 +56,7 @@ public interface OperateHandler extends Orderly {
     Object readFromSource(@Nullable Object source, AssembleProperty property, Operation operation);
 
     /**
-     * 将从数据源获取到的数据写入待处理对象 <br />
+     * 将数据源数据写入待处理对象 <br />
      * target必须是{@link #targetCanWrite(Object, Object, AssembleProperty, AssembleOperation)}所支持的类型
      *
      * @param sourceData 从数据源获取的数据

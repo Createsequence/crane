@@ -35,7 +35,7 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
         }
         List<?> targetsList = StreamSupport.stream(targets.spliterator(), false)
             .collect(Collectors.toList());
-        // 分组收集待处理的进程
+        // 分组收集待进行的操作配置
         MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations = new LinkedMultiValueMap<>();
         collectOperations(targetsList, configuration, pendingOperations);
         // 执行
@@ -50,9 +50,9 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
         if (CollectionUtils.isEmpty(targets)) {
             return;
         }
-        // 将普通字段添加到待处理
+        // 处理普通待装配字段
         processAssembleOperations(targets, configuration, pendingOperations);
-        // 处理嵌套字段
+        // 处理待装卸的嵌套字段
         processDisassembleOperations(targets, configuration, pendingOperations);
     }
 

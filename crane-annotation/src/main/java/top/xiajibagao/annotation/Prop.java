@@ -7,6 +7,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * 字段装配配置
+ * <p>表示一次装配操作中，数据源对象的字段与待处理对象的字段的映射关系
+ *
  * @author huangchengxing
  * @date 2022/02/28 18:01
  */
@@ -15,20 +18,19 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Prop {
 
     /**
-     * 要处理的目标对象中的字段
+     * 引用字段，需要将数据源映射到待处理对象的字段
      */
     @AliasFor("ref")
     String value() default "";
 
     /**
-     * 要处理的目标对象中的字段
+     * 引用字段，待处理对象中需要被数据源映射的字段
      */
     @AliasFor("value")
     String ref() default "";
 
     /**
-     * 当数据源为对象类型时，可以选择性的引用其字段，当为空时默认引用整个数据源对象。
-     * 若数据源不为对象类型时，该字段配置无效。
+     * 数据源字段，数据源对象中需要映射到待处理对象的字段
      */
     String src() default "";
 
@@ -42,6 +44,7 @@ public @interface Prop {
      *     <li>#src: {@link #src()}指定的参数值；</li>
      *     <li>#ref: {@link #ref()}指定的参数值；</li>
      * </ul>
+     * 该功能需要由装配器提供支持
      */
     String exp() default "";
 

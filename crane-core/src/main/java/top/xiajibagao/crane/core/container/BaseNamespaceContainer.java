@@ -16,9 +16,9 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 容器基类，用于提供针对“使用namespace和id获取数据源并操作”的模板代码
+ * 容器基类，用于提供针对“使用namespace和key获取数据源并操作”的模板代码
  *
- * @param <T> source类型
+ * @param <T> 数据源对象类型
  * @param <K> key字段类型
  * @author huangchengxing
  * @date 2022/03/23 21:07
@@ -48,7 +48,13 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
     }
 
     /**
-     * 将数据源写入待处理对象
+     * 将数据源写入对象
+     *
+     * @param sources 数据源
+     * @param target 待处理对象
+     * @param operation 装配配置
+     * @author huangchengxing
+     * @date 2022/4/18 0:16
      */
     protected void writeToTargets(@Nonnull Map<String, Map<K, T>> sources, @CheckForNull Object target, @Nonnull AssembleOperation operation) {
         if (Objects.isNull(target)) {
@@ -70,10 +76,10 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
     }
 
     /**
-     * 根据数据源id与对应的namespace获取数据集
+     * 根据装配的key字段值与namespace获取对应的数据源对象集合
      *
-     * @param namespaceAndKeys namespace-key字段集合
-     * @return java.util.Map<java.lang.String,java.util.Map<K, T>> namespace-key-数据源对象集合
+     * @param namespaceAndKeys namespace与key字段值集合
+     * @return java.util.Map<K, T>
      * @author huangchengxing
      * @date 2022/3/21 12:17
      */
@@ -123,7 +129,7 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
     }
 
     /**
-     * 将通过操作装配器获取的key转为所需要的类型
+     * 将获取的key字段值转为所需要的类型
      *
      * @param key key
      * @return K

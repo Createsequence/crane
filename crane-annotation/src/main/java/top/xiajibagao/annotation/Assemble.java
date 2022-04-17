@@ -5,21 +5,8 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 /**
- * <p>数据装配注解
- *
+ * 数据装配注解
  * <p>注解在key字段上，将从指定的Container以当前注解字段值与{@link #namespace()}获取数据源并填充到当前对象。
- * <ul>
- *     <li>未配置{@link #props()}或{@link #propTemplates()}时，总是尝试将数据源直接填入注解字段；</li>
- *     <li>
- *         配置{@link #props()}或{@link #propTemplates()}，但是未设置{@link Prop#src()}时，
- *         则尝试将数据源直接填入{@link Prop#value()}指定字段；
- *     </li>
- *     <li>
- *         配置{@link #props()}或{@link #propTemplates()}，且设置{@link Prop#src()}时:<br />
- *         1.若数据源不为对象，则直接将数据源填入填入{@link Prop#value()}指定字段；<br />
- *         2.数据源为对象，则将尝试获取数据源对应字段并填入{@link Prop#value()}指定字段；
- *     </li>
- * </ul>
  *
  * @author huangchengxing
  * @date 2022/02/28 18:00
@@ -32,19 +19,19 @@ import java.lang.annotation.*;
 public @interface Assemble {
 
     /**
-     * 指定用于提供数据源的容器，该实例需要可以用spring容器获取
+     * 指定完成装配操作的装配容器，该实例需要可以用spring容器获取
      */
     @AliasFor("container")
     Class<?> value() default Void.class;
 
     /**
-     * 指定用于提供数据源的容器，该实例需要可以用spring容器获取
+     * 指定完成装配操作的容器，该实例需要可以用spring容器获取
      */
     @AliasFor("value")
     Class<?> container() default Void.class;
 
     /**
-     * 容器实例在spring中的名称，当{@link #value()}或{@link #container()}有值时将用于一起查找容器
+     * 装配容器实例在spring中的名称，当{@link #value()}或{@link #container()}有值时将用于一起查找容器
      */
     String containerName() default "";
 

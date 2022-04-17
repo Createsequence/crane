@@ -22,7 +22,9 @@ import java.util.stream.Collectors;
  *
  * <p>处理时按照每种数据对应的类操作配置分组，因此会按照统一配操作配置中的
  * {@link AssembleOperation#getOrder()}或{@link DisassembleOperation#getOrder()}的大小顺序执行处理。<br />
- * 一次执行中，每个容器可能会被访问多次。
+ * 因此，一次执行中一个相同的容器可能会被访问多次。<br />
+ *
+ * <b>注意：由于装卸操作总是发生于装配操作前，故无法保证{@link AssembleOperation}与{@link DisassembleOperation}之间的执行顺序</b>
  *
  * @author huangchengxing
  * @date 2022/03/05 14:40

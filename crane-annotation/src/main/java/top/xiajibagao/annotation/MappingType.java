@@ -10,6 +10,8 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 /**
+ * 字段映射类型，表明数据源对象与装配操作对应的key字段值的映射关系
+ *
  * @author huangchengxing
  * @date 2022/04/11 0:08
  */

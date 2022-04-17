@@ -1,21 +1,22 @@
 package top.xiajibagao.crane.core.operator.interfaces;
 
-import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
 /**
- * 装配器，用于根据配置从{@link Container}中获取获取原始数据，并根据指定配置将其填充至对象中
+ * 装配器
+ * <p>用于根据指定的装配配置，获取对应的key字段值，或将数据源中的字段写入待操作对象
  *
+ * @see AssembleOperation
  * @author huangchengxing
  * @date 2022/02/28 17:52
  */
 public interface Assembler extends Operator {
 
     /**
-     * 根据配置完成装配操作
+     * 根据装配操作配置，将数据源写入待处理对象
      *
-     * @param target 目标实例
-     * @param source 从容器中获取的目标数据源
+     * @param target 待处理对象
+     * @param source 数据源
      * @param operation 操作配置
      * @author huangchengxing
      * @date 2022/2/28 18:56
@@ -23,9 +24,9 @@ public interface Assembler extends Operator {
     void execute(Object target, Object source, AssembleOperation operation);
 
     /**
-     * 从实例中获取所需的key字段数据
+     * 从待处理对象中获取操作配置对应的key字段值
      *
-     * @param target 目标实例
+     * @param target 待处理对象
      * @param operation 操作配置
      * @return java.lang.Object
      * @author huangchengxing

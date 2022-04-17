@@ -6,18 +6,31 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import java.util.List;
 
 /**
- * 容器，表明一类数据来源，{@link Assembler}可以从实现类中获取所需要的原始数据。容器中应当允许通过namespace进一步区分数据来源。
+ * 装配容器
+ * <p>根据一组{@link AssembleOperation}配置完成对一批对象的装配处理的“车间”。
+ * 容器中一般用以完成以下步骤：
+ * <ol>
+ *     <li>使用{@link Assembler}从待处理对象中获取对应key值；</li>
+ *     <li>根据操作配置指定的namespace(如果有)和key值获取对应数据源对象；</li>
+ *     <li>再次使用{@link Assembler}将数据源根据指定配置写入待处理对象中；</li>
+ * </ol>
  *
+ * <p>该接口默认提供基于key查询的初步实现{@link BaseKeyContainer}，
+ * 与同时基于key与namespace的初步实现{@link BaseNamespaceContainer}。
+ *
+ * @see AssembleOperation
+ * @see BaseKeyContainer
+ * @see BaseNamespaceContainer
  * @author huangchengxing
  * @date 2022/02/28 17:52
  */
 public interface Container {
 
     /**
-     * 根据指定配置处理数据
+     * 根据指定装配操作配置处理待处理对象
      *
-     * @param targets 待处理数据集合
-     * @param operations 待处理的装配操作
+     * @param targets 待处理对象
+     * @param operations 待处理的装配操作配置
      * @author huangchengxing
      * @date 2022/2/23 20:49
      */

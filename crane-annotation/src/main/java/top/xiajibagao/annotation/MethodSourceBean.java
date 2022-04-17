@@ -6,8 +6,8 @@ import java.lang.annotation.*;
 import java.util.Collection;
 
 /**
- * 方法数据源对象 <br />
- * 注解类表明该类中存在可直接作为容器的数据源的方法，
+ * 方法数据源对象
+ * <p>注解类表明该类中存在可直接作为容器的数据源的方法，
  * 允许直接在{@link #methods()}中声明或者通过在方法上添加{@link MethodSourceBean.Method}注解的方式声明作为数据源的方法。
  *
  * @author huangchengxing
