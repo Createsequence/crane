@@ -1,15 +1,13 @@
 package top.xiajibagao.crane.core.executor;
 
-import cn.hutool.core.collection.CollStreamUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.MultiValueMap;
 import top.xiajibagao.crane.core.container.Container;
-import top.xiajibagao.crane.core.helper.PairEntry;
+import top.xiajibagao.crane.core.helper.MultiValueTableMap;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -28,22 +26,18 @@ import java.util.concurrent.ExecutorService;
 public class AsyncUnorderedOperationExecutor extends AbstractOperationExecutor {
 
     private final ExecutorService executorService;
-    
+
     @SuppressWarnings("unchecked")
     @Override
-    protected void execute(@Nonnull MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations) {
-        int index = 0;
-        CompletableFuture<Void>[] tasks = new CompletableFuture[pendingOperations.entrySet().size()];
-        for (Map.Entry<Container, List<PairEntry<AssembleOperation, ?>>> entry : pendingOperations.entrySet()) {
+    protected void execute(@Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
+        CompletableFuture<Void>[] task = new CompletableFuture[pendingOperations.asMap().entrySet().size()];
+        int count = 0;
+        for (Map.Entry<Container, MultiValueMap<AssembleOperation, Object>> entry : pendingOperations.asMap().entrySet()) {
             Container container = entry.getKey();
-            List<AssembleOperation> operations = CollStreamUtil.toList(entry.getValue(), PairEntry::getKey);
-            List<Object> targets = CollStreamUtil.toList(entry.getValue(), PairEntry::getValue);
-
-            tasks[index++] = CompletableFuture.runAsync(
-                () -> container.process(targets, operations), executorService
-            );
+            MultiValueMap<AssembleOperation, Object> operations = entry.getValue();
+            task[count++] = CompletableFuture.runAsync(() -> container.process(operations));
         }
-        CompletableFuture.allOf(tasks).join();
+        CompletableFuture.allOf(task).join();
     }
 
 

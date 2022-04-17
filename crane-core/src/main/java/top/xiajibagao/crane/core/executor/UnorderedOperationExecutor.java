@@ -1,9 +1,7 @@
 package top.xiajibagao.crane.core.executor;
 
-import cn.hutool.core.collection.CollStreamUtil;
-import org.springframework.util.MultiValueMap;
 import top.xiajibagao.crane.core.container.Container;
-import top.xiajibagao.crane.core.helper.PairEntry;
+import top.xiajibagao.crane.core.helper.MultiValueTableMap;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 
@@ -22,11 +20,8 @@ import javax.annotation.Nonnull;
 public class UnorderedOperationExecutor extends AbstractOperationExecutor implements OperationExecutor {
 
     @Override
-    protected void execute(@Nonnull MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations) {
-        // 按执行器分批待处理进程
-        pendingOperations.forEach((container, pairs) -> container.process(
-            CollStreamUtil.toList(pairs, PairEntry::getValue), CollStreamUtil.toList(pairs, PairEntry::getKey)
-        ));
+    protected void execute(@Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
+        pendingOperations.asMap().forEach(Container::process);
     }
 
 }

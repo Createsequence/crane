@@ -1,12 +1,9 @@
 package top.xiajibagao.crane.core.executor;
 
-import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.collection.CollUtil;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import top.xiajibagao.crane.core.container.Container;
-import top.xiajibagao.crane.core.helper.PairEntry;
+import top.xiajibagao.crane.core.helper.MultiValueTableMap;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
@@ -21,7 +18,7 @@ import java.util.stream.StreamSupport;
 /**
  * 抽象操作执行器
  * <p>{@link OperationExecutor}初步实现，提供基本的装配与装卸操作的收集处理。
- * 实现类必须实现{@link #execute(MultiValueMap)}方法
+ * 实现类必须实现{@link #execute(MultiValueTableMap)}方法
  *
  * @author huangchengxing
  * @date 2022/04/17 20:36
@@ -33,19 +30,19 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
         if (CollUtil.isEmpty(targets) || Objects.isNull(configuration)) {
             return;
         }
-        List<?> targetsList = StreamSupport.stream(targets.spliterator(), false)
+        List<Object> targetsList = StreamSupport.stream(targets.spliterator(), false)
             .collect(Collectors.toList());
         // 分组收集待进行的操作配置
-        MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations = new LinkedMultiValueMap<>();
+        MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations = new MultiValueTableMap<>();
         collectOperations(targetsList, configuration, pendingOperations);
         // 执行
         execute(pendingOperations);
     }
 
     private void collectOperations(
-        Collection<?> targets,
+        Collection<Object> targets,
         OperationConfiguration configuration,
-        MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations) {
+        MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
 
         if (CollectionUtils.isEmpty(targets)) {
             return;
@@ -63,7 +60,7 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
      * @author huangchengxing
      * @date 2022/4/17 20:37
      */
-    protected abstract void execute(@Nonnull MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations);
+    protected abstract void execute(@Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations);
 
     /**
      * 处理装配操作
@@ -75,18 +72,15 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
      * @date 2022/4/17 20:38
      */
     protected void processAssembleOperations(
-        @Nonnull Collection<?> targets,
+        @Nonnull Collection<Object> targets,
         @Nonnull OperationConfiguration configuration,
-        @Nonnull MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations) {
+        @Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
 
         List<AssembleOperation> operations = configuration.getAssembleOperations();
         if (CollectionUtils.isEmpty(operations)) {
             return;
         }
-        operations.forEach(operation -> pendingOperations.addAll(
-            operation.getContainer(),
-            CollStreamUtil.toList(targets, target -> new PairEntry<>(operation, target))
-        ));
+        operations.forEach(op -> pendingOperations.putValAll(op.getContainer(), op, targets));
     }
 
     /**
@@ -101,7 +95,7 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
     protected void processDisassembleOperations(
         @Nonnull Collection<?> targets,
         @Nonnull OperationConfiguration configuration,
-        @Nonnull MultiValueMap<Container, PairEntry<AssembleOperation, ?>> pendingOperations) {
+        @Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
 
         List<DisassembleOperation> disassembleOperations = configuration.getDisassembleOperations();
         if (CollectionUtils.isEmpty(disassembleOperations)) {
@@ -109,7 +103,7 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
         }
         for (DisassembleOperation operation : disassembleOperations) {
             // 将嵌套字段取出平铺
-            Collection<?> nestedPropertyValues = targets.stream()
+            Collection<Object> nestedPropertyValues = targets.stream()
                 .map(t -> operation.getDisassembler().execute(t, operation))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());

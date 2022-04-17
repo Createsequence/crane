@@ -1,9 +1,8 @@
 package top.xiajibagao.crane.core.container;
 
+import org.springframework.util.MultiValueMap;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-
-import java.util.List;
 
 /**
  * 装配容器
@@ -29,11 +28,10 @@ public interface Container {
     /**
      * 根据指定装配操作配置处理待处理对象
      *
-     * @param targets 待处理对象
-     * @param operations 待处理的装配操作配置
+     * @param operations 待处理对象与待处理的装配操作配置
      * @author huangchengxing
      * @date 2022/2/23 20:49
      */
-    void process(List<Object> targets, List<AssembleOperation> operations);
+    void process(MultiValueMap<AssembleOperation, ?> operations);
 
 }

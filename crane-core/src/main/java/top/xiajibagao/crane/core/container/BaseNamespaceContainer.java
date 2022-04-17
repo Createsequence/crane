@@ -11,7 +11,6 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,12 +26,12 @@ import java.util.Objects;
 public abstract class BaseNamespaceContainer<K, T> implements Container {
 
     @Override
-    public void process(List<Object> targets, List<AssembleOperation> operations) {
-        if (CollUtil.isEmpty(targets) || CollUtil.isEmpty(operations)) {
+    public void process(MultiValueMap<AssembleOperation, ?> operations) {
+        if (CollUtil.isEmpty(operations)) {
             return;
         }
         // 获取key值与命名空间
-        MultiValueMap<String, K> namespacesAndKeys = getNamespaceAndKeyFromTargets(targets, operations);
+        MultiValueMap<String, K> namespacesAndKeys = getNamespaceAndKeyFromTargets(operations);
         if (CollUtil.isEmpty(namespacesAndKeys)) {
             return;
         }
@@ -44,7 +43,7 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
         if (CollUtil.isEmpty(sources)) {
             return;
         }
-        CollUtils.biForEach(targets, operations, (target, operation) -> writeToTargets(sources, target, operation));
+        CollUtils.forEach(operations, (op, t) -> writeToTargets(sources, t, op));
     }
 
     /**
@@ -89,42 +88,21 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
     /**
      * 将对象集合转为所需要的namespace与key集合
      *
-     * @param target 对象
-     * @param operations 操作配置
+     * @param operations 操作配置与对应的对象集合
      * @return org.springframework.util.MultiValueMap<java.lang.String,K>
      * @author huangchengxing
      * @date 2022/3/21 12:17
      */
     @Nonnull
-    protected MultiValueMap<String, K> getKeyAndNamespaceFromTarget(@Nonnull Object target, @Nonnull List<AssembleOperation> operations) {
+    protected MultiValueMap<String, K> getNamespaceAndKeyFromTargets(@Nonnull MultiValueMap<AssembleOperation, ?> operations) {
         MultiValueMap<String, K> results = new LinkedMultiValueMap<>();
-        for (AssembleOperation operation : operations) {
-            Object key = operation.getAssembler().getKey(target, operation);
+        CollUtils.forEach(operations, (op, t) -> {
+            Object key = op.getAssembler().getKey(t, op);
             K actualKey = parseKey(key);
             if (Objects.nonNull(actualKey)) {
-                results.add(operation.getNamespace(), actualKey);
+                results.add(op.getNamespace(), actualKey);
             }
-        }
-        return results;
-    }
-
-    /**
-     * 将对象集合转为所需要的namespace与key集合
-     *
-     * @param targets 对象集合
-     * @param operations 操作配置
-     * @return org.springframework.util.MultiValueMap<java.lang.String,K>
-     * @author huangchengxing
-     * @date 2022/3/21 12:17
-     */
-    @Nonnull
-    protected MultiValueMap<String, K> getNamespaceAndKeyFromTargets(@Nonnull List<Object> targets, @Nonnull List<AssembleOperation> operations) {
-        MultiValueMap<String, K> results = new LinkedMultiValueMap<>();
-        targets.stream()
-            .filter(Objects::nonNull)
-            .map(t -> getKeyAndNamespaceFromTarget(t, operations))
-            .filter(CollUtil::isNotEmpty)
-            .forEach(results::addAll);
+        });
         return results;
     }
 

@@ -47,7 +47,7 @@ public class SequentialOperationExecutor implements OperationExecutor {
     }
 
     protected void execute(@Nonnull MultiValueMap<OperationConfiguration, Object> collectedConfigurations) {
-        // TODO 优化算法
+        // TODO 优化算法，提高执行效率
         // 获取操作配置，并按类配置分别将全部的操作配置与待处理数据装入桶中，然后对同一桶中的操作按sort排序
         Set<Bucket> buckets = collectedConfigurations.entrySet().stream()
             .filter(e -> CollUtil.isNotEmpty(e.getKey().getAssembleOperations()))
@@ -72,16 +72,19 @@ public class SequentialOperationExecutor implements OperationExecutor {
             buckets = buckets.stream().filter(Bucket::isNotEmpty).collect(Collectors.toSet());
         }
 
-        batch.forEach(((container, bucketList) -> container.process(
-            bucketList.stream()
+        batch.forEach(((container, bucketList) -> {
+            List<Object> targets = bucketList.stream()
                 .map(Bucket::getTargets)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList()),
-            bucketList.stream()
+                .collect(Collectors.toList());
+            List<AssembleOperation> operations = bucketList.stream()
                 .map(Bucket::getOperations)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList())
-        )));
+                .collect(Collectors.toList());
+            MultiValueMap<AssembleOperation, Object> processData = new LinkedMultiValueMap<>();
+            operations.forEach(op -> processData.addAll(op, targets));
+            container.process(processData);
+        }));
     }
 
     /**
