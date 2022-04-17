@@ -2,8 +2,6 @@ package top.xiajibagao.crane.core.helper;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -25,7 +23,7 @@ import java.util.function.Predicate;
  */
 public class ReflexUtils {
 
-    private static final Table<Class<?>, String, BeanProperty> CACHE_TABLE = HashBasedTable.create();
+    private static final TableMap<Class<?>, String, BeanProperty> CACHE_TABLE = new BaseTableMap<>();
     public static final String GET_PREFIX = "get";
     public static final String SET_PREFIX = "set";
     public static final String IS_PREFIX = "is";
@@ -88,13 +86,13 @@ public class ReflexUtils {
      * @date 2022/4/1 13:50
      */
     public static Optional<BeanProperty> findProperty(Class<?> targetClass, String fieldName) {
-        BeanProperty property = CACHE_TABLE.get(targetClass, fieldName);
+        BeanProperty property = CACHE_TABLE.getVal(targetClass, fieldName);
         if (Objects.isNull(property)) {
             synchronized (ReflexUtils.class) {
-                property = CACHE_TABLE.get(targetClass, fieldName);
+                property = CACHE_TABLE.getVal(targetClass, fieldName);
                 if (Objects.isNull(property)) {
                     property = createProperty(targetClass, fieldName);
-                    CACHE_TABLE.put(targetClass, fieldName, property);
+                    CACHE_TABLE.putVal(targetClass, fieldName, property);
                 }
             }
         }
