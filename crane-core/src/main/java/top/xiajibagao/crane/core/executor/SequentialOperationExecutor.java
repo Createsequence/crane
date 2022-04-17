@@ -94,7 +94,9 @@ public class SequentialOperationExecutor implements OperationExecutor {
      */
     @Nonnull
     protected MultiValueMap<OperationConfiguration, Object> collectOperationConfigurations(
-        @Nonnull List<Object> targets, @Nonnull OperationConfiguration configuration, @Nonnull MultiValueMap<OperationConfiguration, Object> collectedConfigurations) {
+        @Nonnull List<Object> targets,
+        @Nonnull OperationConfiguration configuration,
+        @Nonnull MultiValueMap<OperationConfiguration, Object> collectedConfigurations) {
         // 若无待操作数据则结束解析
         if (CollectionUtils.isEmpty(targets)) {
             return collectedConfigurations;
