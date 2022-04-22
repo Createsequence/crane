@@ -6,6 +6,7 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
 
 /**
  * <p>无序的{@link OperationExecutor}同步实现。
@@ -21,7 +22,9 @@ public class UnorderedOperationExecutor extends AbstractOperationExecutor implem
 
     @Override
     protected void execute(@Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
-        pendingOperations.asMap().forEach(Container::process);
+        pendingOperations.asMap().entrySet().stream()
+            .sorted(Map.Entry.comparingByKey())
+            .forEach(e -> e.getKey().process(e.getValue()));
     }
 
 }

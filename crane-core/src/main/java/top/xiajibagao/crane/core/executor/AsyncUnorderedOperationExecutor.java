@@ -1,7 +1,6 @@
 package top.xiajibagao.crane.core.executor;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.MultiValueMap;
 import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.helper.MultiValueTableMap;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -30,14 +29,12 @@ public class AsyncUnorderedOperationExecutor extends AbstractOperationExecutor {
     @SuppressWarnings("unchecked")
     @Override
     protected void execute(@Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
-        CompletableFuture<Void>[] task = new CompletableFuture[pendingOperations.asMap().entrySet().size()];
-        int count = 0;
-        for (Map.Entry<Container, MultiValueMap<AssembleOperation, Object>> entry : pendingOperations.asMap().entrySet()) {
-            Container container = entry.getKey();
-            MultiValueMap<AssembleOperation, Object> operations = entry.getValue();
-            task[count++] = CompletableFuture.runAsync(() -> container.process(operations));
-        }
-        CompletableFuture.allOf(task).join();
+        CompletableFuture<Void>[] sortedTasks = pendingOperations.asMap().entrySet()
+            .stream()
+            .sorted(Map.Entry.comparingByKey())
+            .map(e -> CompletableFuture.runAsync(() -> e.getKey().process(e.getValue()), executorService))
+            .toArray(CompletableFuture[]::new);
+        CompletableFuture.allOf(sortedTasks).join();
     }
 
 
