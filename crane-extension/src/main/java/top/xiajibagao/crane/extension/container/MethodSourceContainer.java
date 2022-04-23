@@ -10,6 +10,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.MultiValueMap;
 import top.xiajibagao.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.container.BaseNamespaceContainer;
+import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.helper.ReflexUtils;
 
 import javax.annotation.Nonnull;
@@ -23,7 +24,7 @@ import java.util.stream.Stream;
  * @date 2022/03/31 21:40
  */
 @RequiredArgsConstructor
-public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object> {
+public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object> implements Container {
 
     public final Map<String, MethodSource> methodCache = new HashMap<>();
 
