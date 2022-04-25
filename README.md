@@ -2,7 +2,7 @@
 
 基于 SpringBoot 的注解式字典项、关联表与枚举值处理框架。
 
-![CRANE](https://img.shields.io/github/license/Createsequence/crane)![maven--central](https://img.shields.io/badge/maven--central-0.2.0--alpha1-green)
+![CRANE](https://img.shields.io/github/license/Createsequence/crane) ![maven--central](https://img.shields.io/badge/maven--central-0.2.0--alpha1-green)
 
 ## 一、项目介绍
 
@@ -685,7 +685,7 @@ crane 基于 SpringAOP 和 aspectj 实现了方法返回值处理切面`top.xiaj
 // 自动填充返回的 Classroom 对象
 @ProcessResult(Classroom.class)
 public Classroom getClassroom(Boolean isHandler) {
-    return Collections.emptyList();
+    return new Classroom();
 }
 ~~~
 
@@ -755,8 +755,8 @@ public class Foo {
 ~~~json
 {
     "id": 1,
-    "name": "foo",
-    "age": 12
+    "userName": "foo",
+    "userAge": 12
 }
 ~~~
 
@@ -778,7 +778,7 @@ public class Foo {
 }
 ~~~
 
-
+值得一提的是，`@ProcessJacksonNode`注解与上文提到的 `@ProcessResult`注解一样，也支持指定自定义的配置解析器，操作者工厂和执行器。
 
 ## 六、操作配置
 
@@ -786,7 +786,7 @@ public class Foo {
 
 每一个对象都需要有一个操作配置类用于指导 crane 对其进行填充，操作配置类在 crane 对应 `top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration`下的实现类，并提供了默认实现 `top.xiajibagao.crane.core.parser.BeanOperationConfiguration`。
 
-一个可用的配置类`OperationConfiguration`由以三部分部件组成：
+一个可用的配置类`OperationConfiguration`由三部分组成：
 
 - 字段装配配置：对应`top.xiajibagao.crane.core.parser.interfaces.AssembleOperation`的实现类，代表基于 `@Assemble`注解字段的一次填充操作；
 - 字段装卸配置：对应 `top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation`的实现类，代表基于 `@Disassemble`注解的嵌套字段的平摊操作；
