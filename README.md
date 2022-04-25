@@ -1,127 +1,52 @@
-# crane
-
 ![CRANE](https://img.xiajibagao.top/CRANE.png)
 
-基于 SpringBoot 的注解式字典项、关联表与枚举值通用处理框架。
+基于 SpringBoot 的注解式字典项、关联表与枚举值处理框架。
+
+![CRANE](https://img.shields.io/github/license/Createsequence/crane)![maven--central](https://img.shields.io/badge/maven--central-0.2.0--alpha1-green)
 
 ## 一、项目介绍
 
 ### 1、简介
 
-在我们日常开发中，常常会遇到一些烦人的关联数据处理和转换问题，比如各种 id 传到前端时需要联查相关数据，01这样的字段需要转成男女......等等，这些数据并不具参与后台实际的业务逻辑，但是我们却不得不为此多写一些重复的查询与字段填值代码。
+在我们日常开发中，常常会遇到一些烦人的数据关联和转换问题，比如典型的：
 
-为了避免这种情况，我希望能有个统一的地方配置填充的数据源——不管是数据库、字典还是枚举还是其他什么——然后通过字段注解去自动获取并填充到对象中，为了实现这个功能，在公司的时候我分别开发了一套字典项自动填充框架，与关联表字段信息自动填充框架，这两套框架在使用中暴露了一些问题，经过总结与重新设计，于是有了 crane。
+- 对象属性中存有字典 id，需要获取对应字典值并填充到对象中；
+- 对象属性中存有外键，需要关联查询对应的数据库表实体，并获取其中的指定属性填充到对象中；
+- 对象属性中存有枚举，需要将枚举中的指定属性填充到对象中；
 
-crane 本身不产生数据，它只是数据的搬运工，像一个吊车一样将一个数据来源中的数据“转移”到我们指定货对象中，这也正是其名字的由来。
+实际场景中这种联查的需求远远不止这些，这些相关代码有时并不方便提取，因此我们不得不重复的写一些的样板代码。
+
+crane 便是为了解决这种烦恼而生。它允许通过统一配置填充的数据源——可以是数据库、缓存，字典或枚举——然后在需要的时候自动根据字段注解去获取并填充到对象中。它本身不产生数据，它只是数据的搬运工，像一个吊车一样将一个数据来源中的数据“转移”到我们指定货对象中，这也正是其名字的由来。
 
 ### 2、特性
 
-crane 适用于处理以下情况：
-
-**处理关联表**
-
-有一个 id 字段，但是返回前端的时候需要关联查询带出对应的信息：
-
-~~~json
-{
-    "userId": 1
-}
-~~~
-
-处理后：
-
-~~~json
-{
-    "user": {
-        "name": "小明",
-        "age": 12
-    }
-}
-~~~
-
-**处理枚举值**
-
-有一个枚举字段，但是返回前端时需要返回枚举值json对象或者只返回枚举值：
-
-~~~json
-{
-    "season": "SPRING"
-}
-~~~
-
-处理后：
-
-~~~json
-{
-    "season": {
-        "code": 1,
-        "value": "春天"
-    }
-}
-~~~
-
-**处理字典项**
-
-有一个字典项字段，但是返回前端时需要转成对应的字典值：
-
-~~~json
-{
-    "sex": 1
-}
-~~~
-
-处理后：
-
-~~~json
-{
-    "sex": "男"
-}
-~~~
-
-
-
-**支持嵌套结构的 Json 与 JavaBean**
-
-crane 支持批量处理 Json 对象中的嵌套的 Json 数组与 Json 对象类型属性，也支持批量处理普通 JavaBean 中的嵌套的集合类型与对象类型属性。
+- 丰富的数据源支持。支持从枚举，普通键值对缓存，或被注解的指定方法中获取数据源，并且允许通过少量代码自定义数据源，以兼容任何数据格式；
+- 高度的可扩展型。主要组件都基于接口实现，几乎所有默认组件都允许自行扩展组合并替换；
+- 同时支持处理 JsonNode 与普通 JavaBean 对象，并且能够单体或批量的处理各种复杂的嵌套对象；
+- 注解式配置。全部配置都支持通过注解完成，并且支持 Spring 元注解，允许自定义各种组合注解；
+- 开箱即用。引入依赖即可自动装配所有主要功能的默认配置，并且结合 Spring 提供了诸如自动填充切面等便利的辅助类；
 
 ### 3、原理
 
-**核心概念**
+crane 的执行过程就是传统手动数据填充的过程：
 
-- **容器** `Container`：表示某类特定的数据来源，比如内置的`top.xiajibagao.crane.container.KeyValueContainer`就是一个简单的键值对容器，通过操作者，我们可以获取对象指定指定的某个特定的属性值作为 key，并从中获取数据源；
+>  从待处理对象中获取 key， 然后根据 key 去对应的缓存/接口/数据库中获取对应数据源，将数据源塞入待处理对象
 
-- **操作者** `Operator`：表示用于处理对象实例的类，又根据功能的不同又有所区分：，
+在 crane 中，该过程被抽象为多个步骤，并由多个组件共同完成：
 
-  1. 装配器`Assembler`：用来从对象实例中获取 key 值，并在从容器中获取数据源后将其填充到对象实例中。
+- 操作 `Operation`：对应上述过程描述的一次动作，与类中的一个 key 字段一一对应，表述了本次填充操作对应哪个 key 字段，然后要去何处取对应数据源，接着要如何填充到待处理对象中；
+- 类操作配置 `OperationConfiguration`：由一个 `Class`下整合聚合而来，描述了如何处理一类对象，一般与类一对一；
+- 操作配置解析器 `OperationConfigurationParser`：用于解析 `Class` 中注解，并生成操作配置；
+- 操作执行器 `OperationExecutor`：用于根据操作配置驱动完成对待处理对象的全部填充操作。
+- 操作者 `Operator`：用于完成对指定类型数据读取、写入操作的类，是执行上述过程中“获取...塞入...”的主体；
+- 操作处理器 `OperateHandler`：类似 Spring 的 Converter ，用于配合操作者完成对不同数据类型的数据的读取与写入；
+- 装配源容器 `Container`：也称为数据源容器，一般与一个数据源对应，待处理对象与操作者将在容器中获取数据源，并完成上述填充过程； 
 
-     比如内置的 `top.xiajibagao.crane.impl.json.JacksonAssembler`就是专门用于处理 Json 对象的装配器；
-
-  2. 拆卸器`Disassembler`：用于将对象实例中嵌套的对象取出的类，
-
-     比如内置的 `top.xiajibagao.crane.impl.json.JacksonDisassembler`就是专门用于从 Json 对象中获取其嵌套的 Json 对象字段或 Json 数组字段的拆卸器；
-
-- **操作配置** `Operation`：根据左右域不同分为两类：
-
-  1. 属性操作配置`PropertyOperation`：一般与属性上的注解一一对应，包含了指定的容器与操作者，以及相关的操作配置，表明操作者将从哪个容器中如何获取数据源，并且在获取数据后如何填充到当前指定对象中；
-  2. 类操作配置`OperationConfiguration`：与待处理的类一一对应，内部包含了全部的属性操作配置；
-
-- **配置解析器** `OperationConfigurationParser`：用于解析类中注解，并且将其转换为响应操作配置的类；
-
-- **动作执行器**`OperationExecutor`： 用于根据操作配置完成整个数据处理流程；
-
-**运行流程**
-
-![运行流程与总体结构](https://img.xiajibagao.top/image-20220304091120606.png)
-
-- 我们在类与类属性上通过注解配置要如何处理一个字段：从哪个容器`Container`中获取数据源，要使用什么操作者`Operator`，以什么样的方式去将数据源中的数据填充到我们的对象实例中；
-- 解析器`OperationConfigurationParser`解析类中的注解，分别获取类中每个字段配置的操作者与数据源以及其他配置，将其整合为一个属性操作配置对象 `PropertyOperation`，同一类下的属性操作配置对象最终整合为一个类操作配置对象 `OperationConfiguration`；
-- 当需要执行数据填充操作时，将待处理对象实例与解析获得的对应类操作配置对象放入操作执行器 `OperationExecutor`，执行器将从配置中获取全属性的操作配置，然后依次执行，最终将数据处理并填充到对象实例中；
+<img src="https://img.xiajibagao.top/image-20220420193512250.png" alt="image-20220420193512250" style="zoom:80%;" />
 
 ## 二、快速开始
 
-首先，创建一个空的 SpringBoot 工程。
-
-### 1、添加依赖
+### 1、引入依赖
 
 引入 SpringBoot 父工程：
 
@@ -134,13 +59,13 @@ crane 支持批量处理 Json 对象中的嵌套的 Json 数组与 Json 对象�
 </parent>
 ```
 
-引入`scane`、`spring-boot-starter`、`spring-boot-starter-web`、`spring-boot-starter-test`依赖：
+引入`crane-spring-boot-starter`、`spring-boot-starter`、`spring-boot-starter-web`、`spring-boot-starter-test`，`lombok`依赖：
 
 ~~~xml
 <dependency>
     <groupId>top.xiajibagao</groupId>
-    <artifactId>scane</artifactId>
-    <version>${version}</version>
+    <artifactId>crane-spring-boot-starter</artifactId>
+    <version>${last-version}</version>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -155,9 +80,14 @@ crane 支持批量处理 Json 对象中的嵌套的 Json 数组与 Json 对象�
     <artifactId>spring-boot-starter-test</artifactId>
     <scope>test</scope>
 </dependency>
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <optional>true</optional>
+</dependency>
 ~~~
 
-> 若无法从 maven 仓库引入 scane 依赖，则可以把代码拉到本地，然后执行 `mvn clean install`命令安装到本地后即可引用。
+> 若无法从 maven 仓库引入 crane 依赖，则可以把代码拉到本地，然后执行 `mvn clean install`命令安装到本地后即可引用。
 
 ### 2、引入配置
 
@@ -170,7 +100,6 @@ public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-
 }
 ```
 
@@ -179,11 +108,12 @@ public class Application {
 编写实体类`Person`，并在`sex`字段上添加注解，根据字典项获取字典值，并替换字段值：
 
 ~~~java
-@Data // 这里使用Lombok简化getter和setter方法
+@Data // 使用Lombok简化getter和setter方法
 @Accessors(chain = true)
 public class Person {
-    @Assemble(container = KeyValueContainer.class, namespace = "sex")
+    @Assemble(container = KeyValueContainer.class, namespace = "sex", props = @Prop("sexName"))
     Integer sex;
+    String sexName;
 }
 ~~~
 
@@ -194,10 +124,10 @@ public class Person {
 class CraneApplicationTests {
 
     @Autowired
-    ObjectMapper objectMapper;
+    KeyValueContainer keyValueContainer;
     @Autowired
-    OperationExecutor operationExecutor;
-    
+    OperateHelper operateHelper;
+
     @BeforeEach
     void initDate() {
         // 配置字典项sex
@@ -206,16 +136,13 @@ class CraneApplicationTests {
         gender.put("1", "男");
         keyValueContainer.register("sex", gender);
     }
-    
-    @Test
-    void testSimpleJsonKV() {
-        Person jsonPerson = new Person().setSex(0);
-        JsonNode jsonNode = objectMapper.valueToTree(jsonPerson);
 
-        OperationConfiguration jsonConfig = configurationParser.parse(Person.class, jacksonOperatorFactory);
-        System.out.println(jsonNode); // 处理前
-        operationExecutor.execute(Collections.singletonList(jsonNode), jsonConfig);
-        System.out.println(jsonNode); // 处理后
+    @Test
+    void testProcess() {
+        Person person = new Person().setSex(0);
+        System.out.println("after: " + person); // 处理前
+        operateHelper.process(person);
+        System.out.println("before: " + person); // 处理后
     }
     
 }
@@ -223,58 +150,37 @@ class CraneApplicationTests {
 
 启动测用例，控制台输出：
 
+~~~java
+after: Person(sex=0, sexName=null) // 处理前
+before: Person(sex=0, sexName=女) // 处理后
 ~~~
-{"sex":0} // 处理前
-{"sex":"女"} // 处理后
-~~~
 
-### 4、小结
+至此，即完成了 crane 的基本功能的使用，更多功能请见下文。
 
-通过以上步骤，我们了解了 `crane`的基本使用，仅需引入依赖，启用配置，即可使用配置好的字典项自由填充。实际上它的功能远远不止如此。
+## 三、数据源容器
 
-## 三、使用
+在 crane 中，数据源来自指定的数据源容器，而数据源容器即指 `top.xiajibagao.crane.core.container.Container`接口的各项实现类，它被用于提供各种来源的数据源。
 
-### 1、容器
+当使用时，需要预先将容器注册到 Spring 中，然后即可通过 `@Assemble`的`Assemble#container()`属性根据容器类型、或通过`Assemble#containerName()`根据容器在 Spring 中的 Bean 名称获取容器。
 
-容器是 crane 的核心组件之一，用于为操作者提供数据源，换而言之，就是提供我们填充字段时使用的数据的。我们需要有数据源才能进行后续操作。由于希望能够最大限度的兼容各种数据来源，因此 crane 的容器机制基于接口实现，并且仅提供两个比较常用的默认容器。
+默认情况下，crane 提供以下四种实现：
 
-#### **键值对容器**
+- 枚举容器：`top.xiajibagao.crane.core.container.EnumDictContainer`
+- 键值对容器：`top.xiajibagao.crane.core.container.KeyValueContainer`
+- 方法容器：`top.xiajibagao.crane.extend.container.MethodContainer`
+- 内省容器：`top.xiajibagao.crane.extend.container.IntrospectContainer`
 
-项目默认提供键值对容器`top.xiajibagao.crane.container.KeyValueContainer`，项目启动时会默认将实例注入 spring 容器，当我们需要使用前，需要获取该实例并向其中配置好我们需要的数据。
+下文将介绍其作用与对应的使用方式。
 
-比如现在我们希望配置性别这个字段，则有需要：
+### 1、枚举容器
+
+枚举容器`EnumDictContainer`用于处理枚举类型的数据源。
+
+使用前，需要预先通过`EnumDictContainer#register()`方法项容器注册枚举类，指定货枚举类型与其对应在容器中的 namespace，以及枚举项对应的 key 值。
+
+比如，目前我们有一个枚举类 `Gender`：
 
 ~~~java
-@PostConstruct
-public void initDate() {
-    // 配置字段配置
-    Map<String, Object> gender = new HashMap<>();
-    gender.put("0", "女");
-    gender.put("1", "男");
-    // 从spring中获取容器，并且将配置放入命名空间sex
-    keyValueContainer.register("sex", gender);
-}
-~~~
-
-然后在类中的指定字段上引用即可：
-
-~~~java
-// 指定容器KeyValueContainer与命名空间sex
-@Assemble(container = KeyValueContainer.class, namespace = "sex")
-private Integer sex;
-~~~
-
-当执行时，会先获取 `sex` 字段值，然后去指定的 `KeyValueContainer` 容器的命名空间`sex`找到对应的值，并进行处理。
-
-#### **枚举容器**
-
-项目默认提供枚举容器`top.xiajibagao.crane.container.EnumDictContainer`，项目启动时会默认将实例注入 spring 容器，同样的，当我们需要使用前，需要获取该实例并向其中配置好我们需要的枚举。
-
-比如，现在我们有一个性别枚举：
-
-~~~java
-@Getter
-@RequiredArgsConstructor
 public enum Gender {
     MALE(1, "男"),
     FEMALE(2, "女");
@@ -283,123 +189,222 @@ public enum Gender {
 }
 ~~~
 
-然后去 spring 里面的`EnumDictContainer`注册这个枚举：
+我们可以根据需要选择不同的方法重载将其注册到容器中：
 
 ~~~java
-@PostConstruct
-public void initDate() {
-    // 指定枚举命名空间为“sex”，并且通过枚举名来寻找枚举实例
-    enumDictContainer.register(Gender.class, "sex", Enum::name); 
-}
+// namespace为gender，并且以枚举项的id属性作为key值
+enumDictContainer.register(Gender.class, "gender", Gender::id);
+// namespace为Gender类的非全限定名Gender，并且以枚举项的 Enum#name() 返回值作为key值
+enumDictContainer.register(Gender.class);
 ~~~
 
-接着，在类中如此引用即可：
+当使用时，在 `@Assemble`注解中引用即可：
 
 ~~~java
-@Assemble(container = EnumDictContainer.class, namespace = "sex")
-private Gender gender;
+@Assemble(
+    container = EnumDictContainer.class, // 指定使用枚举容器
+    namespace = "gender", // namespace为上文指定的gender
+    props = @Prop(src = "name", ref = "genderName") // 获取Gender枚举中的name字段值，并填充到genderName字段
+)
+private Integer gender;
+private String genderName;
 ~~~
 
-当然，如果我们希望只引用枚举中的某些特定字段值，这也是支持的，具体参见后文的字段配置部分。
+需要注意的是，枚举容器底层实际上是基于枚举字典 `top.xiajibagao.crane.core.helper.EnumDict`实现，该类默认是单例的，当需要同时启用多个枚举容器时，需要注意不要使用了同一个枚举字典实例。
 
-#### **通用方法容器**
 
-由于实际场景中可能存在大量需要通过 Mapper/service 或 RPC 接口根据 id 查询的情景，因此，若针对每一个接口都需要创建一个容器提供数据源是一件繁琐的事情，为此，crane 提供了通用方法容器`top.xiajibagao.crane.extend.container.MethodContainer`，用于通过注解快速将查询接口接入容器。
 
-**基于方法注解**
+### 2、键值对容器
 
-crane 提供了 `top.xiajibagao.crane.annotation.extend.ContainerMethodBean`使用该注解标记需要的 Mapper/service 或其他任何被 Spring 管理的实例所对应的类，再使用`top.xiajibagao.crane.annotation.extend.ContainerMethod` 标记其中的方法即可：
+键值对容器`KeyValueContainer`基于一个双重 Map 集合实现，本质上是一个基于本地缓存的数据源。
+
+与枚举容器类似，键值对容器使用前也需要预先注册所需的枚举值，然后在字段注解上通过 namespace 与 key 进行引用。
+
+比如，我们需要处理很典型的性别字典项，则如此注册：
 
 ~~~java
-@ContainerMethodBean
+Map<String, Object> gender = new HashMap<>();
+gender.put("0", "女");
+gender.put("1", "男");
+keyValueContainer.register("sex", gender);
+~~~
+
+然后再在待处理对象中引用：
+
+~~~java
+@Assemble(
+    container = keyValueContainer.class, // 指定使用键值对容器
+    namespace = "sex", // namespace为上文指定的sex
+    props = @Prop("sexName") // 从命名空间sex中根据sex字段值获取对应的value，并填充到sexName字段
+)
+private Integer sex;
+private String sexName;
+~~~
+
+
+
+### 3、方法容器
+
+方法容器`MethodContainer`是基于 namespace 隔离，将各个类实例中的方法作为数据源的容器。
+
+**注册方法**
+
+在使用方法容器之前，我们需要先使用 `top.xiajibagao.annotation.@MethodSourceBean.Method`注解作为数据源的方法，然后再使用`top.xiajibagao.annotation.@MethodSourceBean`注解该方法所在的类实例。
+
+比如，我们需要将一个根据用户 id 批量查询用户对象的接口方法作为数据源：
+
+~~~java
+@MethodSourceBean
 public class UserService {
-    
     // 通过“user”寻找对应的实例，然后指定返回值类型为 User.class, key 字段为 id
-    @ContainerMethod(namespace = "user", sourceType = User.class, sourceKey = "id")
-    public List<User> getByIds(List<Integer>) {
+    @MethodSourceBean.Mehtod(namespace = "user", sourceType = User.class, sourceKey = "id")
+    public List<User> getByIds(List<Integer> ids) {
         // 返回user对象集合
     }
 }
 ~~~
 
-当使用时，在类对象中引用即可：
-
-~~~java
-@Assemble(container = MethodContainer.class, namespace = "user")
-private Integer userId;
-~~~
-
-当实际调用时，将会在`UserManager`容器中找到`UserManager.getByIds`方法，然后传入 `userId`查询集合，再按指定的 “id” 字段对结果分组，最后作为数据源交由操作者处理。
-
-**基于类注解**
-
-当目标方法位于父类时，无法通过`ContainerMethod`直接注明指定方法，如果为此专门在所有的实现类里重写方法又显得繁琐，因此，也可以直接在`ContainerMethodBean`注解中声明方法。
-
-我们依然以上述获取用户的方法为例，但是`UserService`的 `getByIds`方法通过继承 `BaseService` 得到的，我们可以这么写：
+当然，如果这个方法来自与父类，无法显示的使用注解声明数据源方法，也允许通过类注解声明：
 
 ~~~java
 @ContainerMethodBean({
     @ContainerMethodBean.Method(
-        namespace = "user",
-        name = "getByIds", returnType = User.class, paramTypes = List.class,
-        sourceType = User.class, sourceKey = "id"
+        namespace = "user", name = "getByIds", sourceType = User.class, sourceKey = "id"
     )
 })
-public class UserService extend BaseService<User> {
+public class UserService extend BaseService<User> {}
+~~~
+
+当项目启动时，crane 将从 Spring 容器中获取被 `@ContainerMethodBean`注解的类，并获取其中被注解的方法，并根据指定的 namespace 注册到方法容器对应的命名空间。
+
+**使用**
+
+当我们使用时，与其他容器保持一致：
+
+~~~java
+@Assemble(
+    container = MethodContainer.class, // 指定使用键值对容器
+    namespace = "user", // namespace为上文指定的user
+    props = @Prop("userBean") // 从命名空间user中获取方法getByIds，然后将userId对应的user对象填充到userBean字段中
+)
+private Integer userId;
+private User userBean;
+~~~
+
+当有一批的待处理对象时，crane 将批量的把 userId 字段值从对象中取出，并组成集合后再传入 `getByIds`方法，以此类推，由于作为 key 字段的类型也没有任何限制，因此作为 key 的字段是集合或是对象也是允许的。
+
+crane 传给数据源方法参数的总是 key 类型的集合，然后从方法获取的一批数据源总是以 `@ContainerMethodBean.Method#sourceKey` 分组，因此作为**数据源的方法入参必须有且仅有一个 `Collection`或Collection子类的参数，返回值也必须为 Collection 或 Collection**。
+
+**一对多**
+
+默认情况，crane 总是认为数据源方法返回的集合中的对象与 key 字段的值是**一对一**的，当数据源方法返回的集合与 key 字段对应的值是**一对多**时，需要在方法注解上声明。
+
+比如我们现在有一批待处理的 `Classroom` 对象，需要根据 `Classroom#id`字段批量获取`Student`对象，然后根据`Student#classroomId`字段填充到对应的 `Classroom` 对象中：
+
+~~~java
+@MethodSourceBean.Mehtod(
+    namespace = "student", 
+    sourceType = Student.class, sourceKey = "classroomId",
+    mappingType = MappingType.ONE_TO_MORE // 声明待处理对象跟Student通过classroomId构成一对多关系
+)
+public List<Student> listStudentByClassroomIds(List<Integer> classroomIds) {
+    // 查询Student对象
 }
 ~~~
 
-该写法依然等效于上述例子。
+然后在待处理对象中引用：
 
-#### **自定义容器**
+~~~java
+@Assemble(
+    container = MethodContainer.class,
+    namespace = "student",
+    props = @Prop("students")
+)
+private Integer classroomId;
+private List<Student> students;
+~~~
 
-当我们的数据源来自于数据库查询，或者默认提供的容器不满足需求时，可以自定义容器。
 
-自定义容器需要实现 `top.xiajibagao.crane.container.Container`接口，并且注册到 spring 中，接着在`@Assemble#container()`方法引用即可。
 
-这里给一个示例，假设我们现在有一个字段`userId`，我们需要从`User`表查出需要的数据，因此我们可以自定义一个容器：
+### 4、内省容器
+
+内省容器`IntrospectContainer`的数据源就是待处理对象本身，它用于需要对待处理对象本身进行处理的情况。
+
+比如简单的同步一下字段：
+
+~~~java
+// 将对象中的name字段的值同步到userName字段上
+@Assemble(container = IntrospectContainer.class, props = @Prop("userName")
+private String name;
+private String userName;
+~~~
+
+也可以用于处理集合取值：
+
+~~~java
+// 将对象中的users集合中全部name字段的值同步到userNames字段上
+@Assemble(container = IntrospectContainer.class, props = @Prop(src = "name", ref = "userNames"))
+private List<User> users;
+private List<String> userNames;
+~~~
+
+或者配合 SpEL 预处理数据源的功能处理一些字段：
+
+~~~java
+@Assemble(
+    container = IntrospectContainer.class, props = @Prop(
+        ref = "userName", 
+        exp = "sex == 1 ? #source.name + '先生' ： #source.name + '女士'", // 根据性别，在name后追加“先生”或者“女士”
+        expType = String.class
+    )
+)
+private String sex;
+private String name;
+~~~
+
+
+
+### 5、自定义容器
+
+一般情况下，以上四种容器可以满足大部分情况下的需求，但是如果有需要，也可以实现`top.xiajibagao.crane.core.container.Container`接口自定义一个容器。
+
+**基本使用**
+
+比如，我们现在需要一个根据待处理对象中的 key，查询出 User 对象并回填对应字段的容器：
 
 ~~~java
 @Component
 public class UserContainer implements Container {
 
     @Autowrite
-    prvate UserService userService;
-    
-    @Override
-    public void process(List<Object> targets, List<AssembleOperation> operations) {
-        for (Object target : targets) {
-            operations.forEach(operation -> {
-                // 通过操作者获取注解字段的值，在这里也对应userId
-                Object key = operation.getAssembler().getKey(target, operation);
-                if (Objects.isNull(key)) {
-                    return;
-                }
-                // 模拟从服务中根据id获取User对象
-                User user = userService.getById(Integer.valueOf(key.toString()));
-                if (Objects.nonNull(beam)) {
-                    // 通过操作者将User对象的数据填充到对象实例
-                    operation.getAssembler().execute(target, beam, operation);
-                }
-            });
-        }
-    }
+    private UserService userService;
 
+    @Override
+    public void process(MultiValueMap<AssembleOperation, ?> operations) {
+        // 从待处理对象中获取 key
+        Set<Integer> userIds = new HashSet<>();
+        operations.forEach((operation, targets) -> targets.forEach(target -> {
+            Object key = operation.getAssembler().getKey(target, op);
+            Integer actualKey = parseKey(key);
+            userIds.add(actualKey);
+        }));
+
+        // 根据 key 获取数据源，并按 id 分组
+        Map<Integer, User> sources = userSevice.listByIds(userIds).stream()
+            .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        // 将数据源回填充至待处理对象
+        operations.forEach((operation, targets) -> targets.forEach(target -> {
+            Object key = op.getAssembler().getKey(t, op);
+            Integer actualKey = parseKey(key);
+            User user = sources.get(actualKey);
+            operation.getAssembler().execute(target, user, operation);
+        }))
+    }
 }
 ~~~
 
-最后我们把这个容器注册到 spring，然后在类中引用即可：
-
-~~~java
-@Assemble(container = UserContainer.class)
-private Integer userId;
-~~~
-
-这个容器将获取每一个实例对象需要关联的用户id，然后同`userService`根据 id 查询对应的`User`，然后根据配置将其数据填充到对象实例中。
-
-由于通过`AssembleOperation`可以轻松获取到待处理数据实际类型，以及一些全局配置信息，因此如果项目基于 JPA 或者 mybatis-plus 这类框架开发，也可以借助通用 Mapper 层实现一个通用的查询容器。
-
-**通用容器模板**
+**基于模板实现**
 
 由于大部分的容器其实操作基本不外乎四步：
 
@@ -408,406 +413,512 @@ private Integer userId;
 3. 查询出的数据源按 key  / namespace 分组 ；
 4. 将分组的数据源处理后填充到对应的待处理对象中；
 
-因此 crane 也提供了抽象模板用于简化操作：
+因此 crane 为 1/2/4 步提取了两类抽象模板，用户可以基于下述模板快速扩展：
 
-- `top.xiajibagao.crane.extend.container.BaseKeyContainer`：基于 key 的容器；
-- `top.xiajibagao.crane.extend.container.BaseNamingContainer`：基于 key 和 namespace 的容器；
+- `top.xiajibagao.crane.core.container.BaseKeyContainer`：根据 key 获取数据源的容器；
+- `top.xiajibagao.crane.core.container.BaseNamingContainer`：根据 key 和 namespace 的容器；
 
-### 2、处理字段
+比如，若上述自定义容器继承了BaseKeyContainer模板，则代码可以简化为：
 
-假如我们有一个已经注册 spring 的 `UserContainer`容器，他提供`User`实例作为数据源：
+~~~Java
+@Component
+public class UserContainer extends BaseKeyContainer<Integer> implements Container {
+    
+    @Autowrite
+    private UserService userService;
+    
+    @Override
+    protected Map<Integer, User> getSources(@Nonnull Set<Integer> keys) {
+        return userSevice.listByIds(userIds).stream()
+            .collect(Collectors.toMap(User::getId, Function.identity()));
+    }
+}
+~~~
+
+
+
+
+
+##  四、字段配置
+
+在此之前，我们需要明确一些概念：
+
+- key 字段：`@Assemble`所注解的字段，该字段的值即我们通常所说的 key 值，或者外键；
+- 待处理对象：需要填充的对象；
+- 数据源对象：从容器中获取原始数据源；
+- 数据源字段： 在`@Prop#src`指定的字段，需要从数据源对象中获取的具体数据对应的 key；
+- 引用字段： 在`@Prop#ref`指定的字段，一般对应对应待处理对象中的具体字段；
+- 数据源数据：最终需要填充至引用字段。
+
+假如我们已经有一个 `UserContainer`容器，允许我们根据 id 获取对应的 `User` 对象作为数据源，下述示例都基于此实现。
+
+### 1、字段映射
+
+当我们使用 `@Assemble`注解时，可以根据 `@Assemble#props`属性，在入参的`@Prop`注解中自由指定数据源与待处理对象字段间的映射规则，操作者中的操作处理器链将根据映射规则与数据源和待处理对象的数据类型以不同的方式进行处理。
+
+**映射对象**
+
+如果数据源是对象，则我们可以将数据源对象的字段映射到待处理对象中
 
 ~~~java
-@Getter
-@RequiredArgsConstructor
-public enum User {
+// 根据id查询User对象，然后将其中的name与age字段值映射到待处理对象的userName与userAge字段上
+@Assemble(container = UserContainer.class, props = {
+    @prop(src = "name", ref = "userName"), 
+    @prop(src = "age", ref = "userAge")
+})
+private String id;
+private String userName;
+private Integer userAge;
+~~~
+
+或者，也可以直接将数据源对象整个映射到待处理对象的字段上：
+
+~~~java
+// 根据id查询User对象，然后将其中的name与age字段值映射到待处理对象的userName与userAge字段上
+@Assemble(container = UserContainer.class, props = {
+    @prop(src = "name", ref = "userName"),
+    @prop(src = "age", ref = "userAge"),
+    @prop("user") // 将user对象直接映射到待处理对象的user字段上
+})
+private Integer id;
+private String userName;
+private Integer userAge;
+private User user;
+~~~
+
+**映射集合字段**
+
+数据源也可以是集合，我们可以选择直接将集合整个映射到待处理对象的字段上：
+
+~~~java
+@Assemble(container = UserContainer.class, props = @prop("users"))
+private Integer id;
+private List<User> users;
+~~~
+
+也可选择只映射集合中对象的某些指定字段：
+
+~~~java
+@Assemble(container = UserContainer.class, props = @prop(src = "name", ref = "userNames"))
+private Integer id;
+private List<String> userNames;
+~~~
+
+
+
+### 2、字段模板
+
+有时候，尤其对象的字段大多都来自于关联查询时，我们需要在 key 字段上配置的注解就会变得及其臃肿，尤其是当有多个对象需要使用相同的配置时，这个情况会变得更加验证，因此 crane 允许通过 `top.xiajibagao.annotation.@PropsTemplate`将字段配置单独的分离到某个特定的类，然后再在 `@Assemble#propTemplates`属性中指定。
+
+比如，我们现在有这样一个注解：
+
+~~~java
+@Assemble(container = UserContainer.class, props = {
+    @prop(src = "name", ref = "userName"),
+    @prop(src = "age", ref = "userAge"),
+    @prop("user") // 将user对象直接映射到待处理对象的user字段上
+})
+private Integer id;
+~~~
+
+我们可以使用一个单独的配置接口，去承担一部分繁琐的字段配置：
+
+~~~java
+@PropsTemplate({
+    @prop(src = "name", ref = "userName"),
+    @prop(src = "age", ref = "userAge")
+})
+public interface UserPropTemplates {};
+~~~
+
+接着我们将原本的注解改为：
+
+~~~java
+@Assemble(container = UserContainer.class, props = @prop("user"), propTemplates = {UserPropTemplates.class})
+private Integer id;
+~~~
+
+即可实现跟原本一样的效果。
+
+
+
+### 3、嵌套字段
+
+有时候待处理对象中会存在嵌套的字段，即字段本身是一个集合或者一个对象，内部还需要进行填充处理的情况，这种情况需要使用 `top.xiajibagao.annotation.Disassemble`注解待处理的字段。
+
+比如，待处理对象中存在嵌套的 User 对象集合，我们需要在填待处理对象时一并处理： 
+
+~~~java
+// 标记集合中存在类型为User的待处理对象
+@Disassemble(User.class)
+private List<User> users;
+~~~
+
+这样在处理外层对象前，会优先将 `users`字段取出平铺，然后根据注解上的类型对应的操作配置进行填充处理，若嵌套字段中仍然存在 `@Disassemble`，则将继续递归处理，因此，需要注意**不要让两个实例互相循环引用，否则将进入死循环**。
+
+嵌套字段允许是多重嵌套的 Collection 或数组，即可以这样：
+
+~~~java
+private List<List<User[]>> users;
+~~~
+
+> **注意：不支持除了 Collection 或数组外的其他类型结果。**
+
+
+
+### 4、多类型处理
+
+crane 对各种类型数据的操作全部依赖于操作处理器 `top.xiajibagao.crane.core.handler.interfaces.OperateHandler`，一个处理器一般用于处理一种特定类型的数据，类似 Spring 中的 `MessageConverter`。
+
+多个处理器通过 `top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain`组合为处理器链。当调用时，处理器链将先按指定的顺序排序，然后找到支持处理该类型数据的处理器中优先级最高的完成操作。
+
+若有需要自定义处理的数据类型，可以直接实现 `OperateHandler`接口，并注册到 Spring 容器中的启用的处理器链即可。
+
+以下是不同类型的数据源对象与不同字段配置对应的大致操作结果：
+
+|                 | src为空，数据源：               | src不为空，数据源：                                          | ref为空，待处理对象：                                        | ref不为空，待处理对象：                                      |
+| --------------- | ------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Collection 集合 | 直接将集合作为数据源数据;       | 将集合展开后，从获取的对象获取对应字段作为数据源继续交由处理器链处理； | 将集合展开后，将数据源数据源与展开后的每个待处理对象继续交由数据源对象处理； | 将集合展开后，将数据源数据源与展开后的每个待处理对象继续交由处理器链处理； |
+| 数组            | 将数组转为集合并作为数据源数据; | 将数组展开后，从获取的对象获取对应字段作为数据源继续交由处理器链处理； | 将集合展开后，将数据源数据源与展开后的每个待处理对象继续交由数据源对象处理； | 将集合展开后，将数据源数据源与展开后的每个待处理对象继续交由处理器链处理； |
+| Map 集合        | 将Map并作为数据源数据;          | 从Map集合中获取 key 对应的值作为数据源数据                   | 将数据源数据填充至Map集合中key字段对应的key中；              | 将数据源数据填充至Map集合对应的key中；                       |
+| 对象            | 将对象作为数据源数据；          | 从对象中获取对应字段的值作为数据源数据                       | 将数据源数据填充至待处理对象对应的key字段                    | 将数据源数据填充至待处理对象中的对应字段中；                 |
+| 枚举            | 将枚举转为Map并作为数据源数据;  | 从枚举转为的Map集合中获取 key 对应的值作为数据源数据         | 不支持                                                       | 不支持                                                       |
+| 基本数据类型    | 将值作为数据源数据；            | 将值作为数据源数据；                                         | 不支持；                                                     | 不支持                                                       |
+
+
+
+### 5、数据源预处理
+
+crane 允许通过 SpEl 表达式针对从容器中获取的原始的数据源进行预处理。
+
+比如我们上文举的例子：
+
+~~~java
+@Assemble(
+    container = IntrospectContainer.class, props = @Prop(
+        ref = "userName", 
+        exp = "sex == 1 ? #source.name + '先生' ： #source.name + '女士'", // 根据性别，在name后追加“先生”或者“女士”
+        expType = String.class // 表达式返回值为String类型
+    )
+)
+private String sex;
+private String name;
+~~~
+
+根据 `sex`字段从容器中获取的数据源，将先经过表达式的处理，然后将返回指定类型的结果，这个结果将作为新的数据源参与后续处理。
+
+表达式上下文中默认注册了以下变量，允许直接在表达式中引用：
+
+- `#source`：原始数据源对象；
+- `#target`：待处理对象；
+- `#key`：key字段的值；
+- `#src`：`@Prop#src`指定的参数值；
+- `#ref`：`@Prop#ref`指定的参数值；
+
+**自定义上下文**
+
+该功能实际由处理器链的表达式包装类 `top.xiajibagao.crane.core.handler.ExpressibleOperateHandlerChain`实现。该类将把一个普通的处理器链包装为支持 SpEL 表达式的处理器链，当数据源进入处理器链前，将由该类先根据表达式进行预处理，然后再将处理后的数据交由处理链处理。
+
+`ExpressibleOperateHandlerChain` 的构造函数允许传入一个类型为 `Supplier<StandardEvaluationContext>`的生产者函数，用户可以自由的向其中注册 Spring 容器、方法或其余的变量。
+
+比如，我们希望注册一个默认变量以及一个默认方法，则可以在配置中如此配置：
+
+~~~java
+@ConditionalOnMissingBean(OrderlyOperateHandlerChain.class)
+@Bean
+public OperateHandlerChain customOperateHandlerChain(OrderlyOperateHandlerChain chain) {
+    return new ExpressibleOperateHandlerChain(chain, () -> {
+        StandardEvaluationContext context = new StandardEvaluationContext();
+        context.setVariable("defName", "游客"); // 注册一个为name的默认变量
+        context.registerFunction("isNull", ClassUtil.getDeclaredMethod(Objects.class, "isNull", Object.class)); // 注册一个isNull方法
+        return context;
+    });
+}
+~~~
+
+然后可以在注解中这么写：
+
+~~~java
+@Assemble(
+    container = IntrospectContainer.class, props = @Prop(
+        ref = "name", 
+        exp = "#isNull(#source) ? #defName : #source", // 若存在用户，则获取用户名，否则获取默认用户名
+        expType = String.class
+    )
+)
+private String userId;
+private String userName;
+~~~
+
+如果希望支持 Ognl 表达式，或者其他需求，则自行扩展该类或依照此创建新的包装类即可。
+
+
+
+## 五、工具类
+
+### 1、OperateHelper
+
+`top.xiajibagao.crane.extension.helper.OperateHelper`的作用类似于 Spring 提供提供的各种 XXXTemplate，是对 crane 功能的封装，用于在代码中快速的调用 crane 的填充功能。
+
+`OperateHelper`创建时会默认配置好使用功能所需的各项组件，然后使用时自行选择带有不同方法参数的重载方法即可。
+
+~~~java
+// 处理数据，使用自定义的配置类与执行器
+operateHelper.process(date, configuration, operationExecutor);
+// 处理数据，使用自定义的配置类与默认执行器
+operateHelper.process(date, configuration);
+// 处理数据，使用默认的解析器解析配置，然后再使用默认执行器执行
+operateHelper.process(date);
+// 处理数据，使用默认的解析器解析配置，然后再使用自定义的执行器执行
+operateHelper.process(date, operationExecutor);
+~~~
+
+
+
+### 2、方法返回值处理切面
+
+crane 基于 SpringAOP 和 aspectj 实现了方法返回值处理切面`top.xiajibagao.crane.extension.aop.MethodResultProcessAspect`，默认拦截被 `top.xiajibagao.crane.extension.aop.ProcessResult`注解的方法返回值进行填充。
+
+比如：
+
+~~~java
+// 自动填充返回的 Classroom 对象
+@ProcessResult(Classroom.class)
+public Classroom getClassroom(Boolean isHandler) {
+    return Collections.emptyList();
+}
+~~~
+
+其中，可以在`@ProcessResult`自行指定配置解析器，操作者工厂与执行器，切面将在处理时动态从 spring 容器中获取这些组件：
+
+~~~java
+@ProcessResult(
+    targetClass = Classroom.class,
+    operatorFactory = BeanReflexOperatorFactory.class,
+    parser = BeanOperateConfigurationParser.class
+)
+public List<Classroom> getClassroom(Boolean isHandler) {
+    return Collections.emptyList();
+}
+~~~
+
+另外，还可以通过 SpEL 表达式针对方法参数与返回值决定是否需要处理返回值：
+
+~~~java
+@ProcessResult(
+    targetClass = Classroom.class, 
+    condition = "!#result.isEmpty && !#isHandle" // 当返回值为空集合，且isHandle参数不为true时才处理返回值
+) 
+public List<Classroom> getClassroom(Boolean isHandle) {
+    return Collections.emptyList();
+}
+~~~
+
+>  **注意：切面仅能处理返回值为单个对象、一维度数组或不嵌套的 Collection 集合**。
+
+
+
+### 3、动态JSON单元
+
+当数据完全不参与业务操作，并且只需要给前段展示时，我们也可以直接在序列化为 JSON 对象时才填充数据。
+
+由于 Spring 默认的使用的 JSON 库为 jackson，因此 crane 基于 jackson 提供了动态填充处理 JsonNode 对象的 `top.xiajibagao.crane.jackson.impl.module.DynamicJsonNodeModule`。
+
+将其注册到序列化使用的 `ObjectMapper` 中，然后使用 `top.xiajibagao.annotation.ProcessJacksonNode` 注解需要处理的类，则在通过 ObjectMapper 序列化时，将会根据操作配置处理 JsonNode，从而使序列化后获得的 json 串带上对应的数据。
+
+比如我们有如下待序列化的对象：
+
+~~~java
+@ProcessJacksonNode
+public class Foo {
+    private String id;
+}
+~~~
+
+由于 JsonNode 的特殊性，相比普通的 JavaBean，它可以直接添加或替换对象的属性值。
+
+比如根据 id 动态添加 name 和 age 字段：
+
+~~~java
+@ProcessJacksonNode
+public class Foo {
+    @Assemble(container = UserContainer.class, props = {
+        @prop(src = "name", ref = "userName"), 
+        @prop(src = "age", ref = "userAge")
+    })
+    private String id;
+}
+~~~
+
+我们可以在序列化后得到如下 json 串：
+
+~~~json
+{
+    "id": 1,
+    "name": "foo",
+    "age": 12
+}
+~~~
+
+或者直接替换字段的值：
+
+~~~java
+@ProcessJacksonNode
+public class Foo {
+    @Assemble(container = UserContainer.class, namespace = "sexs")
+    private Integer sex;
+}
+~~~
+
+序列化后得到：
+
+~~~java
+{
+    "sex": "男"
+}
+~~~
+
+
+
+## 六、操作配置
+
+### 1、配置类
+
+每一个对象都需要有一个操作配置类用于指导 crane 对其进行填充，操作配置类在 crane 对应 `top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration`下的实现类，并提供了默认实现 `top.xiajibagao.crane.core.parser.BeanOperationConfiguration`。
+
+一个可用的配置类`OperationConfiguration`由以三部分部件组成：
+
+- 字段装配配置：对应`top.xiajibagao.crane.core.parser.interfaces.AssembleOperation`的实现类，代表基于 `@Assemble`注解字段的一次填充操作；
+- 字段装卸配置：对应 `top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation`的实现类，代表基于 `@Disassemble`注解的嵌套字段的平摊操作；
+- 全局配置：对应  `top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration`的实现了，代表通过配置文件指定的一些配置；
+
+操作配置类一般可以通过两种方式获取：
+
+- 手动构建；
+- 通过注解构和解析器构建；
+
+### 2、基于注解配置
+
+**基本情况**
+
+基于注解即直接在类字段中使用`@Assemble`和 `@Disassemble`注解指定字段操作，然后通过类操作配置解析器解析注解生成操作配置类。
+
+注解式配置的核心在于配置解析器，即 `top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser` 接口的实现类。crane 默认提供了基本实现 `top.xiajibagao.crane.core.parser.BeanOperateConfigurationParser`，该解析器将解析注解，并生成 `BeanOperationConfiguration`。
+
+该类大部分关键方法都使用 `protected` 修饰，因此若有自定义的需求——比如需要添加新的注解——可以直接基于 `BeanOperateConfigurationParser` 重写。
+
+crane 的大部分组件默认支持该种方式。
+
+**循环引用**
+
+实际场景中可能存在 A 类中存在类型为 B 的字段，而 B 类中又存在类型为 A 的字段，即类型循环引用的情况。
+
+比如：
+
+~~~java
+public class A {
+    @Disassemble(B.class)
+    private B nestB;
+} 
+
+public class B {
+    @Disassemble(A.class)
+    private A nestA;
+} 
+~~~
+
+此处 crane 借鉴 spring 的三级缓存，通过一级缓存缓存未构建完成的配置引用从而使解决循环引用问题，因此是允许如此操作的。
+
+### 3、手动构建配置
+
+**基本情况**
+
+实际场景中，可能存在一个类需要同时存在两套配置，或者不太方便直接添加注解的情况，而手动通过构造函数的方式去创建如此复杂的配置实例又不太现实，因此 crane 提供了配置构建辅助类 `top.xiajibagao.crane.core.parser.OperateConfigurationAssistant`用于手动构建操作配置。
+
+比如，我们现在对类 `Person.class`的注解配置如下：
+
+~~~java
+public class Person {
+
+    @Assemble(container = TestContainer.class, props = {
+        @Prop(src = "beanName", ref = "name"),
+        @Prop(src = "beanAge", ref = "age"),
+    })
     private Integer id;
     private String name;
-}
-~~~
+    private Integer age;
 
-#### **普通字段**
+    @Assemble(container = KeyValueContainer.class, namespace = "sex", props = @Prop("sexName"))
+    private Integer sex;
+    private String sexName;
 
-若我们现有字段 `user`对应希望关联的 User 对象的 id，我们可以简单的直接配置使用：
+    @Assemble(container = EnumDictContainer.class, namespace = "gender", props = {
+        @Prop(src = "id", ref = "genderId"),
+        @Prop(src = "name", ref = "genderName")
+    })
+    private Gender gender;
+    private Integer genderId;
+    private String genderName;
 
-~~~java
-@Assemble(container = UserContainer.class)
-private Integer user = 1;
-
-// 处理后得到
-{
-    "user": {
-        "id": 1,
-        "name": "小明"
-    }
-}
-~~~
-
-当然，也可以指定将**数据源的对象直接赋值给指定字段**（若是 Json 则可以添加原本不存在的字段）：
-
-~~~java
-@Assemble(container = UserContainer.class, props = @Prop("userInfo"))
-private Integer user = 1;
-
-// 处理后得到
-{
-    "user": 1,
-    "userInfo": {
-        "id": 1,
-        "name": "小明"
-    }
-}
-~~~
-
-由于数据源是对象，因此我们也可以将**对象中的指定属性映射到目标实例的指定属性**，比如：
-
-~~~java
-@Assemble(container = UserContainer.class, props = {
-    @Prop(src = "name", ref = "userName"),
-    @Prop(src = "id", ref = "userId")
-})
-private Integer user = 1;
-
-// 处理后得到
-{
-    "user": 1,
-    "userId": 1,
-    "userName": "小明"
-}
-~~~
-
-如果我们愿意的话，也可以同时保留上述三种形式：
-
-~~~java
-@Assemble(container = UserContainer.class, props = {
-    @Prop("user"),
-    @Prop(src = "name", ref = "userName"),
-    @Prop(src = "id", ref = "userId")
-})
-private Integer user = 1;
-
-// 处理后得到
-{
-    "user": {
-        "id": 1,
-        "name": "小明"
-    },
-    "userId": 1,
-    "userName": "小明"
-}
-~~~
-
-#### **嵌套字段**
-
-crane 支持对类中嵌套的对象及集合类型进行处理，只需对该类型字段添加注解 `top.xiajibagao.crane.annotation.Disassemble`即可。
-
-如果该字段是对象：
-
-~~~java
-@Disassemble(Foo.class)
-private Foo foo; 
-~~~
-
-如果是集合：
-
-~~~java
-@Disassemble(Foo.class)
-private List<Foo> foos; 
-~~~
-
->  **注意：目前对集合仅支持单层嵌套，即不支持集合中套集合多层嵌套的写法**
-
-举个例子：
-
-现在我们有一个 Person，并且已经向 spring 容器中的 `KeyValueContainer` 配置了 `sex`相关配置：
-
-~~~java
-@Accessors(chain = true)
-@Data
-public class Person {
-    
-    String name;
-
-    @Assemble(container = KeyValueContainer.class, namespace = "sex")
-    Integer sex;
-    
     @Disassemble(Person.class)
     List<Person> relatives;
 
 }
 ~~~
 
-现在执行代码：
+若使用`OperateConfigurationAssistant`构建则对应如下：
 
 ~~~java
-Person jsonPerson = new Person().setName("小明");
-jsonPerson.setRelatives(Arrays.asList(
-    new Person().setName("小明爸").setSex(1),
-    new Person().setName("小明妈").setSex(0)
-));
-
-JsonNode jsonNode = objectMapper.valueToTree(jsonPerson);
-
-OperationConfiguration jsonConfig = configurationParser.parse(Person.class, jacksonOperatorFactory);
-System.out.println(jsonNode); // 处理前
-operationExecutor.execute(Collections.singletonList(jsonNode), jsonConfig);
-System.out.println(jsonNode); // 处理后
-
-// 处理前
-{
-    "name":"小明","sex":1,
-    "relatives":[
-        {"name":"小明爸","sex":1},
-        {"name":"小明妈","sex":0}
-    ]
-}
-// 处理后
-{
-    "name":"小明","sex":"男",
-    "relatives":[
-        {"name":"小明爸","sex":"男"},
-        {"name":"小明妈","sex":"女"}
-    ]
-}
+OperateConfigurationAssistant<Person> assistant = OperateConfigurationAssistant.basedOnBeanOperationConfiguration(globalConfiguration, Person.class, operatorFactory);
+assistant
+    .buildAssembler(Person::getGender, enumDictContainer) // 构建装配操作，key 字段为 gender
+        .namespace("gender")
+        .property("id", Person::getGenderId)
+        .property("name", Person::getGenderName)
+        .build()
+    .buildAssembler(Person::getSex, keyValueContainer)  // 构建装配操作，key 字段为 sex
+        .namespace("sex")
+        .onlyRefProperty(Person::getSexName)
+        .build()
+    .buildAssembler(Person::getId, testContainer)  // 构建装配操作，key 字段为 id
+        .property("beanName", "name")
+        .property("beanAge", "age")
+        .build();
+	.buildDisassembler(Person::getRelatives, assistant.getConfiguration())  // 构建装卸操作，平摊字段为 relatives
+    	.build();
 ~~~
 
->  **注意：无法处理对象实例循环引用的情况（即 A 实例引用 B 实例，B 实例又引用了 A 实例）！！！**
->
->  **注意：无法处理对象实例循环引用的情况（即 A 实例引用 B 实例，B 实例又引用了 A 实例）！！！**
->
->  **注意：无法处理对象实例循环引用的情况（即 A 实例引用 B 实例，B 实例又引用了 A 实例）！！！**
+此处借鉴了 mybatis-plus 的函数式条件构造器，允许 get/set 方法的 lambda 表达式引用实际字段，避免字段的硬编码。
 
-#### **配置模板**
+不过这种方式相比注解式依然更肉眼可见的麻烦，所以个人还是推荐更便利且可读性更高的注解式配置。
 
-`Assemble#props()`可以很方便的用来配置数据源与对象实例间的字段映射，但是当需要配置的字段映射很多，且需要处理的字段也很多时，就会导致注解膨胀，让我们的代码变得臃肿。
+**循环引用**
 
-因此，可以通过`top.xiajibagao.crane.annotation.PropsTemplate`注解，将字段映射配置在另外的类上，然后通过`Assemble#propTemplate()`对类进行引用。
+当手动配置存在循环引用时，需要自行处理，如上述例子的 `relatives`字段。
 
-比如，我们原本有这样一个配置：
+### 4、配置缓存
 
-~~~java
-@Assemble(
-    container = UserContainer.class,
-    props = {
-        @Prop(src = "age", ref = "userAge"),
-        @Prop(src = "name", ref = "userName"),
-        @Prop(src = "sex", ref = "userSex")
-    }
-)
-private Integer UserId;
-~~~
+配置解析涉及到大量对象的创建与反射调用，并且在解析的类中存在较多嵌套对象时还需要进行多次递归，因此一般推荐配置类作为单例使用，并且提供了默认的配置缓存 `top.xiajibagao.crane.extension.cache.ConfigurationCache`。
 
-我们可以创建一个字段配置模板，用于存储一部分配置：
+该接口提供了一个基于本地缓存的默认实现 `top.xiajibagao.crane.extension.cache.OperationConfigurationCache`。
 
-~~~java
-@PropsTemplate({
-    @Prop(src = "name", ref = "userName"),
-    @Prop(src = "sex", ref = "userSex")
-})
-public interface UserPropTemplate{}
-~~~
+此外，针对使用较多的配置解析器，默认提供了一个`ConfigurationCache`实现的带缓存功能的配置解析器包装类 `top.xiajibagao.crane.extension.cache.CacheConfigurationParserWrapper`，该包装类允许包装一个普通的配置解析器，并使其在解析后能够自动缓存解析配置。
 
-现在使用下述配置就能实现跟之前一样的效果：
+## 七、操作配置执行器
 
-~~~java
-@Assemble(
-    container = UserContainer.class, 
-    props = @Prop(src = "age", ref = "userAge"),
-    propTemplates = UserPropTemplate.class
-)
-private Integer UserId;
-~~~
+操作执行器在 crane 中对应 `top.xiajibagao.crane.core.executor.OperationExecutor`接口的实现类，他是基于操作配置，容器与操作类的更高一层抽象，用于根据操作配置驱动完成待处理对象的每一个字段。
 
-#### **字段排序**
+默认提供了三种实现：
 
-默认情况下，执行器会按字段在类中声明的先后顺序对字段进行处理，但是也可以通过`top.xiajibagao.crane.annotation.Sort`注解对字段的处理顺序进行排序，比如：
+- 同步的无序执行器`top.xiajibagao.crane.core.executor.AsyncUnorderedOperationExecutor`：无视操作配置指定的执行顺序，按容器优先的排序然后依次完成不同容器中的操作；
+- 异步的无序执行器`top.xiajibagao.crane.core.executor.UnorderedOperationExecutor`：无视操作配置指定的执行顺序，然后以容器为单位异步的完成不同容器中的操作，仅保证按容器优先级提交任务，不保证实际的执行顺序。
+- 同步的顺序执行器`top.xiajibagao.crane.core.executor.SequentialOperationExecutor`：严格按照操作配置指定的执行顺序完成不同容器中的操作；
 
-~~~java
-@Sort(3)
-@Assemble(container = ExampleContainer.class)
-private Integer deptManagerId;
-@Sort(2)
-@Assemble(container = ExampleContainer.class)
-private String deptId;
-@Sort(1)
-@Assemble(container = ExampleContainer.class)
-private Integer userId;
-~~~
+>  **注意：`SequentialOperationExecutor`的排序算法并不高效，因此除非必要，最好自定义（如果能顺便给我提个pr就更好了）或尽可能少用。**
 
-使用`Sort`注解后，三个字段将按注解值从小到大排序，依次处理 `userId` => `deptId` =>`deptManagerId`。
 
-该功能主要用于解决无法通过一个容器获取全部的数据源，先查出一个前置 id，然后才能通过另一个容器根据前置 id 查询出后续数据的情景。
 
-一个比较典型的情景是需要先通过用户 id 查出用户归属部门 id，然后再根据用户归属部门 id 查询出部门领导信息。
-
-> 注意：排序功能需要执行器提供支持，默认提供了按排序执行的执行器`top.xiajibagao.crane.operator.SequentialOperationExecutor`
-
-### 3、操作者
-
-操作者 `Operator` 是实现 crane 对不同数据类型处理的核心，与容器一样，出于对不同类型数据兼容的考虑，crane 提供三个顶层接口用于实现：
-
-- `top.xiajibagao.crane.operator.interfaces.Assembler`：与 `@Assemble`注解对应，用于获取 key 数据与处理容器中获取的数据源；
-- `top.xiajibagao.crane.operator.interfaces.Disassembler`：与 `@Disassemble`注解对应，用于将提取实例中的嵌套字段数据；
-- `top.xiajibagao.crane.operator.interfaces.OperatorFactory`：用于生产上述两接口的实现类实例；
-
-此外，提供了`top.xiajibagao.crane.impl.json`包的基本实现用于处理 JsonNode 对象，以及`top.xiajibagao.crane.impl.bean`包的基本实现用于处理普通 JavaBean。
-
-当使用时，仅需在提供一个 `OperatorFactory`实例，在调用`OperationConfiguration#parse()`时放入即可：
-
-~~~java
-// 用于生成 JacksonAssembler 与 JacksonDisassembler
-OperatorFactory jacksonOperatorFactory = new JacksonOperatorFactory();
-// 用于生成 BeanReflexAssembler 与 BeanReflexDisassembler
-OperatorFactory beanReflexOperatorFactory = new BeanReflexOperatorFactory();
-// 解析时根据需要选择不同的 OperatorFactory 即可
-OperationConfiguration jsonConfig = configurationParser.parse(Person.class, jacksonOperatorFactory);
-~~~
-
-同理，若有当前的操作者不符合需求，比如希望能处理 `FastJson`产生的 Json 对象，则仅需要提供 `FastJson` 版的 `Assembler` 与 `Disassembler`，然后再提供一个能够生产这两者的`OperatorFactory`即可。
-
-### 4、配置解析器
-
-解析器对应的顶层接口为`top.xiajibagao.crane.parse.interfaces.OperateConfigurationParser`，其主要用于解析类注解并生成`OperationConfiguration`。
-
-提供了默认的实现类`top.xiajibagao.crane.parse.BeanOperateConfigurationParser`，该实现类提供了对所有默认注解的解析支持，并且主要的关键方法都使用`protected`修饰以便于子类重写。
-
-因此，若有扩展的需求，推荐基于该实现重写，否则需要注意是否会影响到原有注解的解析。
-
-### 5、配置执行器
-
-执行器对应的顶层接口为`top.xiajibagao.crane.operator.interfaces.OperationExecutor`，其主要用于根据解析出的配置`OperationConfiguration`对数据进行处理。
-
-默认提供三个实现类：
-
-- `top.xiajibagao.crane.operator.SequentialOperationExecutor`：有序且同步的执行器，会按照`top.xiajibagao.crane.annotation.Sort`注解指定的顺序处理字段，由于为了保证顺序，对同一批数据进行处理时，可能会多次访问同一个容器；
-- `top.xiajibagao.crane.operator.UnorderedOperationExecutor`：无序且同步的执行器，不会按照`top.xiajibagao.crane.annotation.Sort`注解指定的顺序处理字段，由于不需要保证顺序，对同一批数据进行处理时，同一个容器仅需访问一次；
-- `top.xiajibagao.crane.operator.AsyncUnorderedOperationExecutor`：`UnorderedOperationExecutor`的异步版，不同之处在于不同容器之间的访问是并行进行的。该容器默认不注册到 Spring，需要自行启用。
-
-若有其他需求同样可以自行实现接口。
-
-## 四、扩展功能
-
-以下功能为非通用功能，需要自行启用。
-
-### 1、自定义注解
-
-crane 通过`org.springframework.core.annotation.AnnotatedElementUtils`实现了元注解的功能，任何带有 `top.xiajibagao.crane.annotation.MateAnnotation`注解标记的注解都可以将其作为元注解。
-
-比如，假设现在我们有一个关于用户关联信息填充的复制配置：
-
-~~~java
-@Assemble(
-    container = DBContainer.class, 
-    namespace = "user",
-    props = {
-        @Prop(src = "age", ref = "userAge"),
-        @Prop(src = "name", ref = "userName"),
-    },
-    propTemplates = {
-        UserRoleAssembleTemplate.class, 
-        UserDeptAssembleTemplate.class
-    }
-)
-private Integer UserId;
-~~~
-
-由于很多类都需要引入这些配置，这会导致代码变得十分臃肿，因此我们可以创建一个注解，并且将原本的注解作为元注解放到新注解上：
-
-~~~java
-@Assemble(
-    container = DBContainer.class, 
-    namespace = "user",
-    props = {
-        @Prop(src = "age", ref = "userAge"),
-        @Prop(src = "name", ref = "userName"),
-    },
-    propTemplates = {
-        UserRoleAssembleTemplate.class, 
-        UserDeptAssembleTemplate.class
-    }
-)
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface AssembleUserInfo {
-}
-~~~
-
-现在我们只需要在类中以如此方式使用即可得到跟原本一样的效果：
-
-~~~java
-@AssembleUserInfo
-private Integer UserId;
-~~~
-
-### 2、方法返回值处理切面
-
-针对普通的 JavaBean 填充，crane 提供了一个注解`top.xiajibagao.crane.impl.bean.aop.ProcessResult`，与拦截注解的切面`top.xiajibagao.crane.impl.bean.aop.MethodResultProcessAspect`。
-
-将切面注册到 spring 后，我们可以在方法上添加如下注解，切面将自动根据注解配置拦截返回值并进行处理：
-
-~~~java
-@ProcessResult(
-    targetClass = Foo.class,
-    parser = BeanOperateConfigurationParser.class,
-    operatorFactory = BeanReflexOperatorFactory.class,
-    executor = UnorderedOperationExecutor.class
-)
-public List<Foo> listFooById(Integer id) {
-    // 具体实现
-}
-~~~
-
-注解`ProcessResult`同样可以作为元注解使用。
-
-此外，该注解支持通过 `ProcessResult#condition()`属性根据一个返回布尔值的 SpEL 表达式执行结果选择是否执行填充，比如：
-
-~~~java
-@ProcessResult(targetClass = Foo.class, condition = "#id != null")
-public List<Foo> listFooById(Integer id) {
-    // 具体实现
-}
-~~~
-
-按上述写法，当 id 为 null 时将不执行填充。
-
-### 3、全局序列化配置
-
-针对 `SpringBoot`的 `@RequestBody`或 `@RestController`注解，提供`top.xiajibagao.crane.impl.json.module.ProcessJson`注解和`top.xiajibagao.crane.impl.json.module.CraneDynamicJsonModule`模块用于配置全局的 Json 序列化配置。
-
-首先将 module 注册到全局序列化使用的 `ObjectMapper`中：
-
-~~~java
-@Bean
-public ObjectMapper objectMapper(BeanFactory beanFactory) {
-    ObjectMapper globalSerialMapper = new ObjectMapper();
-    ObjectMapper processMapper = new ObjectMapper(); // globalSerialMapper 与 processMapper 不能是同一个实例，请务必注意！
-    globalSerialMapper.registerModule(new CraneDynamicJsonModule(processMapper, beanFactory));
-    return globalSerialMapper;
-}
-~~~
-
-> **注意：CraneDynamicJsonModule 创建时也需要一个 ObjectMapper 实例，该实例不可以与 Module 要注册的 ObjectMapper 实例相同，否则将序列化时将进入死循环！**
-
-然后，在需要进行处理的类上注解：
-
-~~~java
-@ProcessJson(
-    targetClass = Foo.class,
-    parser = BeanOperateConfigurationParser.class,
-    operatorFactory = BeanReflexOperatorFactory.class,
-    executor = UnorderedOperationExecutor.class
-)
-@Accessors(chain = true)
-@Data
-public class BeanPerson {
-    
-}
-~~~
-
-如此，当返回给前段的数据在序列化时，就会先解析注解配置并对 JsonNode 对象进行处理。
-
-## 五、待开发功能
+## 待开发功能
 
 - [x] 提供支持缓存的类注解配置解析器；
 
@@ -889,4 +1000,5 @@ public class BeanPerson {
 
 - [ ] 完善测试用例；
   
-- [ ] 发布v1.0.0版本，并提供完整的文档；
+- [ ] 发布 v1.0.0 版本；
+
