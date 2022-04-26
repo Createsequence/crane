@@ -170,7 +170,7 @@ before: Person(sex=0, sexName=女) // 处理后
 - 方法容器：`top.xiajibagao.crane.extend.container.MethodContainer`
 - 内省容器：`top.xiajibagao.crane.extend.container.IntrospectContainer`
 
-下文将介绍其作用与对应的使用方式。
+下面将介绍其作用与对应的使用方式。
 
 ### 1、枚举容器
 
@@ -264,7 +264,7 @@ public class UserService {
 }
 ~~~
 
-当然，如果这个方法来自与父类，无法显示的使用注解声明数据源方法，也允许通过类注解声明：
+当然，如果这个方法来自父类，无法显式的使用注解声明数据源方法，也允许通过类注解声明：
 
 ~~~java
 @ContainerMethodBean({
@@ -418,7 +418,7 @@ public class UserContainer implements Container {
 - `top.xiajibagao.crane.core.container.BaseKeyContainer`：根据 key 获取数据源的容器；
 - `top.xiajibagao.crane.core.container.BaseNamingContainer`：根据 key 和 namespace 的容器；
 
-比如，若上述自定义容器继承了BaseKeyContainer模板，则代码可以简化为：
+比如，若上述自定义容器继承了 `BaseKeyContainer` 模板，则代码可以简化为：
 
 ~~~Java
 @Component
@@ -765,7 +765,7 @@ public class Foo {
 ~~~java
 @ProcessJacksonNode
 public class Foo {
-    @Assemble(container = UserContainer.class, namespace = "sexs")
+    @Assemble(container = KeyValueContainer.class, namespace = "sex")
     private Integer sex;
 }
 ~~~
@@ -827,13 +827,13 @@ public class B {
 } 
 ~~~
 
-此处 crane 借鉴 spring 的三级缓存，通过一级缓存缓存未构建完成的配置引用从而使解决循环引用问题，因此是允许如此操作的。
+此处 crane 借鉴 spring 的三级缓存，通过缓存未构建完成的配置引用从而使解决循环引用问题，因此是允许如此操作的。
 
 ### 3、手动构建配置
 
 **基本情况**
 
-实际场景中，可能存在一个类需要同时存在两套配置，或者不太方便直接添加注解的情况，而手动通过构造函数的方式去创建如此复杂的配置实例又不太现实，因此 crane 提供了配置构建辅助类 `top.xiajibagao.crane.core.parser.OperateConfigurationAssistant`用于手动构建操作配置。
+实际场景中，可能存在一个类需要同时存在两套配置，或者不太方便直接添加注解的情况，而手动通过构造函数去创建如此复杂的配置实例又太麻烦，因此 crane 提供了配置构建辅助类 `top.xiajibagao.crane.core.parser.OperateConfigurationAssistant`用于手动构建操作配置。
 
 比如，我们现在对类 `Person.class`的注解配置如下：
 
@@ -902,11 +902,11 @@ assistant
 
 该接口提供了一个基于本地缓存的默认实现 `top.xiajibagao.crane.extension.cache.OperationConfigurationCache`。
 
-此外，针对使用较多的配置解析器，默认提供了一个`ConfigurationCache`实现的带缓存功能的配置解析器包装类 `top.xiajibagao.crane.extension.cache.CacheConfigurationParserWrapper`，该包装类允许包装一个普通的配置解析器，并使其在解析后能够自动缓存解析配置。
+此外，针对使用较多的配置解析器，默认提供了一个基于`ConfigurationCache`实现的配置解析器包装类 `top.xiajibagao.crane.extension.cache.CacheConfigurationParserWrapper`，该包装类允许包装一个普通的配置解析器，并使其在解析后能够自动缓存解析配置。
 
 ## 七、操作配置执行器
 
-操作执行器在 crane 中对应 `top.xiajibagao.crane.core.executor.OperationExecutor`接口的实现类，他是基于操作配置，容器与操作类的更高一层抽象，用于根据操作配置驱动完成待处理对象的每一个字段。
+操作执行器在 crane 中对应 `top.xiajibagao.crane.core.executor.OperationExecutor`接口的实现类，他是基于操作配置，容器与操作类的更高一层抽象，用于根据操作配置驱动完成待处理对象的每一个字段的操作。
 
 默认提供了三种实现：
 
@@ -915,6 +915,41 @@ assistant
 - 同步的顺序执行器`top.xiajibagao.crane.core.executor.SequentialOperationExecutor`：严格按照操作配置指定的执行顺序完成不同容器中的操作；
 
 >  **注意：`SequentialOperationExecutor`的排序算法并不高效，因此除非必要，最好自定义（如果能顺便给我提个pr就更好了）或尽可能少用。**
+
+## 八、操作者
+
+操作者对应 `top.xiajibagao.crane.core.operator.interfaces.Operator` 接口的实现类，该接口作为最顶层抽象实际不常用，真正常用的是其两个子类：
+
+- 装配器：`top.xiajibagao.crane.core.operator.interfaces.Assembler`；
+- 装卸器：`top.xiajibagao.crane.core.operator.interfaces.Disassembler`；
+
+### 1、装配器
+
+装配器用于从待处理对象和数据源中根据操作配置读取或写入数据，默认提供了两个实现：
+
+- JavaBean 装配器：`top.xiajibagao.crane.core.operator.BeanReflexAssembler`；
+- JsonNode 装配器：`top.xiajibagao.crane.jackson.impl.operator.JacksonAssembler`；
+
+前者基于反射实现，专门用于处理普通的 JavaBean，后者基于 jackson 实现，专门用于处理 jackson 序列化时产生的 `com.fasterxml.jackson.databind.JsonNode`对象。
+
+两者的读写基本都依赖于上文提到的 `top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain`操作处理器链完成，因此若有其他的类型的数据需要处理，可以直接参照上文[多类型处理](#4、多类型处理)。
+
+### 2、装卸器
+
+装卸器用于从待处理对象中获取需要展开再处理的嵌套字段数据，默认也提供了两个实现：
+
+- JavaBean 装卸器：`top.xiajibagao.crane.core.operator.BeanReflexDisassembler`；
+- JsonNode 装卸器：`top.xiajibagao.crane.jackson.impl.operator.JacksonDisassembler`；
+
+两者一个用于处理普通 JavaBean，一个用于处理 JsonNode。
+
+### 3、操作者工厂
+
+操作者工厂对应 `top.xiajibagao.crane.core.operator.interfacesOperatorFactory`接口，用于生产对应的 `Assmbler`和 `Disassembler`。
+
+操作者工厂主要用于配合配置解析器使用，从而使生成的装配、装卸操作配置带上对应的装配器和装卸器。
+
+crane 在所有涉及到配置解析的地方都可以自行指定操作者工厂，因此，若有需要自定义装卸器与转配器从而处理其他数据结构的需求——比如项目的 JSON 库是 FastJson，需要处理 FastJson 的 JsonNode ——可以自定义一个装配器与装卸器，然后创建一个对应用于生成两者的操作者工厂，然后在构建配置的时候使用。
 
 
 
