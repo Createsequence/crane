@@ -4,6 +4,7 @@ import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.helper.MultiValueTableMap;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
+import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class UnorderedOperationExecutor extends AbstractOperationExecutor implements OperationExecutor {
 
     @Override
-    protected void execute(@Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
+    protected void execute(@Nonnull GlobalConfiguration globalConfiguration, @Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
         pendingOperations.asMap().entrySet().stream()
             .sorted(Map.Entry.comparingByKey())
             .forEach(e -> e.getKey().process(e.getValue()));

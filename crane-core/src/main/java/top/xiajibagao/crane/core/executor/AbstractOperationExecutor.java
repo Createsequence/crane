@@ -6,6 +6,7 @@ import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.helper.MultiValueTableMap;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
+import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
 import javax.annotation.Nonnull;
@@ -18,7 +19,7 @@ import java.util.stream.StreamSupport;
 /**
  * 抽象操作执行器
  * <p>{@link OperationExecutor}初步实现，提供基本的装配与装卸操作的收集处理。
- * 实现类必须实现{@link #execute(MultiValueTableMap)}方法
+ * 实现类必须实现{@link #execute(GlobalConfiguration, MultiValueTableMap)}方法
  *
  * @author huangchengxing
  * @date 2022/04/17 20:36
@@ -36,7 +37,7 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
         MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations = new MultiValueTableMap<>();
         collectOperations(targetsList, configuration, pendingOperations);
         // 执行
-        execute(pendingOperations);
+        execute(configuration.getGlobalConfiguration(), pendingOperations);
     }
 
     private void collectOperations(
@@ -56,11 +57,12 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
     /**
      * 执行操作
      *
+     * @param globalConfiguration 全局配置
      * @param pendingOperations 待执行的操作
      * @author huangchengxing
      * @date 2022/4/17 20:37
      */
-    protected abstract void execute(@Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations);
+    protected abstract void execute(@Nonnull GlobalConfiguration globalConfiguration, @Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations);
 
     /**
      * 处理装配操作

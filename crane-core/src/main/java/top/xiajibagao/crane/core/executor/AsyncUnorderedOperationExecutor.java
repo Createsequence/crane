@@ -5,6 +5,7 @@ import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.helper.MultiValueTableMap;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
+import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
@@ -28,11 +29,11 @@ public class AsyncUnorderedOperationExecutor extends AbstractOperationExecutor {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void execute(@Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
+    protected void execute(@Nonnull GlobalConfiguration globalConfiguration, @Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
         CompletableFuture<Void>[] sortedTasks = pendingOperations.asMap().entrySet()
             .stream()
             .sorted(Map.Entry.comparingByKey())
-            .map(e -> CompletableFuture.runAsync(() -> e.getKey().process(e.getValue()), executorService))
+            .map(e -> CompletableFuture.runAsync(() -> e.getKey().process(e. getValue()), executorService))
             .toArray(CompletableFuture[]::new);
         CompletableFuture.allOf(sortedTasks).join();
     }

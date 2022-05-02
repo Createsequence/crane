@@ -11,6 +11,7 @@ import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.helper.CounterSet;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
+import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
 import javax.annotation.Nonnull;
@@ -43,10 +44,10 @@ public class SequentialOperationExecutor implements OperationExecutor {
             targetsList, configuration, new LinkedMultiValueMap<>()
         );
 
-        execute(collectedConfigurations);
+        execute(configuration.getGlobalConfiguration(), collectedConfigurations);
     }
 
-    protected void execute(@Nonnull MultiValueMap<OperationConfiguration, Object> collectedConfigurations) {
+    protected void execute(@Nonnull GlobalConfiguration globalConfiguration, @Nonnull MultiValueMap<OperationConfiguration, Object> collectedConfigurations) {
         // TODO 优化算法，提高执行效率
         // 获取操作配置，并按类配置分别将全部的操作配置与待处理数据装入桶中，然后对同一桶中的操作按sort排序
         Set<Bucket> buckets = collectedConfigurations.entrySet().stream()
