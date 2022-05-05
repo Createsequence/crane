@@ -25,9 +25,6 @@ public class DynamicJsonNodeModule extends Module {
 
     private final BeanFactory beanFactory;
     private final ObjectMapper objectMapper;
-    private final OperatorFactory defaultOperatorFactory;
-    private final OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser;
-    private final OperationExecutor defaultOperationExecutor;
 
     @Override
     public String getModuleName() {
@@ -41,9 +38,7 @@ public class DynamicJsonNodeModule extends Module {
 
     @Override
     public void setupModule(SetupContext context) {
-        context.addBeanSerializerModifier(new DynamicJsonNodeBeanSerializerModifier(
-            beanFactory, objectMapper, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor
-        ));
+        context.addBeanSerializerModifier(new DynamicJsonNodeBeanSerializerModifier(beanFactory, objectMapper));
     }
 
     @RequiredArgsConstructor
@@ -51,9 +46,6 @@ public class DynamicJsonNodeModule extends Module {
 
         private final BeanFactory beanFactory;
         private final ObjectMapper objectMapper;
-        private final OperatorFactory defaultOperatorFactory;
-        private final OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser;
-        private final OperationExecutor defaultOperationExecutor;
 
         @Override
         public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {

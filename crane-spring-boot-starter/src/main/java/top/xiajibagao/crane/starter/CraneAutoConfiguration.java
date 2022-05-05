@@ -14,14 +14,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
+import top.xiajibagao.crane.core.aop.MethodResultProcessAspect;
+import top.xiajibagao.crane.core.cache.ConfigurationCache;
+import top.xiajibagao.crane.core.cache.OperationConfigurationCache;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
+import top.xiajibagao.crane.core.container.IntrospectContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
+import top.xiajibagao.crane.core.container.MethodSourceContainer;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.SequentialOperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
 import top.xiajibagao.crane.core.handler.*;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.EnumDict;
+import top.xiajibagao.crane.core.helper.OperateTemplate;
 import top.xiajibagao.crane.core.operator.BeanReflexOperatorFactory;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.BeanGlobalConfiguration;
@@ -29,12 +35,6 @@ import top.xiajibagao.crane.core.parser.BeanOperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.core.aop.MethodResultProcessAspect;
-import top.xiajibagao.crane.core.cache.ConfigurationCache;
-import top.xiajibagao.crane.core.cache.OperationConfigurationCache;
-import top.xiajibagao.crane.core.container.IntrospectContainer;
-import top.xiajibagao.crane.core.container.MethodSourceContainer;
-import top.xiajibagao.crane.core.helper.OperateTemplate;
 import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.ValueNodeOperateHandler;
@@ -224,13 +224,8 @@ public class CraneAutoConfiguration {
         @Bean("DefaultCraneJacksonDynamicJsonNodeModule")
         public DynamicJsonNodeModule dynamicJsonNodeModule(
             BeanFactory beanFactory,
-            @Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper defaultObjectMapper,
-            @Qualifier("DefaultCraneJacksonOperatorFactory") OperatorFactory defaultOperatorFactory,
-            @Qualifier("DefaultCraneBeanOperateConfigurationParser") OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
-            @Qualifier("DefaultCraneUnorderedOperationExecutor") OperationExecutor defaultOperationExecutor) {
-            return new DynamicJsonNodeModule(
-                beanFactory, defaultObjectMapper, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor
-            );
+            @Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper defaultObjectMapper) {
+            return new DynamicJsonNodeModule(beanFactory, defaultObjectMapper);
         }
 
         @Order
