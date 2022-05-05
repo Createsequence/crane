@@ -122,12 +122,12 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
         Container container;
         if (CharSequenceUtil.isNotBlank(annotation.containerName())) {
             if (ClassUtils.isAssignable(Container.class, annotation.container())) {
-                container = (Container)beanFactory.getBean(annotation.containerName(), annotation.container());
+                container = beanFactory.getBean(annotation.containerName(), annotation.container());
             } else {
                 container = (Container)beanFactory.getBean(annotation.containerName());
             }
         } else {
-            container = (Container)beanFactory.getBean(annotation.container());
+            container = beanFactory.getBean(annotation.container());
         }
 
         // 解析属性配置
