@@ -1,8 +1,6 @@
-package top.xiajibagao.crane.core.aop;
+package top.xiajibagao.crane.core.annotation;
 
 import org.springframework.core.annotation.AliasFor;
-import top.xiajibagao.crane.core.annotation.ConfigOption;
-import top.xiajibagao.crane.core.annotation.MateAnnotation;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
 import top.xiajibagao.crane.core.operator.BeanReflexOperatorFactory;
@@ -28,31 +26,31 @@ public @interface ProcessResult {
     /**
      * 待处理的目标类型
      */
-    @AliasFor("targetClass")
+    @AliasFor(annotation = ConfigOption.class, attribute = "value")
     Class<?> value() default Void.class;
 
     /**
      * 待处理的目标类型
      */
-    @AliasFor("value")
+    @AliasFor(annotation = ConfigOption.class, attribute = "targetClass")
     Class<?> targetClass() default Void.class;
 
     /**
      * 要使用的配置解析器
      */
-    @AliasFor(annotation = ConfigOption.class)
+    @AliasFor(annotation = ConfigOption.class, attribute = "parser")
     Class<? extends OperateConfigurationParser<?>> parser() default BeanOperateConfigurationParser.class;
 
     /**
      * 要使用的操作者工厂
      */
-    @AliasFor(annotation = ConfigOption.class)
+    @AliasFor(annotation = ConfigOption.class, attribute = "operatorFactory")
     Class<? extends OperatorFactory> operatorFactory() default BeanReflexOperatorFactory.class;
 
     /**
      * 要使用的执行器
      */
-    @AliasFor(annotation = ConfigOption.class)
+    @AliasFor(annotation = ConfigOption.class, attribute = "executor")
     Class<? extends OperationExecutor> executor() default UnorderedOperationExecutor.class;
 
     /**

@@ -14,8 +14,8 @@ import top.xiajiabagao.crane.starter.common.TestConfig;
 import top.xiajiabagao.crane.starter.common.TestContainer;
 import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
+import top.xiajibagao.crane.core.annotation.ProcessResult;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
-import top.xiajibagao.crane.core.aop.ProcessResult;
 
 import java.util.*;
 

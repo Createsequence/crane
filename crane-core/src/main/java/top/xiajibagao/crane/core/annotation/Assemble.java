@@ -1,6 +1,8 @@
 package top.xiajibagao.crane.core.annotation;
 
 import org.springframework.core.annotation.AliasFor;
+import top.xiajibagao.crane.core.container.Container;
+import top.xiajibagao.crane.core.container.KeyValueContainer;
 
 import java.lang.annotation.*;
 
@@ -22,13 +24,13 @@ public @interface Assemble {
      * 指定完成装配操作的装配容器，该实例需要可以用spring容器获取
      */
     @AliasFor("container")
-    Class<?> value() default Void.class;
+    Class<? extends Container> value() default KeyValueContainer.class;
 
     /**
      * 指定完成装配操作的容器，该实例需要可以用spring容器获取
      */
     @AliasFor("value")
-    Class<?> container() default Void.class;
+    Class<? extends Container> container() default KeyValueContainer.class;
 
     /**
      * 装配容器实例在spring中的名称，当{@link #value()}或{@link #container()}有值时将用于一起查找容器

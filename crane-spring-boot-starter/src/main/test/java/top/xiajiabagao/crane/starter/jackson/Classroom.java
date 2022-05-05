@@ -4,9 +4,9 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.Disassemble;
-import top.xiajibagao.crane.core.annotation.ProcessJacksonNode;
 import top.xiajibagao.crane.core.annotation.Prop;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
+import top.xiajibagao.crane.jackson.impl.annotation.ProcessJacksonNode;
 
 import java.util.List;
 

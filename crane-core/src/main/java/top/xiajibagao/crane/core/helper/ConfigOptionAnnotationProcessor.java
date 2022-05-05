@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import top.xiajibagao.crane.core.annotation.ConfigOption;
+import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.core.cache.ConfigurationCache;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Objects;
@@ -38,8 +38,8 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
         }
 
         // 从缓存中获取解析器
-        OperateConfigurationParser<OperationConfiguration> parser = (OperateConfigurationParser<OperationConfiguration>) beanFactory.getBean(annotation.parser());
-        OperatorFactory operatorFactory = (OperatorFactory)beanFactory.getBean(annotation.operatorFactory());
+        OperateConfigurationParser<OperationConfiguration> parser = beanFactory.getBean(annotation.parser());
+        OperatorFactory operatorFactory = beanFactory.getBean(annotation.operatorFactory());
         OperationConfiguration configuration = configurationCache.getOrCached(
                 getNamespace(parser),
                 operatorFactory.getClass(),
@@ -47,7 +47,7 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
                 () -> parser.parse(targetClass, operatorFactory)
         );
         
-        OperationExecutor executor = (OperationExecutor) beanFactory.getBean(annotation.executor());
+        OperationExecutor executor = beanFactory.getBean(annotation.executor());
         executor.execute(CollUtils.adaptToCollection(target), configuration);
     }
     

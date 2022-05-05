@@ -1,17 +1,16 @@
 package top.xiajibagao.crane.jackson.impl.module;
 
-import cn.hutool.core.lang.Assert;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import top.xiajibagao.crane.core.annotation.ProcessJacksonNode;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
+import top.xiajibagao.crane.jackson.impl.annotation.ProcessJacksonNode;
 
 import java.util.Objects;
 
@@ -62,24 +61,11 @@ public class DynamicJsonNodeModule extends Module {
             if (Objects.isNull(annotation)) {
                 return serializer;
             }
-            OperatorFactory operatorFactory = defaultIfVoid(
-                OperatorFactory.class, annotation.operatorFactory(), defaultOperatorFactory
-            );
-            OperateConfigurationParser<? extends OperationConfiguration> configurationParser = defaultIfVoid(
-                OperateConfigurationParser.class, annotation.parser(), defaultOperateConfigurationParser
-            );
+            OperatorFactory operatorFactory = beanFactory.getBean(annotation.operatorFactory());
+            OperateConfigurationParser<? extends OperationConfiguration> configurationParser = beanFactory.getBean(annotation.parser());
             OperationConfiguration operationConfiguration = configurationParser.parse(beanDesc.getBeanClass(), operatorFactory);
-            OperationExecutor operationExecutor = defaultIfVoid(OperationExecutor.class, annotation.executor(), defaultOperationExecutor);
+            OperationExecutor operationExecutor = beanFactory.getBean(annotation.executor());
             return new DynamicJsonNodeBeanSerializer<>(beanDesc.getBeanClass(), objectMapper, operationConfiguration, operationExecutor);
-        }
-
-        @SuppressWarnings("unchecked")
-        private <T> T defaultIfVoid(Class<T> targetType, Class<?> beanType, T def) {
-            if (Objects.equals(Void.class, beanType)) {
-                return def;
-            }
-            Assert.isAssignable(targetType, beanType, "类型[{}]不为[{}]或其子类", targetType, beanType);
-            return Objects.equals(Void.class, beanType) ? def : (T) beanFactory.getBean(beanType);
         }
 
     }
