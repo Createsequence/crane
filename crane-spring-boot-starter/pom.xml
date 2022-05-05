@@ -15,21 +15,14 @@
 
         <dependency>
             <groupId>top.xiajibagao</groupId>
-            <artifactId>crane-jackson-implement</artifactId>
-            <version>${project.version}</version>
-            <optional>true</optional>
+            <artifactId>crane-core</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>top.xiajibagao</groupId>
+            <artifactId>crane-jackson-implement</artifactId>
+            <version>${project.parent.version}</version>
             <optional>true</optional>
         </dependency>
 
