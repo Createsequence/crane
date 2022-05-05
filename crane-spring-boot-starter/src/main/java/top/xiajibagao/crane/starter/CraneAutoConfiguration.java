@@ -3,11 +3,14 @@ package top.xiajibagao.crane.starter;
 import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +33,6 @@ import top.xiajibagao.crane.core.helper.EnumDict;
 import top.xiajibagao.crane.core.helper.OperateTemplate;
 import top.xiajibagao.crane.core.operator.BeanReflexOperatorFactory;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
-import top.xiajibagao.crane.core.parser.BeanGlobalConfiguration;
 import top.xiajibagao.crane.core.parser.BeanOperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
@@ -55,15 +57,9 @@ public class CraneAutoConfiguration {
     /**
      * 基础配置
      */
+    @AutoConfigureAfter(CraneConfigurationProperties.class)
     @Configuration
     public static class DefaultCraneAutoConfiguration {
-
-        @Order
-        @ConditionalOnMissingBean(GlobalConfiguration.class)
-        @Bean("DefaultCraneGlobalConfiguration")
-        public GlobalConfiguration globalConfiguration() {
-            return new BeanGlobalConfiguration();
-        }
 
         // ==================== 解析器 ====================
 
@@ -238,4 +234,14 @@ public class CraneAutoConfiguration {
 
     }
 
+    /**
+     * @author huangchengxing
+     * @date 2022/05/05 23:49
+     */
+    @Configuration
+    @ConfigurationProperties(prefix = "crane")
+    @Accessors(fluent = true)
+    @Data
+    public static class CraneConfigurationProperties implements GlobalConfiguration {
+    }
 }
