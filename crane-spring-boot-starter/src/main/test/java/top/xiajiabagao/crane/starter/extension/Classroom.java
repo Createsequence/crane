@@ -2,10 +2,10 @@ package top.xiajiabagao.crane.starter.extension;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import top.xiajibagao.annotation.Assemble;
-import top.xiajibagao.annotation.Disassemble;
-import top.xiajibagao.annotation.Prop;
-import top.xiajibagao.crane.extension.container.MethodSourceContainer;
+import top.xiajibagao.crane.core.annotation.Assemble;
+import top.xiajibagao.crane.core.annotation.Disassemble;
+import top.xiajibagao.crane.core.annotation.Prop;
+import top.xiajibagao.crane.core.container.MethodSourceContainer;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.extension.cache;
+package top.xiajibagao.crane.core.cache;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;

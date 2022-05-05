@@ -1,9 +1,9 @@
-package top.xiajibagao.crane.extension.container;
+package top.xiajibagao.crane.core.container;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.ReflectionUtils;
-import top.xiajibagao.annotation.MappingType;
+import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.helper.BeanProperty;
 
 import java.lang.reflect.Method;

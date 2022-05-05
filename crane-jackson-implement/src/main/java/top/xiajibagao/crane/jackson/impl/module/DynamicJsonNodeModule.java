@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import top.xiajibagao.annotation.ProcessJacksonNode;
+import top.xiajibagao.crane.core.annotation.ProcessJacksonNode;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;

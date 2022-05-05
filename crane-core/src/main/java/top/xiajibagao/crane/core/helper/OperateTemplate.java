@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.extension.helper;
+package top.xiajibagao.crane.core.helper;
 
 import cn.hutool.core.collection.CollUtil;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@ import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.extension.cache.ConfigurationCache;
+import top.xiajibagao.crane.core.cache.ConfigurationCache;
 
 import java.util.Collection;
 import java.util.Objects;

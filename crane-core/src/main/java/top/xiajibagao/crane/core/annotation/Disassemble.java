@@ -1,4 +1,4 @@
-package top.xiajibagao.annotation;
+package top.xiajibagao.crane.core.annotation;
 
 import org.springframework.core.annotation.AliasFor;
 

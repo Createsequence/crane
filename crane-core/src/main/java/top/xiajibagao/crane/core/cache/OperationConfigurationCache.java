@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.extension.cache;
+package top.xiajibagao.crane.core.cache;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;

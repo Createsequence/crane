@@ -19,7 +19,7 @@ import top.xiajibagao.crane.core.container.KeyValueContainer;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.extension.helper.OperateTemplate;
+import top.xiajibagao.crane.core.helper.OperateTemplate;
 
 import java.util.Arrays;
 import java.util.HashMap;

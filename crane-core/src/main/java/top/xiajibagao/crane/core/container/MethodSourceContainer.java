@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.extension.container;
+package top.xiajibagao.crane.core.container;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
@@ -8,9 +8,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MultiValueMap;
-import top.xiajibagao.annotation.MethodSourceBean;
-import top.xiajibagao.crane.core.container.BaseNamespaceContainer;
-import top.xiajibagao.crane.core.container.Container;
+import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.helper.ReflexUtils;
 
 import javax.annotation.Nonnull;

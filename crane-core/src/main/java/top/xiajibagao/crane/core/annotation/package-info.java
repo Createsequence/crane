@@ -4,4 +4,4 @@
  * @author huangchengxing
  * @date 2022/04/18 6:02
  */
-package top.xiajibagao.annotation;
+package top.xiajibagao.crane.core.annotation;

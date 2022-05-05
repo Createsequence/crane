@@ -5,10 +5,10 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import top.xiajiabagao.crane.starter.common.Gender;
 import top.xiajiabagao.crane.starter.common.TestContainer;
-import top.xiajibagao.annotation.Assemble;
-import top.xiajibagao.annotation.Disassemble;
-import top.xiajibagao.annotation.Prop;
-import top.xiajibagao.annotation.PropsTemplate;
+import top.xiajibagao.crane.core.annotation.Assemble;
+import top.xiajibagao.crane.core.annotation.Disassemble;
+import top.xiajibagao.crane.core.annotation.Prop;
+import top.xiajibagao.crane.core.annotation.PropsTemplate;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
 

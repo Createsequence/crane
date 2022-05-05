@@ -1,4 +1,4 @@
-package top.xiajibagao.annotation;
+package top.xiajibagao.crane.core.annotation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.CollectionUtils;

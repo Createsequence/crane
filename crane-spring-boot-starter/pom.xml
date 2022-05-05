@@ -5,7 +5,7 @@
     <parent>
         <artifactId>crane</artifactId>
         <groupId>top.xiajibagao</groupId>
-        <version>0.2.0-alpha1</version>
+        <version>0.2.1-alpha1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>crane-spring-boot-starter</artifactId>
@@ -15,14 +15,8 @@
 
         <dependency>
             <groupId>top.xiajibagao</groupId>
-            <artifactId>crane-extension</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>top.xiajibagao</groupId>
             <artifactId>crane-jackson-implement</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
 

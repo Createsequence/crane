@@ -2,10 +2,10 @@ package top.xiajiabagao.crane.starter.jackson;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import top.xiajibagao.annotation.Assemble;
-import top.xiajibagao.annotation.Disassemble;
-import top.xiajibagao.annotation.ProcessJacksonNode;
-import top.xiajibagao.annotation.Prop;
+import top.xiajibagao.crane.core.annotation.Assemble;
+import top.xiajibagao.crane.core.annotation.Disassemble;
+import top.xiajibagao.crane.core.annotation.ProcessJacksonNode;
+import top.xiajibagao.crane.core.annotation.Prop;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
 
 import java.util.List;

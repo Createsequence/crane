@@ -21,7 +21,7 @@ import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.OperateConfigurationAssistant;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.extension.helper.OperateTemplate;
+import top.xiajibagao.crane.core.helper.OperateTemplate;
 
 import java.util.Arrays;
 import java.util.HashMap;
