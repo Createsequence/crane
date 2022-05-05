@@ -20,7 +20,7 @@ import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.OperateConfigurationAssistant;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.extension.helper.OperateHelper;
+import top.xiajibagao.crane.extension.helper.OperateTemplate;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ public class ProcessByOperateConfigurationAssistantTest {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private OperateHelper operateHelper;
+    private OperateTemplate operateTemplate;
 
     // 容器
     @Autowired
@@ -100,7 +100,7 @@ public class ProcessByOperateConfigurationAssistantTest {
     private void processAndLog(Object actual) throws JsonProcessingException {
         OperationConfiguration configuration = getConfiguration();
         System.out.println("before: " + objectMapper.writeValueAsString(actual));
-        operateHelper.process(actual, configuration);
+        operateTemplate.process(actual, configuration);
         System.out.println("after: " + objectMapper.writeValueAsString(actual));
     }
 

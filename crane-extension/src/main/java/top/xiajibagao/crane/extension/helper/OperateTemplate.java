@@ -22,7 +22,7 @@ import java.util.Objects;
  * @date 2022/04/09 23:19
  */
 @RequiredArgsConstructor
-public class OperateHelper {
+public class OperateTemplate {
 
     private final ConfigurationCache configurationCache;
     private final OperatorFactory defaultOperatorFactory;

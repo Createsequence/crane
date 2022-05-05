@@ -19,7 +19,7 @@ import top.xiajibagao.crane.core.container.KeyValueContainer;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.extension.helper.OperateHelper;
+import top.xiajibagao.crane.extension.helper.OperateTemplate;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ public class ProcessByAnnotationConfigTest {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private OperateHelper operateHelper;
+    private OperateTemplate operateTemplate;
 
     // 容器
     @Autowired
@@ -80,7 +80,7 @@ public class ProcessByAnnotationConfigTest {
     private void processAndLog(Object actual) throws JsonProcessingException {
         OperationConfiguration configuration = operateConfigurationParser.parse(Person.class, operatorFactory);
         System.out.println("before: " + objectMapper.writeValueAsString(actual));
-        operateHelper.process(actual, configuration);
+        operateTemplate.process(actual, configuration);
         System.out.println("after: " + objectMapper.writeValueAsString(actual));
     }
 

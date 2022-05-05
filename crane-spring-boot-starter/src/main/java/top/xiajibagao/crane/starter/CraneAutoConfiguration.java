@@ -34,7 +34,7 @@ import top.xiajibagao.crane.extension.cache.ConfigurationCache;
 import top.xiajibagao.crane.extension.cache.OperationConfigurationCache;
 import top.xiajibagao.crane.extension.container.IntrospectContainer;
 import top.xiajibagao.crane.extension.container.MethodSourceContainer;
-import top.xiajibagao.crane.extension.helper.OperateHelper;
+import top.xiajibagao.crane.extension.helper.OperateTemplate;
 import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.ValueNodeOperateHandler;
@@ -175,14 +175,14 @@ public class CraneAutoConfiguration {
         }
 
         @Order
-        @ConditionalOnMissingBean(OperateHelper.class)
+        @ConditionalOnMissingBean(OperateTemplate.class)
         @Bean("DefaultCraneOperateHelper")
-        public OperateHelper operateHelper(
+        public OperateTemplate operateHelper(
             @Qualifier("DefaultCraneOperationConfigurationCache") ConfigurationCache configurationCache,
             @Qualifier("DefaultCraneBeanReflexOperatorFactory") OperatorFactory defaultOperatorFactory,
             @Qualifier("DefaultCraneBeanOperateConfigurationParser") OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
             @Qualifier("DefaultCraneUnorderedOperationExecutor") OperationExecutor defaultOperationExecutor) {
-            return new OperateHelper(configurationCache, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor);
+            return new OperateTemplate(configurationCache, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor);
         }
 
     }
