@@ -2,13 +2,17 @@ package top.xiajibagao.crane.core.container;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ReflectionUtils;
+import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
+import top.xiajibagao.crane.core.helper.BeanProperty;
 import top.xiajibagao.crane.core.helper.ReflexUtils;
 
 import javax.annotation.Nonnull;
@@ -119,4 +123,35 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         return results;
     }
 
+    /**
+     * @author huangchengxing
+     * @date 2022/03/31 21:26
+     */
+    @RequiredArgsConstructor
+    public static class MethodSource {
+
+        @Getter
+        private final MappingType mappingType;
+        private final Object target;
+        @Getter
+        private final Class<?> targetClass;
+        @Getter
+        private final String containerName;
+        private final Method sourceGetter;
+        private final BeanProperty sourceKeyProperty;
+
+        @SuppressWarnings("unchecked")
+        public Collection<Object> getSources(List<Object> keys) {
+            Collection<Object> params = keys;
+            if (Objects.equals(sourceGetter.getParameterTypes()[0], Set.class)) {
+                params = new HashSet<>(keys);
+            }
+            return (Collection<Object>)ReflectionUtils.invokeMethod(sourceGetter, target, params);
+        }
+
+        public Object getSourceKeyPropertyValue(Object source) {
+            return ReflectionUtils.invokeMethod(sourceKeyProperty.getter(), source);
+        }
+
+    }
 }
