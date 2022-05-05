@@ -32,7 +32,7 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
         if (Objects.isNull(annotation)) {
             return;
         }
-        Class<?> targetClass = annotation.value();
+        Class<?> targetClass = getTargetClass(annotation, annotatedElement, target);
         if (targetClass.isAssignableFrom(Void.TYPE)) {
             return;
         }
@@ -51,6 +51,14 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
         executor.execute(CollUtils.adaptToCollection(target), configuration);
     }
     
+    /**
+     * 获取指定namespace
+     *
+     * @param parser 解析器
+     * @return java.lang.String
+     * @author huangchengxing
+     * @date 2022/5/5 22:56
+     */
     protected String getNamespace(OperateConfigurationParser<OperationConfiguration> parser) {
         return parser.getClass().getName();
     }
@@ -66,6 +74,20 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
     protected ConfigOption parseAnnotation(AnnotatedElement annotatedElement) {
         return Objects.isNull(annotatedElement) ?
             null : AnnotatedElementUtils.findMergedAnnotation(annotatedElement, ConfigOption.class);
+    }
+    
+    /**
+     * 获取配置对象类型
+     *
+     * @param annotation 注解
+     * @param annotatedElement 注解元素
+     * @param target 待处理对象
+     * @return java.lang.Class<?> 指定的配置对象类型，当返回值类型为{@link Void}时则跳过本次操作
+     * @author huangchengxing
+     * @date 2022/5/5 22:51
+     */
+    protected Class<?> getTargetClass(ConfigOption annotation, T annotatedElement, Object target) {
+        return annotation.value();
     }
 
 }
