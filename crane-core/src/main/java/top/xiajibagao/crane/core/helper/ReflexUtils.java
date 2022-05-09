@@ -2,15 +2,18 @@ package top.xiajibagao.crane.core.helper;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -80,12 +83,12 @@ public class ReflexUtils {
      *
      * @param targetClass 类
      * @param fieldName 属性名
-     * @throws IllegalArgumentException 当属性存在，而却找不到对应setter与getter方法时抛出
+     * @throws IllegalArgumentException 当属性不存在，或者属性存在但是却找不到对应setter与getter方法时抛出
      * @return cn.net.nova.crane.helper.PropertyUtils.PropertyCache
      * @author huangchengxing
      * @date 2022/4/1 13:50
      */
-    public static Optional<BeanProperty> findProperty(Class<?> targetClass, String fieldName) {
+    public static BeanProperty findProperty(Class<?> targetClass, String fieldName) {
         BeanProperty property = CACHE_TABLE.getVal(targetClass, fieldName);
         if (Objects.isNull(property)) {
             synchronized (ReflexUtils.class) {
@@ -96,23 +99,21 @@ public class ReflexUtils {
                 }
             }
         }
-        return Optional.ofNullable(property);
+        return property;
     }
 
     /**
      * 创建字段缓存
      */
-    @Nullable
+    @Nonnull
     private static BeanProperty createProperty(Class<?> targetClass, String fieldName) {
         Field field = findField(targetClass, fieldName);
-        if (Objects.isNull(field)) {
-            return null;
-        }
+        Assert.notNull(field, String.format("类[%s]中不存在属性[%s]", targetClass, field));
         Method getter = findGetterMethod(targetClass, field);
         Assert.notNull(getter, String.format("属性[%s]找不到对应的Getter方法", field));
         Method setter = findSetterMethod(targetClass, field);
         Assert.notNull(setter, String.format("属性[%s]找不到对应的Setter方法", field));
-        return new BeanProperty(targetClass, field, getter, setter);
+        return new ReflexBeanProperty(targetClass, field, getter, setter);
     }
 
     /**
@@ -293,6 +294,28 @@ public class ReflexUtils {
      */
     private static String getStandardMethodName(String prefix, String name) {
         return CharSequenceUtil.upperFirstAndAddPre(name, prefix);
+    }
+
+    @Accessors(fluent = true)
+    @RequiredArgsConstructor
+    public static class ReflexBeanProperty implements BeanProperty {
+        @Getter
+        private final Class<?> targetClass;
+        @Getter
+        private final Field field;
+        private final Method getter;
+        private final Method setter;
+
+        @Override
+        public Object getValue(Object target) {
+            return ObjectUtils.computeIfNotNull(target, t -> ReflectionUtils.invokeMethod(getter, t));
+        }
+
+        @Override
+        public void setValue(Object target, Object value) {
+            ReflectionUtils.invokeMethod(setter, target, value);
+        }
+
     }
 
 }

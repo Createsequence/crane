@@ -12,6 +12,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ReflectionUtils;
 import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
+import top.xiajibagao.crane.core.helper.AsmReflexUtils;
 import top.xiajibagao.crane.core.helper.BeanProperty;
 import top.xiajibagao.crane.core.helper.ReflexUtils;
 
@@ -60,11 +61,9 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
             );
             if (Objects.nonNull(method)) {
                 checkMethod(method, classMethod.namespace());
-                ReflexUtils.findProperty(classMethod.sourceType(), classMethod.sourceKey())
-                    .ifPresent(property -> {
-                        MethodSource cache = new MethodSource(classMethod.mappingType(), methodSourceBean, targetClass, classMethod.namespace(), method, property);
-                        methodCache.put(classMethod.namespace(), cache);
-                    });
+                BeanProperty property = AsmReflexUtils.findProperty(classMethod.sourceType(), classMethod.sourceKey());
+                MethodSource cache = new MethodSource(classMethod.mappingType(), methodSourceBean, targetClass, classMethod.namespace(), method, property);
+                methodCache.put(classMethod.namespace(), cache);
             }
         }
         return false;
@@ -84,11 +83,9 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
                 return;
             }
             checkMethod(proxyMethod, annotation.namespace());
-            ReflexUtils.findProperty(annotation.sourceType(), annotation.sourceKey())
-                .ifPresent(pc -> {
-                    MethodSource method = new MethodSource(annotation.mappingType(), methodSourceBean, targetClass, annotation.namespace(), proxyMethod, pc);
-                    methodCache.put(annotation.namespace(), method);
-                });
+            BeanProperty property = AsmReflexUtils.findProperty(annotation.sourceType(), annotation.sourceKey());
+            MethodSource method = new MethodSource(annotation.mappingType(), methodSourceBean, targetClass, annotation.namespace(), proxyMethod, property);
+            methodCache.put(annotation.namespace(), method);
         });
     }
 
@@ -150,7 +147,7 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         }
 
         public Object getSourceKeyPropertyValue(Object source) {
-            return ReflectionUtils.invokeMethod(sourceKeyProperty.getter(), source);
+            return sourceKeyProperty.getValue(source);
         }
 
     }

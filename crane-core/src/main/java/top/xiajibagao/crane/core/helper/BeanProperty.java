@@ -1,32 +1,49 @@
 package top.xiajibagao.crane.core.helper;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
-import org.springframework.util.ReflectionUtils;
-
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 /**
  * @author huangchengxing
  * @date 2022/04/01 14:08
  */
-@Accessors(fluent = true)
-@RequiredArgsConstructor
-@Getter
-public class BeanProperty {
-    private final Class<?> targetClass;
-    private final Field field;
-    private final Method getter;
-    private final Method setter;
+public interface BeanProperty {
 
-    public Object getValue(Object target) {
-        return ObjectUtils.computeIfNotNull(target, t -> ReflectionUtils.invokeMethod(getter, t));
-    }
+    /**
+     * 获取所属类型
+     *
+     * @return java.lang.Class<?>
+     * @author huangchengxing
+     * @date 2022/5/9 16:38
+     */
+    Class<?> targetClass();
 
-    public void setValue(Object target, Object value) {
-        ReflectionUtils.invokeMethod(setter, target, value);
-    }
+    /**
+     * 获取属性
+     *
+     * @return java.lang.reflect.Field
+     * @author huangchengxing
+     * @date 2022/5/9 16:39
+     */
+    Field field();
+
+    /**
+     * 获取属性值
+     *
+     * @param target 目标对象
+     * @return java.lang.Object
+     * @author huangchengxing
+     * @date 2022/5/9 16:39
+     */
+    Object getValue(Object target);
+
+    /**
+     * 设置属性值
+     *
+     * @param target 目标对象
+     * @param value 属性值
+     * @author huangchengxing
+     * @date 2022/5/9 16:40
+     */
+    void setValue(Object target, Object value);
 
 }
