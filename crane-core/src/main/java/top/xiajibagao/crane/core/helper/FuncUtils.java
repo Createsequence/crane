@@ -2,6 +2,7 @@ package top.xiajibagao.crane.core.helper;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ReflectUtil;
+import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.ref.WeakReference;

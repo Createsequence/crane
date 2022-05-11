@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.core.helper;
+package top.xiajibagao.crane.core.helper.reflex;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +24,7 @@ public class BeanPropertyFactory {
      *
      * @param targetClass 目标类型
      * @param fieldName 字段名
-     * @return java.util.Optional<top.xiajibagao.crane.core.helper.BeanProperty>
+     * @return java.util.Optional<top.xiajibagao.crane.core.helper.reflex.BeanProperty>
      * @author huangchengxing
      * @date 2022/5/10 16:05
      */
