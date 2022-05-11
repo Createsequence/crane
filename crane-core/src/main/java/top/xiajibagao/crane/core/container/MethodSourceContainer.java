@@ -61,9 +61,11 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
             );
             if (Objects.nonNull(method)) {
                 checkMethod(method, classMethod.namespace());
-                BeanProperty property = AsmReflexUtils.findProperty(classMethod.sourceType(), classMethod.sourceKey());
-                MethodSource cache = new MethodSource(classMethod.mappingType(), methodSourceBean, targetClass, classMethod.namespace(), method, property);
-                methodCache.put(classMethod.namespace(), cache);
+                AsmReflexUtils.findProperty(classMethod.sourceType(), classMethod.sourceKey())
+                    .ifPresent(property -> {
+                        MethodSource cache = new MethodSource(classMethod.mappingType(), methodSourceBean, targetClass, classMethod.namespace(), method, property);
+                        methodCache.put(classMethod.namespace(), cache);
+                    });
             }
         }
         return false;
@@ -83,9 +85,11 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
                 return;
             }
             checkMethod(proxyMethod, annotation.namespace());
-            BeanProperty property = AsmReflexUtils.findProperty(annotation.sourceType(), annotation.sourceKey());
-            MethodSource method = new MethodSource(annotation.mappingType(), methodSourceBean, targetClass, annotation.namespace(), proxyMethod, property);
-            methodCache.put(annotation.namespace(), method);
+            AsmReflexUtils.findProperty(annotation.sourceType(), annotation.sourceKey())
+                .ifPresent(property -> {
+                    MethodSource method = new MethodSource(annotation.mappingType(), methodSourceBean, targetClass, annotation.namespace(), proxyMethod, property);
+                    methodCache.put(annotation.namespace(), method);
+                });
         });
     }
 

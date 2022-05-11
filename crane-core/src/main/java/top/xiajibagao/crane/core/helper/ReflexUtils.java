@@ -10,10 +10,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -26,7 +26,15 @@ import java.util.function.Predicate;
  */
 public class ReflexUtils {
 
-    private static final TableMap<Class<?>, String, BeanProperty> CACHE_TABLE = new BaseTableMap<>();
+    private static final BeanPropertyFactory REFLEX_PROPERTY_FACTORY = new BeanPropertyFactory(
+        (targetClass, field) -> {
+            Method getter = findGetterMethod(targetClass, field);
+            Assert.notNull(getter, String.format("属性[%s]找不到对应的Getter方法", field));
+            Method setter = findSetterMethod(targetClass, field);
+            Assert.notNull(setter, String.format("属性[%s]找不到对应的Setter方法", field));
+            return new ReflexBeanProperty(targetClass, field, getter, setter);
+        }
+    );
     public static final String GET_PREFIX = "get";
     public static final String SET_PREFIX = "set";
     public static final String IS_PREFIX = "is";
@@ -88,32 +96,8 @@ public class ReflexUtils {
      * @author huangchengxing
      * @date 2022/4/1 13:50
      */
-    public static BeanProperty findProperty(Class<?> targetClass, String fieldName) {
-        BeanProperty property = CACHE_TABLE.getVal(targetClass, fieldName);
-        if (Objects.isNull(property)) {
-            synchronized (ReflexUtils.class) {
-                property = CACHE_TABLE.getVal(targetClass, fieldName);
-                if (Objects.isNull(property)) {
-                    property = createProperty(targetClass, fieldName);
-                    CACHE_TABLE.putVal(targetClass, fieldName, property);
-                }
-            }
-        }
-        return property;
-    }
-
-    /**
-     * 创建字段缓存
-     */
-    @Nonnull
-    private static BeanProperty createProperty(Class<?> targetClass, String fieldName) {
-        Field field = findField(targetClass, fieldName);
-        Assert.notNull(field, String.format("类[%s]中不存在属性[%s]", targetClass, field));
-        Method getter = findGetterMethod(targetClass, field);
-        Assert.notNull(getter, String.format("属性[%s]找不到对应的Getter方法", field));
-        Method setter = findSetterMethod(targetClass, field);
-        Assert.notNull(setter, String.format("属性[%s]找不到对应的Setter方法", field));
-        return new ReflexBeanProperty(targetClass, field, getter, setter);
+    public static Optional<BeanProperty> findProperty(Class<?> targetClass, String fieldName) {
+        return REFLEX_PROPERTY_FACTORY.getProperty(targetClass, fieldName);
     }
 
     /**

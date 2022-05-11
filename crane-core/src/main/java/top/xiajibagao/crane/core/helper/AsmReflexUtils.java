@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -19,8 +20,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class AsmReflexUtils {
 
-    private static final TableMap<Class<?>, String, BeanProperty> CACHE_TABLE = new BaseTableMap<>();
     private static final Map<Class<?>, MethodAccess> METHOD_ACCESS_CACHE = new ConcurrentHashMap<>();
+    private static final BeanPropertyFactory ASM_REFLEX_PROPERTY_FACTORY = new BeanPropertyFactory(
+        (targetClass, field) -> {
+            int getterIndex = findGetterMethodIndex(targetClass, field.getName());
+            Assert.isTrue(getterIndex > -1, String.format("属性[%s]找不到对应的Getter方法", field));
+            int setterIndex = findSetterMethodIndex(targetClass, field.getName(), field.getType());
+            Assert.isTrue(setterIndex > -1, String.format("属性[%s]找不到对应的Setter方法", field));
+            MethodAccess methodAccess = getMethodAccess(targetClass);
+            return new AsmReflexBeanProperty(
+                targetClass, field, new IndexedMethod(methodAccess, getterIndex), new IndexedMethod(methodAccess, setterIndex)
+            );
+        }
+    );
 
     private AsmReflexUtils() {
     }
@@ -36,35 +48,8 @@ public class AsmReflexUtils {
      * @date 2022/4/1 13:50
      */
     @Nonnull
-    public static BeanProperty findProperty(Class<?> targetClass, String fieldName) {
-        BeanProperty property = CACHE_TABLE.getVal(targetClass, fieldName);
-        if (Objects.isNull(property)) {
-            synchronized (ReflexUtils.class) {
-                property = CACHE_TABLE.getVal(targetClass, fieldName);
-                if (Objects.isNull(property)) {
-                    property = createProperty(targetClass, fieldName);
-                    CACHE_TABLE.putVal(targetClass, fieldName, property);
-                }
-            }
-        }
-        return property;
-    }
-
-    /**
-     * 创建字段缓存
-     */
-    @Nonnull
-    private static BeanProperty createProperty(Class<?> targetClass, String fieldName) {
-        Field field = ReflexUtils.findField(targetClass, fieldName);
-        Assert.notNull(field, String.format("类[%s]中不存在属性[%s]", targetClass, field));
-        int getterIndex = findGetterMethodIndex(targetClass, field.getName());
-        Assert.isTrue(getterIndex > -1, String.format("属性[%s]找不到对应的Getter方法", fieldName));
-        int setterIndex = findSetterMethodIndex(targetClass, field.getName(), field.getType());
-        Assert.isTrue(setterIndex > -1, String.format("属性[%s]找不到对应的Setter方法", fieldName));
-        MethodAccess methodAccess = getMethodAccess(targetClass);
-        return new AsmReflexBeanProperty(
-            targetClass, field, new IndexedMethod(methodAccess, getterIndex), new IndexedMethod(methodAccess, setterIndex)
-        );
+    public static Optional<BeanProperty> findProperty(Class<?> targetClass, String fieldName) {
+        return ASM_REFLEX_PROPERTY_FACTORY.getProperty(targetClass, fieldName);
     }
 
     /**
