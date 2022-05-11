@@ -9,11 +9,11 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.ReflectionUtils;
 import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils;
 import top.xiajibagao.crane.core.helper.reflex.BeanProperty;
+import top.xiajibagao.crane.core.helper.reflex.IndexedMethod;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 
 import javax.annotation.Nonnull;
@@ -47,25 +47,20 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
      * 解析{@link MethodSourceBean}注解中声明的方法
      */
     private boolean parseClassAnnotation(Object methodSourceBean, Class<?> targetClass) {
-        MethodSourceBean annotation = AnnotatedElementUtils.findMergedAnnotation(targetClass, MethodSourceBean.class);
-        if (Objects.isNull(annotation)) {
+        MethodSourceBean bean = AnnotatedElementUtils.findMergedAnnotation(targetClass, MethodSourceBean.class);
+        if (Objects.isNull(bean)) {
             return true;
         }
-        MethodSourceBean.Method[] classMethods = annotation.methods();
-        for (MethodSourceBean.Method classMethod : classMethods) {
-            if (CharSequenceUtil.isBlank(classMethod.name())) {
+        MethodSourceBean.Method[] annotations = bean.methods();
+        for (MethodSourceBean.Method annotation : annotations) {
+            if (CharSequenceUtil.isBlank(annotation.name())) {
                 continue;
             }
-            Method method = ReflexUtils.findMethod(targetClass, classMethod.name(),
-                true, classMethod.returnType(), classMethod.paramTypes()
+            Method method = ReflexUtils.findMethod(targetClass, annotation.name(),
+                true, annotation.returnType(), annotation.paramTypes()
             );
             if (Objects.nonNull(method)) {
-                checkMethod(method, classMethod.namespace());
-                AsmReflexUtils.findProperty(classMethod.sourceType(), classMethod.sourceKey())
-                    .ifPresent(property -> {
-                        MethodSource cache = new MethodSource(classMethod.mappingType(), methodSourceBean, targetClass, classMethod.namespace(), method, property);
-                        methodCache.put(classMethod.namespace(), cache);
-                    });
+                registerMethod(methodSourceBean, targetClass, annotation, method);
             }
         }
         return false;
@@ -84,13 +79,23 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
             if (Objects.isNull(annotation)) {
                 return;
             }
-            checkMethod(proxyMethod, annotation.namespace());
-            AsmReflexUtils.findProperty(annotation.sourceType(), annotation.sourceKey())
-                .ifPresent(property -> {
-                    MethodSource method = new MethodSource(annotation.mappingType(), methodSourceBean, targetClass, annotation.namespace(), proxyMethod, property);
-                    methodCache.put(annotation.namespace(), method);
-                });
+            registerMethod(methodSourceBean, targetClass, annotation, proxyMethod);
         });
+    }
+
+    /**
+     * 注册方法
+     */
+    private void registerMethod(Object methodSourceBean, Class<?> targetClass, MethodSourceBean.Method classMethod, Method method) {
+        checkMethod(method, classMethod.namespace());
+        AsmReflexUtils.findProperty(classMethod.sourceType(), classMethod.sourceKey())
+            .ifPresent(property -> {
+                MethodSource cache = new MethodSource(
+                    classMethod.mappingType(), methodSourceBean, targetClass, classMethod.namespace(),
+                    method, AsmReflexUtils.findMethod(targetClass, method), property
+                );
+                methodCache.put(classMethod.namespace(), cache);
+            });
     }
 
     private void checkMethod(Method declaredMethod, String containerName) {
@@ -139,6 +144,7 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         @Getter
         private final String containerName;
         private final Method sourceGetter;
+        private final IndexedMethod indexedMethod;
         private final BeanProperty sourceKeyProperty;
 
         @SuppressWarnings("unchecked")
@@ -147,7 +153,7 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
             if (Objects.equals(sourceGetter.getParameterTypes()[0], Set.class)) {
                 params = new HashSet<>(keys);
             }
-            return (Collection<Object>)ReflectionUtils.invokeMethod(sourceGetter, target, params);
+            return (Collection<Object>)indexedMethod.invoke(target, params);
         }
 
         public Object getSourceKeyPropertyValue(Object source) {

@@ -114,4 +114,18 @@ public class AsmReflexUtils {
         return new IndexedMethod(methodAccess, methodAccess.getIndex(methodName, paramTypes));
     }
 
+    /**
+     * 获取指定方法
+     *
+     * @param targetClass 目标类型
+     * @param method 目标方法
+     * @return top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils.IndexedMethod
+     * @author huangchengxing
+     * @date 2022/5/9 17:44
+     */
+    public static IndexedMethod findMethod(Class<?> targetClass, Method method) {
+        MethodAccess methodAccess = MethodAccess.get(targetClass);
+        return new IndexedMethod(methodAccess, methodAccess.getIndex(method.getName(), method.getParameterTypes()));
+    }
+
 }
