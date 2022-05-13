@@ -28,7 +28,6 @@
     </developers>
 
     <properties>
-        <project.version>0.3.1-alpha1</project.version>
         <java.version>1.8</java.version>
         <server.id>maven-central</server.id>
 
@@ -47,7 +46,7 @@
 
     <groupId>top.xiajibagao</groupId>
     <artifactId>crane</artifactId>
-    <version>0.3.1-alpha1</version>
+    <version>0.4.0-alpha1</version>
     <name>crane</name>
     <description>基于 SpringBoot 的注解式字典项、关联表与枚举值通用处理框架</description>
     <url>https://github.com/Createsequence/crane</url>
@@ -124,18 +123,6 @@
     </dependencyManagement>
 
     <dependencies>
-
-        <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>reflectasm</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <optional>true</optional>
-        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
