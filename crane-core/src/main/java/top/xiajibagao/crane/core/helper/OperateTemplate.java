@@ -2,13 +2,11 @@ package top.xiajibagao.crane.core.helper;
 
 import cn.hutool.core.collection.CollUtil;
 import lombok.RequiredArgsConstructor;
+import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
-import top.xiajibagao.crane.core.helper.CollUtils;
-import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.core.cache.ConfigurationCache;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -117,6 +115,17 @@ public class OperateTemplate {
         process(target, factory, defaultOperateConfigurationParser, defaultOperationExecutor);
     }
 
+    /**
+     * 使用默认执行器和配置解析器，然后根据指定配置处理数据
+     *
+     * @param target 待处理数据
+     * @param executor 执行器
+     * @author huangchengxing
+     * @date 2022/4/9 23:43
+     */
+    public void process(Object target, OperationExecutor executor) {
+        process(target, defaultOperatorFactory, defaultOperateConfigurationParser, executor);
+    }
     /**
      * 使用默认执行器、配置解析器与操作者工厂处理数据
      *
