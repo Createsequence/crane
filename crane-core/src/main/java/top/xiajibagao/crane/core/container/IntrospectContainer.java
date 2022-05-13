@@ -1,8 +1,7 @@
 package top.xiajibagao.crane.core.container;
 
+import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.MultiValueMap;
-import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
@@ -16,8 +15,8 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 public class IntrospectContainer implements Container {
 
     @Override
-    public void process(MultiValueMap<AssembleOperation, ?> operations) {
-        CollUtils.forEach(operations, (op, t) -> ObjectUtils.tryAction(
+    public void process(Multimap<AssembleOperation, ?> operations) {
+        operations.forEach((op, t) -> ObjectUtils.tryAction(
             () -> op.getAssembler().execute(t, t, op),
             x -> log.error("字段[{}]处理失败，错误原因：{}", op.getTargetProperty(), x.getMessage())
         ));

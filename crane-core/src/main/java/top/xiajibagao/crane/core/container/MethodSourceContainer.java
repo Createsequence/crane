@@ -2,13 +2,13 @@ package top.xiajibagao.crane.core.container;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.MultiValueMap;
 import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils;
@@ -113,9 +113,9 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
 
     @Nonnull
     @Override
-    protected Map<String, Map<Object, Object>> getSources(@Nonnull MultiValueMap<String, Object> namespaceAndKeys) {
+    protected Map<String, Map<Object, Object>> getSources(@Nonnull Multimap<String, Object> namespaceAndKeys) {
         Map<String, Map<Object, Object>> results = new HashMap<>(namespaceAndKeys.size());
-        namespaceAndKeys.forEach((namespace, keys) -> {
+        namespaceAndKeys.asMap().forEach((namespace, keys) -> {
             MethodSource method = methodCache.get(namespace);
             if (Objects.isNull(method)) {
                 return;
@@ -148,7 +148,7 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         private final BeanProperty sourceKeyProperty;
 
         @SuppressWarnings("unchecked")
-        public Collection<Object> getSources(List<Object> keys) {
+        public Collection<Object> getSources(Collection<Object> keys) {
             Collection<Object> params = keys;
             if (Objects.equals(sourceGetter.getParameterTypes()[0], Set.class)) {
                 params = new HashSet<>(keys);

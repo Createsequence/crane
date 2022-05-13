@@ -2,11 +2,11 @@ package top.xiajibagao.crane.core.executor;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.stream.StreamUtil;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.helper.CounterSet;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -40,23 +40,24 @@ public class SequentialOperationExecutor implements OperationExecutor {
         List<Object> targetsList = StreamUtil.of(targets).collect(Collectors.toList());
 
         // 解析配置
-        MultiValueMap<OperationConfiguration, Object> collectedConfigurations = collectOperationConfigurations(
-            targetsList, configuration, new LinkedMultiValueMap<>()
+        Multimap<OperationConfiguration, Object> collectedConfigurations = collectOperationConfigurations(
+            targetsList, configuration, ArrayListMultimap.create()
         );
 
         execute(configuration.getGlobalConfiguration(), collectedConfigurations);
     }
 
-    protected void execute(@Nonnull GlobalConfiguration globalConfiguration, @Nonnull MultiValueMap<OperationConfiguration, Object> collectedConfigurations) {
+    protected void execute(@Nonnull GlobalConfiguration globalConfiguration, @Nonnull Multimap<OperationConfiguration, Object> collectedConfigurations) {
         // TODO 优化算法，提高执行效率
         // 获取操作配置，并按类配置分别将全部的操作配置与待处理数据装入桶中，然后对同一桶中的操作按sort排序
-        Set<Bucket> buckets = collectedConfigurations.entrySet().stream()
+        Set<Bucket> buckets = collectedConfigurations.asMap().entrySet()
+            .stream()
             .filter(e -> CollUtil.isNotEmpty(e.getKey().getAssembleOperations()))
             .map(e -> new Bucket(e.getKey().getAssembleOperations(), e.getValue()))
             .peek(b -> Collections.sort(b.getOperations()))
             .collect(Collectors.toSet());
 
-        MultiValueMap<Container, Bucket> batch = new LinkedMultiValueMap<>();
+        Multimap<Container, Bucket> batch = ArrayListMultimap.create();
         while (CollUtil.isNotEmpty(buckets)) {
             // 找出本轮最匹配的容器
             Container maxContainer = (Container) new CounterSet<>()
@@ -67,13 +68,13 @@ public class SequentialOperationExecutor implements OperationExecutor {
                 .map(b -> b.getOperations(maxContainer))
                 .filter(Bucket::isNotEmpty)
                 .collect(Collectors.toList());
-            batch.put(maxContainer, matchedOperation);
+            batch.putAll(maxContainer, matchedOperation);
 
             // 移除处理完毕的容器
             buckets = buckets.stream().filter(Bucket::isNotEmpty).collect(Collectors.toSet());
         }
 
-        batch.forEach(((container, bucketList) -> {
+        batch.asMap().forEach(((container, bucketList) -> {
             List<Object> targets = bucketList.stream()
                 .map(Bucket::getTargets)
                 .flatMap(Collection::stream)
@@ -82,8 +83,8 @@ public class SequentialOperationExecutor implements OperationExecutor {
                 .map(Bucket::getOperations)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-            MultiValueMap<AssembleOperation, Object> processData = new LinkedMultiValueMap<>();
-            operations.forEach(op -> processData.addAll(op, targets));
+            Multimap<AssembleOperation, Object> processData = ArrayListMultimap.create();
+            operations.forEach(op -> processData.putAll(op, targets));
             container.process(processData);
         }));
     }
@@ -94,20 +95,20 @@ public class SequentialOperationExecutor implements OperationExecutor {
      * @param targets 当前解析的数据
      * @param configuration 当前解析的数据对应的类操作配置
      * @param collectedConfigurations 已经归类的操作配置
-     * @return org.springframework.util.MultiValueMap<top.xiajibagao.crane.parse.interfaces.OperationConfiguration,java.lang.Object>
+     * @return com.google.common.collect.Multimap<top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration,java.lang.Object>
      * @author huangchengxing
      * @date 2022/3/5 14:58
      */
     @Nonnull
-    protected MultiValueMap<OperationConfiguration, Object> collectOperationConfigurations(
+    protected Multimap<OperationConfiguration, Object> collectOperationConfigurations(
         @Nonnull List<Object> targets,
         @Nonnull OperationConfiguration configuration,
-        @Nonnull MultiValueMap<OperationConfiguration, Object> collectedConfigurations) {
+        @Nonnull Multimap<OperationConfiguration, Object> collectedConfigurations) {
         // 若无待操作数据则结束解析
         if (CollectionUtils.isEmpty(targets)) {
             return collectedConfigurations;
         }
-        targets.forEach(t -> collectedConfigurations.add(configuration, t));
+        targets.forEach(t -> collectedConfigurations.put(configuration, t));
 
         // 若无嵌套字段则结束解析
         List<DisassembleOperation> disassembleOperations = configuration.getDisassembleOperations();
@@ -131,7 +132,7 @@ public class SequentialOperationExecutor implements OperationExecutor {
     @Data
     private static class Bucket {
         private final List<AssembleOperation> operations;
-        private final List<Object> targets;
+        private final Collection<Object> targets;
 
         public Container peekContainerOfFirstOperation() {
             return isEmpty() ? null : CollUtil.getFirst(operations).getContainer();

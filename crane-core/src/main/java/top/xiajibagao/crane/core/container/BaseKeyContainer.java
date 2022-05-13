@@ -1,10 +1,9 @@
 package top.xiajibagao.crane.core.container;
 
 import cn.hutool.core.collection.CollUtil;
+import com.google.common.collect.Multimap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.MultiValueMap;
-import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
@@ -27,8 +26,8 @@ import java.util.Set;
 public abstract class BaseKeyContainer<K> implements Container {
 
     @Override
-    public void process(MultiValueMap<AssembleOperation, ?> operations) {
-        if (CollUtil.isEmpty(operations)) {
+    public void process(Multimap<AssembleOperation, ?> operations) {
+        if (Objects.isNull(operations) || operations.isEmpty()) {
             return;
         }
         // 获取key值
@@ -47,7 +46,7 @@ public abstract class BaseKeyContainer<K> implements Container {
         if (CollUtil.isEmpty(sources)) {
             return;
         }
-        CollUtils.forEach(operations, (op, t) -> writeToTargets(sources, t, op));
+        operations.forEach((op, t) -> writeToTargets(sources, t, op));
     }
 
     /**
@@ -93,9 +92,9 @@ public abstract class BaseKeyContainer<K> implements Container {
      * @date 2022/3/21 12:17
      */
     @Nonnull
-    protected Set<K> getTargetIds(@Nonnull MultiValueMap<AssembleOperation, ?> operations) {
+    protected Set<K> getTargetIds(@Nonnull Multimap<AssembleOperation, ?> operations) {
         Set<K> results = new HashSet<>();
-        CollUtils.forEach(operations, (op, t) -> {
+        operations.forEach((op, t) -> {
             Object key = op.getAssembler().getKey(t, op);
             K actualKey = parseKey(key);
             if (Objects.nonNull(actualKey)) {

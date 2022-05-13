@@ -1,10 +1,9 @@
 package top.xiajibagao.crane.core.container;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.MultiValueMap;
-import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.EnumDict;
 
 import javax.annotation.Nonnull;
@@ -34,9 +33,9 @@ public class EnumDictContainer extends BaseNamespaceContainer<String, EnumDict.E
 
     @Nonnull
     @Override
-    protected Map<String, Map<String, EnumDict.EnumDictItem<?>>> getSources(@Nonnull MultiValueMap<String, String> namespaceAndKeys) {
+    protected Map<String, Map<String, EnumDict.EnumDictItem<?>>> getSources(@Nonnull Multimap<String, String> namespaceAndKeys) {
         Table<String, String, EnumDict.EnumDictItem<?>> results = HashBasedTable.create();
-        CollUtils.forEach(namespaceAndKeys, (namespace, key) -> {
+        namespaceAndKeys.forEach((namespace, key) -> {
             EnumDict.EnumDictItem<?> item = enumDict.getItem(namespace, key);
             if (Objects.nonNull(item)) {
                 results.put(namespace, key, item);

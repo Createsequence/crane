@@ -1,6 +1,6 @@
 package top.xiajibagao.crane.core.container;
 
-import org.springframework.util.MultiValueMap;
+import com.google.common.collect.Multimap;
 import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -37,6 +37,6 @@ public interface Container extends Orderly {
      * @author huangchengxing
      * @date 2022/2/23 20:49
      */
-    void process(MultiValueMap<AssembleOperation, ?> operations);
+    void process(Multimap<AssembleOperation, ?> operations);
 
 }

@@ -1,10 +1,9 @@
 package top.xiajibagao.crane.core.container;
 
 import cn.hutool.core.collection.CollUtil;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
@@ -26,13 +25,13 @@ import java.util.Objects;
 public abstract class BaseNamespaceContainer<K, T> implements Container {
 
     @Override
-    public void process(MultiValueMap<AssembleOperation, ?> operations) {
-        if (CollUtil.isEmpty(operations)) {
+    public void process(Multimap<AssembleOperation, ?> operations) {
+        if (Objects.isNull(operations) || operations.isEmpty()) {
             return;
         }
         // 获取key值与命名空间
-        MultiValueMap<String, K> namespacesAndKeys = getNamespaceAndKeyFromTargets(operations);
-        if (CollUtil.isEmpty(namespacesAndKeys)) {
+        Multimap<String, K> namespacesAndKeys = getNamespaceAndKeyFromTargets(operations);
+        if (namespacesAndKeys.isEmpty()) {
             return;
         }
         // 根据key值获取数据源
@@ -43,7 +42,7 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
         if (CollUtil.isEmpty(sources)) {
             return;
         }
-        CollUtils.forEach(operations, (op, t) -> writeToTargets(sources, t, op));
+        operations.forEach((op, t) -> writeToTargets(sources, t, op));
     }
 
     /**
@@ -83,7 +82,7 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
      * @date 2022/3/21 12:17
      */
     @Nonnull
-    protected abstract Map<String, Map<K, T>> getSources(@Nonnull MultiValueMap<String, K> namespaceAndKeys);
+    protected abstract Map<String, Map<K, T>> getSources(@Nonnull Multimap<String, K> namespaceAndKeys);
 
     /**
      * 将对象集合转为所需要的namespace与key集合
@@ -94,13 +93,13 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
      * @date 2022/3/21 12:17
      */
     @Nonnull
-    protected MultiValueMap<String, K> getNamespaceAndKeyFromTargets(@Nonnull MultiValueMap<AssembleOperation, ?> operations) {
-        MultiValueMap<String, K> results = new LinkedMultiValueMap<>();
-        CollUtils.forEach(operations, (op, t) -> {
+    protected Multimap<String, K> getNamespaceAndKeyFromTargets(@Nonnull Multimap<AssembleOperation, ?> operations) {
+        Multimap<String, K> results = HashMultimap.create();
+        operations.forEach((op, t) -> {
             Object key = op.getAssembler().getKey(t, op);
             K actualKey = parseKey(key);
             if (Objects.nonNull(actualKey)) {
-                results.add(op.getNamespace(), actualKey);
+                results.put(op.getNamespace(), actualKey);
             }
         });
         return results;

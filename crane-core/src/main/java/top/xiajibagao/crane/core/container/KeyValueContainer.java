@@ -1,9 +1,9 @@
 package top.xiajibagao.crane.core.container;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Table;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.MultiValueMap;
-import top.xiajibagao.crane.core.helper.BaseTableMap;
-import top.xiajibagao.crane.core.helper.TableMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,7 +21,7 @@ public class KeyValueContainer extends BaseNamespaceContainer<String, Object> im
     /**
      * 数据缓存
      */
-    public final TableMap<String, String, Object> cache = new BaseTableMap<>();
+    public final Table<String, String, Object> cache = HashBasedTable.create();
 
     /**
      * 注册值
@@ -35,7 +35,7 @@ public class KeyValueContainer extends BaseNamespaceContainer<String, Object> im
         if (CollectionUtils.isEmpty(values)) {
             return;
         }
-        values.forEach((k, v) -> cache.putVal(namespace, k, v));
+        values.forEach((k, v) -> cache.put(namespace, k, v));
     }
 
     /**
@@ -49,13 +49,13 @@ public class KeyValueContainer extends BaseNamespaceContainer<String, Object> im
      */
     @SuppressWarnings("unchecked")
     public <T> T get(String namespace, String key) {
-        return (T) cache.getVal(namespace, key);
+        return (T) cache.get(namespace, key);
     }
 
     @Nonnull
     @Override
-    protected Map<String, Map<String, Object>> getSources(@Nonnull MultiValueMap<String, String> namespaceAndKeys) {
-        return cache.asMap();
+    protected Map<String, Map<String, Object>> getSources(@Nonnull Multimap<String, String> namespaceAndKeys) {
+        return cache.rowMap();
     }
 
     @Override
