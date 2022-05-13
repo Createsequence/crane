@@ -82,7 +82,7 @@ public abstract class BaseKeyContainer<K> implements Container {
      * @date 2022/3/21 12:17
      */
     @Nonnull
-    protected abstract Map<K, Object> getSources(@Nonnull Set<K> keys);
+    protected abstract Map<K, ?> getSources(@Nonnull Set<K> keys);
 
     /**
      * 从待处理对象中获取所需要的key字段值
