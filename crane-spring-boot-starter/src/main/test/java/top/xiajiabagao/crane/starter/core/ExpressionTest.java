@@ -17,11 +17,11 @@ import top.xiajiabagao.crane.starter.common.TestContainer;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
+import top.xiajibagao.crane.core.helper.OperateTemplate;
 import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.OperateConfigurationAssistant;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.core.helper.OperateTemplate;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -163,7 +163,7 @@ public class ExpressionTest {
      */
     @SneakyThrows
     @Test
-    public void testMultiNestBeanByAnnotationConfig() {
+    public void testSingleNestBeanByAnnotationConfig() {
         Person actual = getActualPerson()
             .setRelatives(Arrays.asList(getActualPerson(), getActualPerson()));
         processAndLog(actual);
@@ -178,7 +178,7 @@ public class ExpressionTest {
      */
     @SneakyThrows
     @Test
-    public void testSingleNestBeanByAnnotationConfig() {
+    public void testMultiNestBeanByAnnotationConfig() {
         Person[] actual = new Person[] {
             getActualPerson()
                 .setRelatives(Arrays.asList(getActualPerson(), getActualPerson())),
