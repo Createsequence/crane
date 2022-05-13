@@ -1,9 +1,9 @@
 package top.xiajibagao.crane.core.handler;
 
-import cn.hutool.core.collection.CollUtil;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
-import top.xiajibagao.crane.core.helper.Orderly;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,18 +14,16 @@ import java.util.List;
  * @author huangchengxing
  * @date 2022/04/08 21:02
  */
+@Getter
+@Accessors(fluent = true)
 public class OrderlyOperateHandlerChain implements OperateHandlerChain {
 
     private final List<OperateHandler> handlers = new ArrayList<>();
 
     @Override
-    public List<OperateHandler> handlers() {
-        return CollUtil.sort(handlers, Orderly::compareTo);
-    }
-
-    @Override
     public OperateHandlerChain addHandler(OperateHandler handler) {
         handlers.add(handler);
+        handlers.sort(OperateHandler::compareTo);
         return this;
     }
 
