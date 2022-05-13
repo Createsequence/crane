@@ -2,13 +2,13 @@ package top.xiajibagao.crane.core.executor;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.stream.StreamUtil;
-import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.springframework.util.CollectionUtils;
 import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.helper.CounterSet;
+import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
@@ -41,7 +41,7 @@ public class SequentialOperationExecutor implements OperationExecutor {
 
         // 解析配置
         Multimap<OperationConfiguration, Object> collectedConfigurations = collectOperationConfigurations(
-            targetsList, configuration, ArrayListMultimap.create()
+            targetsList, configuration, LinkedListMultimap.create()
         );
 
         execute(configuration.getGlobalConfiguration(), collectedConfigurations);
@@ -57,7 +57,7 @@ public class SequentialOperationExecutor implements OperationExecutor {
             .peek(b -> Collections.sort(b.getOperations()))
             .collect(Collectors.toSet());
 
-        Multimap<Container, Bucket> batch = ArrayListMultimap.create();
+        Multimap<Container, Bucket> batch = LinkedListMultimap.create();
         while (CollUtil.isNotEmpty(buckets)) {
             // 找出本轮最匹配的容器
             Container maxContainer = (Container) new CounterSet<>()
@@ -83,7 +83,7 @@ public class SequentialOperationExecutor implements OperationExecutor {
                 .map(Bucket::getOperations)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-            Multimap<AssembleOperation, Object> processData = ArrayListMultimap.create();
+            Multimap<AssembleOperation, Object> processData = LinkedListMultimap.create();
             operations.forEach(op -> processData.putAll(op, targets));
             container.process(processData);
         }));
@@ -128,11 +128,15 @@ public class SequentialOperationExecutor implements OperationExecutor {
         return collectedConfigurations;
     }
 
-    @RequiredArgsConstructor
     @Data
     private static class Bucket {
         private final List<AssembleOperation> operations;
         private final Collection<Object> targets;
+
+        public Bucket(List<AssembleOperation> operations, Collection<Object> targets) {
+            this.operations = CollUtil.sort(operations, Orderly::compareTo);
+            this.targets = targets;
+        }
 
         public Container peekContainerOfFirstOperation() {
             return isEmpty() ? null : CollUtil.getFirst(operations).getContainer();
