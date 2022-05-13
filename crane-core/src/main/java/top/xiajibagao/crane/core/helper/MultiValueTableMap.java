@@ -9,6 +9,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 两个key对应多个值的集合，类似：
+ * <pre>
+ *             colKey       colKey       colKey
+ *         -------------------------------------
+ *  rowKey |  v1, v2... |  v1, v2... |  v1, v2...
+ *         -------------------------------------
+ *  rowKey |  v1, v2... |  v1, v2... |  v1, v2...
+ *         -------------------------------------
+ * </pre>
+ *
  * @author huangchengxing
  * @date 2022/04/18 3:52
  */
