@@ -38,8 +38,7 @@ public class BeanReflexAssembler implements Assembler {
     @Override
     public Object getKey(Object target, AssembleOperation operation) {
         return handlerChain.readFromSource(
-            target, new BeanAssembleProperty(null, operation.getTargetProperty().getName(), "", Void.class),
-            operation
+            target, BeanAssembleProperty.ofNameOnlyProperty(operation.getTargetProperty().getName()), operation
         );
     }
     

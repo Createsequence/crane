@@ -25,8 +25,7 @@ public class BeanReflexDisassembler implements Disassembler {
         List<Object> results = new ArrayList<>();
         // bfs遍历集合
         Object disassemblePropertyValue = handlerChain.readFromSource(
-            target, new BeanAssembleProperty(null, operation.getTargetProperty().getName(), "", Void.class),
-            operation
+            target, BeanAssembleProperty.ofNameOnlyProperty(operation.getTargetProperty().getName()), operation
         );
         Deque<Object> deque = new LinkedList<>();
         deque.add(disassemblePropertyValue);

@@ -17,4 +17,8 @@ public class BeanAssembleProperty implements AssembleProperty {
     private final String exp;
     private final Class<?> expType;
 
+    public static BeanAssembleProperty ofNameOnlyProperty(String propertyName) {
+        return new BeanAssembleProperty(null, propertyName, "", Void.class);
+    }
+
 }
