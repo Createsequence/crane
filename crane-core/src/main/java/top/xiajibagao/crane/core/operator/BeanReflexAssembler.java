@@ -4,14 +4,13 @@ import cn.hutool.core.collection.CollUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
+import top.xiajibagao.crane.core.helper.PairEntry;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.BeanAssembleProperty;
 import top.xiajibagao.crane.core.parser.EmptyAssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -29,16 +28,11 @@ public class BeanReflexAssembler implements Assembler {
         if (Objects.isNull(target) || Objects.isNull(source)) {
             return;
         }
-        List<AssembleProperty> properties = CollUtil.defaultIfEmpty(
-            operation.getProperties(), Collections.singletonList(EmptyAssembleProperty.instance())
-        );
-        for (AssembleProperty property : properties) {
-            Object sourceData = handlerChain.readFromSource(source, property, operation);
-            if (Objects.isNull(sourceData)) {
-                return;
-            }
-            handlerChain.writeToTarget(sourceData, target, property, operation);
-        }
+        CollUtil.defaultIfEmpty(operation.getProperties(), Collections.singletonList(EmptyAssembleProperty.instance()))
+            .stream()
+            .map(property -> PairEntry.of(property, handlerChain.readFromSource(source, property, operation)))
+            .filter(PairEntry::hasValue)
+            .forEach(pair -> handlerChain.writeToTarget(pair.getValue(), target, pair.getKey(), operation));
     }
 
     @Override
