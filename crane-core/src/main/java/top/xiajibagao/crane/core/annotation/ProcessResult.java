@@ -3,6 +3,7 @@ package top.xiajibagao.crane.core.annotation;
 import org.springframework.core.annotation.AliasFor;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
+import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.parser.BeanOperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
@@ -32,6 +33,12 @@ public @interface ProcessResult {
      */
     @AliasFor(annotation = ConfigOption.class, attribute = "targetClass")
     Class<?> targetClass() default Void.class;
+
+    /**
+     * 分组
+     */
+    @AliasFor(annotation = ConfigOption.class, attribute = "groups")
+    Class<?>[] groups() default { DefaultGroup.class };
 
     /**
      * 要使用的配置解析器

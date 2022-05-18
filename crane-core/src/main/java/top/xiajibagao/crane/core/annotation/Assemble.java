@@ -3,6 +3,7 @@ package top.xiajibagao.crane.core.annotation;
 import org.springframework.core.annotation.AliasFor;
 import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
+import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 
@@ -59,6 +60,11 @@ public @interface Assemble {
      * 仅当无法根据注解字段名找到key字段时，才尝试通过别名找到至少一个存在的字段。
      */
     String[] aliases() default {};
+
+    /**
+     * 分组
+     */
+    Class<?>[] groups() default { DefaultGroup.class };
 
     /**
      * 字段映射配置

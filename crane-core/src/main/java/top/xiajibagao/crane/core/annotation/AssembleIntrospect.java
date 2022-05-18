@@ -2,6 +2,7 @@ package top.xiajibagao.crane.core.annotation;
 
 import org.springframework.core.annotation.AliasFor;
 import top.xiajibagao.crane.core.container.IntrospectContainer;
+import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 
@@ -31,6 +32,12 @@ public @interface AssembleIntrospect {
      */
     @AliasFor(annotation = Assemble.class, attribute = "namespace")
     String namespace() default "";
+
+    /**
+     * 分组
+     */
+    @AliasFor(annotation = Assemble.class, attribute = "groups")
+    Class<?>[] groups() default { DefaultGroup.class };
 
     /**
      * 指定注解的key字段别名。<br />
