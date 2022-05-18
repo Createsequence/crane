@@ -29,7 +29,7 @@ public class JacksonAssembler implements Assembler {
 
     @Override
     public void execute(Object target, Object source, AssembleOperation operation) {
-        if (Objects.isNull(source) || !(target instanceof ObjectNode)) {
+        if (JacksonUtils.isNotNodeOrNull(target) || Objects.isNull(source)) {
             return;
         }
         ObjectNode targetNode = (ObjectNode) target;

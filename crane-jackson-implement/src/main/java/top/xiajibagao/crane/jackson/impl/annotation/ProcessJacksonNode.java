@@ -3,6 +3,7 @@ package top.xiajibagao.crane.jackson.impl.annotation;
 import top.xiajibagao.crane.core.annotation.MateAnnotation;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
+import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.parser.BeanOperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
@@ -29,5 +30,10 @@ public @interface ProcessJacksonNode {
      * 要使用的执行器
      */
     Class<? extends OperationExecutor> executor() default UnorderedOperationExecutor.class;
+
+    /**
+     * 分组
+     */
+    Class<?>[] groups() default { DefaultGroup.class };
 
 }

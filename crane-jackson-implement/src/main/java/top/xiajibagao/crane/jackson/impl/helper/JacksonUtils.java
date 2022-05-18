@@ -193,6 +193,30 @@ public class JacksonUtils {
     public static boolean isNull(JsonNode node) {
         return Objects.isNull(node) || node.isNull();
     }
+
+    /**
+     * 该节点是否为JsonNode且不为null节点
+     *
+     * @param node 节点
+     * @return boolean
+     * @author huangchengxing
+     * @date 2022/3/2 11:14
+     */
+    public static boolean isNodeAndNotNull(Object node) {
+        return (node instanceof JsonNode) && !((JsonNode)node).isNull();
+    }
+
+    /**
+     * 该对象为null，或不为JsonNode，或者为JsonNode但是为null节点
+     *
+     * @param node 节点
+     * @return boolean
+     * @author huangchengxing
+     * @date 2022/3/2 11:14
+     */
+    public static boolean isNotNodeOrNull(Object node) {
+        return !isNodeAndNotNull(node);
+    }
     
     /**
      * 获取非空节点

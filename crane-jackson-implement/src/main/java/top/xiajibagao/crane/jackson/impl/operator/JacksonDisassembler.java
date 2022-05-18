@@ -25,7 +25,7 @@ public class JacksonDisassembler implements Disassembler {
 
     @Override
     public Collection<?> execute(Object target, DisassembleOperation operation) {
-        if (!(target instanceof JsonNode) || ((JsonNode)target).isNull()) {
+        if (JacksonUtils.isNotNodeOrNull(target)) {
             return Collections.emptyList();
         }
         JsonNode targetNode = (JsonNode)target;
