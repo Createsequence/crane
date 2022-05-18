@@ -111,7 +111,7 @@ public class Application {
 @Data // 使用Lombok简化getter和setter方法
 @Accessors(chain = true)
 public class Person {
-    @Assemble(container = KeyValueContainer.class, namespace = "sex", props = @Prop("sexName"))
+    @Assemble(namespace = "sex", props = @Prop("sexName"))
     Integer sex;
     String sexName;
 }
@@ -126,7 +126,7 @@ class CraneApplicationTests {
     @Autowired
     KeyValueContainer keyValueContainer;
     @Autowired
-    OperateHelper operateHelper;
+    OperateTemplate operateTemplate;
 
     @BeforeEach
     void initDate() {
@@ -141,7 +141,7 @@ class CraneApplicationTests {
     void testProcess() {
         Person person = new Person().setSex(0);
         System.out.println("after: " + person); // 处理前
-        operateHelper.process(person);
+        operateTemplate.process(person);
         System.out.println("before: " + person); // 处理后
     }
     
@@ -155,7 +155,7 @@ after: Person(sex=0, sexName=null) // 处理前
 before: Person(sex=0, sexName=女) // 处理后
 ~~~
 
-至此，即完成了 crane 的基本功能的使用，更多功能请见下文。
+至此，即完成了 crane 的最基本功能的使用。
 
 ## Wiki
 
@@ -220,6 +220,8 @@ before: Person(sex=0, sexName=女) // 处理后
   ~~~
 
 - [x] 使用字节码类库优化原生反射的性能；
+
+- [ ] 允许通过多个 key 字段获取数据源；
 
 - [ ] 添加一个完整的示例项目；
 
