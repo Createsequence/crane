@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 public class SequentialOperationExecutor implements OperationExecutor {
 
     @Override
-    public void execute(Iterable<?> targets, OperationConfiguration configuration) {
-        if (CollUtil.isEmpty(targets) || Objects.isNull(configuration)) {
+    public void execute(Iterable<?> targets, OperationConfiguration configuration, @Nonnull Set<Class<?>> groups) {
+        if (CollUtil.isEmpty(targets) || Objects.isNull(configuration) || CollUtil.isEmpty(groups)) {
             return;
         }
         List<Object> targetsList = StreamUtil.of(targets).collect(Collectors.toList());
@@ -44,17 +44,19 @@ public class SequentialOperationExecutor implements OperationExecutor {
             targetsList, configuration, LinkedListMultimap.create()
         );
 
-        execute(configuration.getGlobalConfiguration(), collectedConfigurations);
+        execute(configuration.getGlobalConfiguration(), groups, collectedConfigurations);
     }
 
-    protected void execute(@Nonnull GlobalConfiguration globalConfiguration, @Nonnull Multimap<OperationConfiguration, Object> collectedConfigurations) {
+    protected void execute(
+        @Nonnull GlobalConfiguration globalConfiguration,
+        @Nonnull Set<Class<?>> targetGroups,
+        @Nonnull Multimap<OperationConfiguration, Object> collectedConfigurations) {
         // TODO 优化算法，提高执行效率
         // 获取操作配置，并按类配置分别将全部的操作配置与待处理数据装入桶中，然后对同一桶中的操作按sort排序
         Set<Bucket> buckets = collectedConfigurations.asMap().entrySet()
             .stream()
             .filter(e -> CollUtil.isNotEmpty(e.getKey().getAssembleOperations()))
-            .map(e -> new Bucket(e.getKey().getAssembleOperations(), e.getValue()))
-            .peek(b -> Collections.sort(b.getOperations()))
+            .map(e -> new Bucket(e.getKey().getAssembleOperations(), e.getValue(), targetGroups))
             .collect(Collectors.toSet());
 
         Multimap<Container, Bucket> batch = LinkedListMultimap.create();
@@ -132,10 +134,15 @@ public class SequentialOperationExecutor implements OperationExecutor {
     private static class Bucket {
         private final List<AssembleOperation> operations;
         private final Collection<Object> targets;
+        private final Set<Class<?>> targetGroups;
 
-        public Bucket(List<AssembleOperation> operations, Collection<Object> targets) {
-            this.operations = CollUtil.sort(operations, Orderly::compareTo);
+        public Bucket(List<AssembleOperation> operations, Collection<Object> targets, Set<Class<?>> targetGroups) {
+            this.operations = operations.stream()
+                .filter(op -> CollUtil.containsAny(targetGroups, op.getGroups()))
+                .sorted(Orderly::compareTo)
+                .collect(Collectors.toList());
             this.targets = targets;
+            this.targetGroups = targetGroups;
         }
 
         public Container peekContainerOfFirstOperation() {
@@ -153,7 +160,7 @@ public class SequentialOperationExecutor implements OperationExecutor {
                 matched.add(curr);
                 iterator.remove();
             }
-            return new Bucket(matched, targets);
+            return new Bucket(matched, targets, targetGroups);
         }
 
         public boolean isEmpty() {

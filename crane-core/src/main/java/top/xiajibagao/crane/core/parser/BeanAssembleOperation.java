@@ -28,5 +28,6 @@ public class BeanAssembleOperation implements AssembleOperation {
     private final Container container;
     private final Assembler assembler;
     private final List<AssembleProperty> properties;
+    private final Set<Class<?>> groups;
 
 }

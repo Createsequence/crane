@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.core.helper;
 
+import cn.hutool.core.util.ArrayUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -26,9 +27,9 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
     private final ConfigurationCache configurationCache;
     
     @SuppressWarnings("unchecked")
-    public void process(T annotatedElement, Object target) {
+    public void process(T annotatedElement, Object target, Class<?>... targetGroups) {
         ConfigOption annotation = parseAnnotation(annotatedElement);
-        if (Objects.isNull(annotation)) {
+        if (Objects.isNull(annotation) || ArrayUtil.isEmpty(targetGroups)) {
             return;
         }
         Class<?> targetClass = getTargetClass(annotation, annotatedElement, target);
@@ -42,7 +43,7 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
             getNamespace(parser), targetClass, parser::parse
         );
         OperationExecutor executor = beanFactory.getBean(annotation.executor());
-        executor.execute(CollUtils.adaptToCollection(target), configuration);
+        executor.execute(CollUtils.adaptToCollection(target), configuration, targetGroups);
     }
     
     /**

@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.container.Container;
+import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.helper.FuncUtils;
 import top.xiajibagao.crane.core.helper.SFunc;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
@@ -229,13 +230,13 @@ public class OperateConfigurationAssistant<T> {
             return property(resource, "");
         }
 
-        public OperateConfigurationAssistant<T> build() {
+        public OperateConfigurationAssistant<T> build(Class<?>... groups) {
             builder.configuration.getAssembleOperations().add(new BeanAssembleOperation(
                 order,
                 builder.configuration,
                 targetField, aliases,
                 namespace, container,
-                assembler, properties
+                assembler, properties, ArrayUtil.isNotEmpty(groups) ? CollUtil.newHashSet(groups) : CollUtil.newHashSet(DefaultGroup.class)
             ));
             return builder;
         }

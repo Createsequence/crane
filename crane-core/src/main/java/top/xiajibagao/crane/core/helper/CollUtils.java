@@ -3,6 +3,7 @@ package top.xiajibagao.crane.core.helper;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.func.Consumer3;
 import cn.hutool.core.stream.StreamUtil;
+import cn.hutool.core.util.ArrayUtil;
 import org.springframework.lang.NonNull;
 
 import java.util.*;
@@ -203,6 +204,22 @@ public final class CollUtils {
 			return Collections.emptyList();
 		}
 		return toCollection(source, ArrayList::new, Function.identity());
+	}
+
+	/**
+	 * 将一个数组转为HashSet集合
+	 *
+	 * @param source 数组
+	 * @param <T> 返回集合元素类型
+	 * @return java.util.Set<T> 转换集合
+	 * @author huangchengxing
+	 * @date 2021/10/19 10:25
+	 */
+	public static <T> Set<T> toSet(T... source) {
+		if (ArrayUtil.isEmpty(source)) {
+			return Collections.emptySet();
+		}
+		return toCollection(Arrays.asList(source), HashSet::new, Function.identity());
 	}
 
 	/**

@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -27,15 +28,15 @@ import java.util.stream.StreamSupport;
 public abstract class AbstractOperationExecutor implements OperationExecutor {
 
     @Override
-    public void execute(Iterable<?> targets, OperationConfiguration configuration) {
-        if (CollUtil.isEmpty(targets) || Objects.isNull(configuration)) {
+    public void execute(Iterable<?> targets, OperationConfiguration configuration, @Nonnull Set<Class<?>> groups) {
+        if (CollUtil.isEmpty(targets) || Objects.isNull(configuration) || CollUtil.isEmpty(groups)) {
             return;
         }
         List<Object> targetsList = StreamSupport.stream(targets.spliterator(), false)
             .collect(Collectors.toList());
         // 分组收集待进行的操作配置
         MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations = new MultiValueTableMap<>();
-        collectOperations(targetsList, configuration, pendingOperations);
+        collectOperations(targetsList, configuration, groups, pendingOperations);
         // 执行
         execute(configuration.getGlobalConfiguration(), pendingOperations);
     }
@@ -43,15 +44,16 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
     private void collectOperations(
         Collection<Object> targets,
         OperationConfiguration configuration,
+        Set<Class<?>> targetGroups,
         MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
 
         if (CollectionUtils.isEmpty(targets)) {
             return;
         }
         // 处理普通待装配字段
-        processAssembleOperations(targets, configuration, pendingOperations);
+        processAssembleOperations(targets, configuration, targetGroups, pendingOperations);
         // 处理待装卸的嵌套字段
-        processDisassembleOperations(targets, configuration, pendingOperations);
+        processDisassembleOperations(targets, configuration, targetGroups, pendingOperations);
     }
 
     /**
@@ -75,14 +77,16 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
      */
     protected void processAssembleOperations(
         @Nonnull Collection<Object> targets,
-        @Nonnull OperationConfiguration configuration,
+        @Nonnull OperationConfiguration configuration, Set<Class<?>> targetGroups,
         @Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
 
         List<AssembleOperation> operations = configuration.getAssembleOperations();
         if (CollectionUtils.isEmpty(operations)) {
             return;
         }
-        operations.forEach(op -> pendingOperations.putValAll(op.getContainer(), op, targets));
+        operations.stream()
+            .filter(op -> CollUtil.containsAny(targetGroups, op.getGroups()))
+            .forEach(op -> pendingOperations.putValAll(op.getContainer(), op, targets));
     }
 
     /**
@@ -97,6 +101,7 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
     protected void processDisassembleOperations(
         @Nonnull Collection<?> targets,
         @Nonnull OperationConfiguration configuration,
+        Set<Class<?>> targetGroups,
         @Nonnull MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
 
         List<DisassembleOperation> disassembleOperations = configuration.getDisassembleOperations();
@@ -111,7 +116,7 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
                 .collect(Collectors.toList());
             OperationConfiguration operationConfiguration = operation.getTargetOperateConfiguration();
             // 递归解析嵌套对象
-            collectOperations(nestedPropertyValues, operationConfiguration, pendingOperations);
+            collectOperations(nestedPropertyValues, operationConfiguration, targetGroups, pendingOperations);
         }
     }
 

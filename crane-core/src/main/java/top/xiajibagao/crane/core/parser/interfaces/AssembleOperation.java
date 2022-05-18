@@ -4,6 +4,7 @@ import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 字段装配配置
@@ -69,5 +70,14 @@ public interface AssembleOperation extends Operation {
      * @date 2022/3/1 16:02
      */
     List<AssembleProperty> getProperties();
+
+    /**
+     * 获取分组
+     *
+     * @return java.util.Set<java.lang.Class<?>>
+     * @author huangchengxing
+     * @date 2022/5/18 20:47
+     */
+    Set<Class<?>> getGroups();
 
 }

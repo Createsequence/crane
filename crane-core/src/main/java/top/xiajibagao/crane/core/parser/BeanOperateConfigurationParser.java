@@ -150,7 +150,8 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
             configuration,
             property, aliases,
             annotation.namespace(), container,
-            assembler, properties
+            assembler, properties, 
+            CollUtils.toSet(annotation.groups())
         );
     }
     
