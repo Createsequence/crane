@@ -11,6 +11,7 @@ import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * 基于操作配置允许动态添加/替换字段与字段值的序列化器
@@ -23,12 +24,14 @@ public class DynamicJsonNodeBeanSerializer<T> extends StdSerializer<T> {
     private final ObjectMapper objectMapper;
     private final OperationConfiguration operationConfiguration;
     private final OperationExecutor operationExecutor;
+    private final Set<Class<?>> groups;
 
     public DynamicJsonNodeBeanSerializer(
-        Class<T> t, ObjectMapper objectMapper,
+        Class<T> t, ObjectMapper objectMapper, Set<Class<?>> groups,
         OperationConfiguration operationConfiguration, OperationExecutor operationExecutor) {
         super(t);
         this.operationConfiguration = operationConfiguration;
+        this.groups = groups;
         this.objectMapper = objectMapper;
         this.operationExecutor = operationExecutor;
     }
@@ -39,7 +42,7 @@ public class DynamicJsonNodeBeanSerializer<T> extends StdSerializer<T> {
             return;
         }
         JsonNode jsonNode = objectMapper.valueToTree(value);
-        operationExecutor.execute(CollUtils.adaptToCollection(jsonNode), operationConfiguration);
+        operationExecutor.execute(CollUtils.adaptToCollection(jsonNode), operationConfiguration, groups);
         objectMapper.writeTree(gen, jsonNode);
     }
 

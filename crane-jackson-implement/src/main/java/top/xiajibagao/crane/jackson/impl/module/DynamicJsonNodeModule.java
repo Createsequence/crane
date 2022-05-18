@@ -1,5 +1,7 @@
 package top.xiajibagao.crane.jackson.impl.module;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
@@ -11,6 +13,7 @@ import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 import top.xiajibagao.crane.jackson.impl.annotation.ProcessJacksonNode;
 
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -55,7 +58,11 @@ public class DynamicJsonNodeModule extends Module {
             OperateConfigurationParser<? extends OperationConfiguration> configurationParser = beanFactory.getBean(annotation.parser());
             OperationConfiguration operationConfiguration = configurationParser.parse(beanDesc.getBeanClass());
             OperationExecutor operationExecutor = beanFactory.getBean(annotation.executor());
-            return new DynamicJsonNodeBeanSerializer<>(beanDesc.getBeanClass(), objectMapper, operationConfiguration, operationExecutor);
+            return new DynamicJsonNodeBeanSerializer<>(
+                beanDesc.getBeanClass(), objectMapper,
+                ArrayUtil.isNotEmpty(annotation.groups()) ? CollUtil.newHashSet(annotation.groups()) : Collections.emptySet(),
+                operationConfiguration, operationExecutor
+            );
         }
 
     }
