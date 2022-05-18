@@ -8,6 +8,7 @@ package top.xiajibagao.crane.core.operator.interfaces;
  * @author huangchengxing
  * @date 2022/03/01 15:20
  */
+@Deprecated
 public interface OperatorFactory {
 
     /**

@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
-import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
@@ -23,7 +22,6 @@ import java.util.Objects;
 public class OperateTemplate {
 
     private final ConfigurationCache configurationCache;
-    private final OperatorFactory defaultOperatorFactory;
     private final OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser;
     private final OperationExecutor defaultOperationExecutor;
 
@@ -48,9 +46,7 @@ public class OperateTemplate {
      * @author huangchengxing
      * @date 2022/4/9 23:44
      */
-    public void process(Object target,
-        OperationConfiguration configuration,
-        OperationExecutor executor) {
+    public void process(Object target, OperationConfiguration configuration, OperationExecutor executor) {
         executor.execute(CollUtils.adaptToCollection(target), configuration);
     }
 
@@ -58,17 +54,12 @@ public class OperateTemplate {
      * 根据指定配置处理数据
      *
      * @param target 待处理数据
-     * @param factory 操作者工厂
      * @param parser 配置解析器
      * @param executor 执行器
      * @author huangchengxing
      * @date 2022/4/9 23:43
      */
-    public void process(
-        Object target,
-        OperatorFactory factory,
-        OperateConfigurationParser<? extends OperationConfiguration> parser,
-        OperationExecutor executor) {
+    public void process(Object target, OperateConfigurationParser<? extends OperationConfiguration> parser, OperationExecutor executor) {
         // 适配为集合
         Collection<?> targets = CollUtils.adaptToCollection(target);
         if (CollUtil.isEmpty(targets)) {
@@ -81,7 +72,7 @@ public class OperateTemplate {
         }
         // 解析配置
         OperationConfiguration configuration = configurationCache.getOrCached(
-            parser.getClass().getName(), factory.getClass(), targetClass, () -> parser.parse(targetClass, factory)
+            parser.getClass().getName(), targetClass, parser::parse
         );
         // 根据处理数据
         executor.execute(targets, configuration);
@@ -91,28 +82,12 @@ public class OperateTemplate {
      * 使用默认执行器，然后根据指定配置处理数据
      *
      * @param target 待处理数据
-     * @param factory 操作者工厂
      * @param parser 配置解析器
      * @author huangchengxing
      * @date 2022/4/9 23:43
      */
-    public void process(
-        Object target,
-        OperatorFactory factory,
-        OperateConfigurationParser<? extends OperationConfiguration> parser) {
-        process(target, factory, parser, defaultOperationExecutor);
-    }
-
-    /**
-     * 使用默认执行器和配置解析器，然后根据指定配置处理数据
-     *
-     * @param target 待处理数据
-     * @param factory 操作者工厂
-     * @author huangchengxing
-     * @date 2022/4/9 23:43
-     */
-    public void process(Object target, OperatorFactory factory) {
-        process(target, factory, defaultOperateConfigurationParser, defaultOperationExecutor);
+    public void process(Object target, OperateConfigurationParser<? extends OperationConfiguration> parser) {
+        process(target, parser, defaultOperationExecutor);
     }
 
     /**
@@ -124,7 +99,7 @@ public class OperateTemplate {
      * @date 2022/4/9 23:43
      */
     public void process(Object target, OperationExecutor executor) {
-        process(target, defaultOperatorFactory, defaultOperateConfigurationParser, executor);
+        process(target, defaultOperateConfigurationParser, executor);
     }
     /**
      * 使用默认执行器、配置解析器与操作者工厂处理数据
@@ -134,7 +109,7 @@ public class OperateTemplate {
      * @date 2022/4/9 23:43
      */
     public void process(Object target) {
-        process(target, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor);
+        process(target, defaultOperateConfigurationParser, defaultOperationExecutor);
     }
 
 }

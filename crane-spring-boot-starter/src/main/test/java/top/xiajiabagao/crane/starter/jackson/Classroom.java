@@ -5,8 +5,9 @@ import lombok.experimental.Accessors;
 import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.Disassemble;
 import top.xiajibagao.crane.core.annotation.Prop;
-import top.xiajibagao.crane.core.container.KeyValueContainer;
 import top.xiajibagao.crane.jackson.impl.annotation.ProcessJacksonNode;
+import top.xiajibagao.crane.jackson.impl.operator.JacksonAssembler;
+import top.xiajibagao.crane.jackson.impl.operator.JacksonDisassembler;
 
 import java.util.List;
 
@@ -19,15 +20,15 @@ import java.util.List;
 @Data
 public class Classroom {
 
-    @Assemble(container = KeyValueContainer.class, namespace = "student", props = @Prop(src = "name", ref = "studentNames"))
-    @Assemble(container = KeyValueContainer.class, namespace = "student", props = @Prop("students"))
+    @Assemble(assembler = JacksonAssembler.class, namespace = "student", props = @Prop(src = "name", ref = "studentNames"))
+    @Assemble(assembler = JacksonAssembler.class, namespace = "student", props = @Prop("students"))
     private Integer id;
     private String name;
 
     List<Member> students;
     List<String> studentNames;
 
-    @Disassemble(Member.class)
+    @Disassemble(disassembler = JacksonDisassembler.class, targetClass = Member.class)
     List<Member> members;
 
 }

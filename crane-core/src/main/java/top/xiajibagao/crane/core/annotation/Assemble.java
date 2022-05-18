@@ -3,6 +3,8 @@ package top.xiajibagao.crane.core.annotation;
 import org.springframework.core.annotation.AliasFor;
 import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
+import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
+import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 
 import java.lang.annotation.*;
 
@@ -36,6 +38,16 @@ public @interface Assemble {
      * 装配容器实例在spring中的名称，当{@link #value()}或{@link #container()}有值时将用于一起查找容器
      */
     String containerName() default "";
+
+    /**
+     * 装配器
+     */
+    Class<? extends Assembler> assembler() default BeanReflexAssembler.class;
+
+    /**
+     * 装配器Bean名称
+     */
+    String assemblerName() default "";
 
     /**
      * 指定容器中数据源对应的命名空间

@@ -6,7 +6,6 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import top.xiajibagao.crane.core.annotation.ConfigOption;
 import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
-import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
@@ -39,14 +38,9 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
 
         // 从缓存中获取解析器
         OperateConfigurationParser<OperationConfiguration> parser = beanFactory.getBean(annotation.parser());
-        OperatorFactory operatorFactory = beanFactory.getBean(annotation.operatorFactory());
         OperationConfiguration configuration = configurationCache.getOrCached(
-                getNamespace(parser),
-                operatorFactory.getClass(),
-                targetClass,
-                () -> parser.parse(targetClass, operatorFactory)
+            getNamespace(parser), targetClass, parser::parse
         );
-        
         OperationExecutor executor = beanFactory.getBean(annotation.executor());
         executor.execute(CollUtils.adaptToCollection(target), configuration);
     }

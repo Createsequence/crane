@@ -2,7 +2,6 @@ package top.xiajibagao.crane.core.cache;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
-import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
@@ -26,15 +25,9 @@ public class CacheConfigurationParserWrapper<T extends OperationConfiguration> i
     
     @SuppressWarnings("unchecked")
     @Override
-    public T parse(@NonNull Class<?> targetClass, @NonNull OperatorFactory operatorFactory) {
+    public T parse(@NonNull Class<?> targetClass) {
         Objects.requireNonNull(targetClass);
-        Objects.requireNonNull(operatorFactory);
-        return (T) configurationCache.getOrCached(
-                getNamespace(),
-                operatorFactory.getClass(),
-                targetClass,
-                () -> configurationParser.parse(targetClass, operatorFactory)
-        );
+        return (T) configurationCache.getOrCached(getNamespace(), targetClass, configurationParser::parse);
     }
 
     

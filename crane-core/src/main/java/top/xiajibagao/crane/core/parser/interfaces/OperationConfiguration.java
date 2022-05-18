@@ -3,7 +3,6 @@ package top.xiajibagao.crane.core.parser.interfaces;
 import org.springframework.lang.NonNull;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
-import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 
 import java.util.List;
 
@@ -14,7 +13,6 @@ import java.util.List;
  *
  * @see AssembleOperation
  * @see DisassembleOperation
- * @see OperatorFactory
  * @see Assembler
  * @see Disassembler
  * @author huangchengxing
@@ -41,16 +39,6 @@ public interface OperationConfiguration {
      */
     @NonNull
     Class<?> getTargetClass();
-
-    /**
-     * 获取操作者工厂
-     *
-     * @return top.xiajibagao.crane.operator.interfaces.OperatorFactory
-     * @author huangchengxing
-     * @date 2022/3/1 15:52
-     */
-    @NonNull
-    OperatorFactory getOperatorFactory();
 
     /**
      * 获取类中所有配置的装配操作

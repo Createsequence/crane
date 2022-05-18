@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
-import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 import top.xiajibagao.crane.jackson.impl.annotation.ProcessJacksonNode;
@@ -53,9 +52,8 @@ public class DynamicJsonNodeModule extends Module {
             if (Objects.isNull(annotation)) {
                 return serializer;
             }
-            OperatorFactory operatorFactory = beanFactory.getBean(annotation.operatorFactory());
             OperateConfigurationParser<? extends OperationConfiguration> configurationParser = beanFactory.getBean(annotation.parser());
-            OperationConfiguration operationConfiguration = configurationParser.parse(beanDesc.getBeanClass(), operatorFactory);
+            OperationConfiguration operationConfiguration = configurationParser.parse(beanDesc.getBeanClass());
             OperationExecutor operationExecutor = beanFactory.getBean(annotation.executor());
             return new DynamicJsonNodeBeanSerializer<>(beanDesc.getBeanClass(), objectMapper, operationConfiguration, operationExecutor);
         }

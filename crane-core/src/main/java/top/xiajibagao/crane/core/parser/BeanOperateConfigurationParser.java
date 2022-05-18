@@ -19,8 +19,8 @@ import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.exception.CraneException;
 import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
+import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
-import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.interfaces.*;
 
 import java.lang.reflect.Field;
@@ -42,12 +42,12 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
     private final BeanFactory beanFactory;
 
     @Override
-    public BeanOperationConfiguration parse(Class<?> targetClass, OperatorFactory operatorFactory) {
-        return parse(targetClass, operatorFactory, new ParseContext());
+    public BeanOperationConfiguration parse(Class<?> targetClass) {
+        return parse(targetClass, new ParseContext());
     }
 
-    private BeanOperationConfiguration parse(Class<?> targetClass, OperatorFactory operatorFactory, ParseContext parseContext) {
-        BeanOperationConfiguration operationConfiguration = createConfiguration(targetClass, operatorFactory);
+    private BeanOperationConfiguration parse(Class<?> targetClass, ParseContext parseContext) {
+        BeanOperationConfiguration operationConfiguration = createConfiguration(targetClass);
         List<AssembleOperation> sortedAssembleOperations = new ArrayList<>();
         List<DisassembleOperation> sortedDisassembleOperations = new ArrayList<>();
         // 解析属性注解获取操作配置
@@ -67,13 +67,12 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
      * 创建一个配置
      *
      * @param targetClass 目标类型
-     * @param operatorFactory 操作者工厂
      * @return T
      * @author huangchengxing
      * @date 2022/3/1 16:24
      */
-    protected BeanOperationConfiguration createConfiguration(Class<?> targetClass, OperatorFactory operatorFactory) {
-        return new BeanOperationConfiguration(configuration, targetClass, operatorFactory, new ArrayList<>(), new ArrayList<>());
+    protected BeanOperationConfiguration createConfiguration(Class<?> targetClass) {
+        return new BeanOperationConfiguration(configuration, targetClass, new ArrayList<>(), new ArrayList<>());
     }
 
     // =========================== 装配 ===========================
@@ -141,6 +140,8 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
             .flatMap(Collection::stream)
             .forEach(properties::add);
 
+        Assembler assembler = CharSequenceUtil.isBlank(annotation.assemblerName()) ?
+            beanFactory.getBean(annotation.assembler()) : beanFactory.getBean(annotation.assembler(), annotation.assemblerName());
         return new BeanAssembleOperation(
             ObjectUtils.computeIfNotNull(
                 AnnotatedElementUtils.getMergedAnnotation(property, Order.class),
@@ -149,7 +150,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
             configuration,
             property, aliases,
             annotation.namespace(), container,
-            configuration.getOperatorFactory().getAssembler(), properties
+            assembler, properties
         );
     }
     
@@ -202,7 +203,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
             log.info(CharSequenceUtil.format("类{}与嵌套的成员变量类型{}形成循环依赖...", configuration.getTargetClass(), operateClass));
             operationConfiguration = parseContext.getLookingForConfig(operateClass);
         } else {
-            operationConfiguration = parse(operateClass, configuration.getOperatorFactory(), parseContext);
+            operationConfiguration = parse(operateClass, parseContext);
         }
         DisassembleOperation operation = createDisassembleOperation(property, disassemble, configuration, operationConfiguration, parseContext);
         parseContext.found(configuration);
@@ -224,7 +225,8 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
      */
     protected DisassembleOperation createDisassembleOperation(
 		    Field property, Disassemble annotation, BeanOperationConfiguration configuration, OperationConfiguration operationConfiguration, ParseContext parseContext) {
-        Disassembler disassembler = operationConfiguration.getOperatorFactory().getDisassembler();
+        Disassembler disassembler = CharSequenceUtil.isBlank(annotation.disassemblerName()) ?
+            beanFactory.getBean(annotation.disassembler()) : beanFactory.getBean(annotation.disassembler(), annotation.disassemblerName());
         Set<String> aliases = CollUtils.toSet(Arrays.asList(annotation.aliases()));
         return new BeanDisassembleOperation(
             ObjectUtils.computeIfNotNull(

@@ -3,8 +3,6 @@ package top.xiajibagao.crane.core.annotation;
 import org.springframework.core.annotation.AliasFor;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
-import top.xiajibagao.crane.core.operator.BeanReflexOperatorFactory;
-import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
 import top.xiajibagao.crane.core.parser.BeanOperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
@@ -40,12 +38,6 @@ public @interface ProcessResult {
      */
     @AliasFor(annotation = ConfigOption.class, attribute = "parser")
     Class<? extends OperateConfigurationParser<?>> parser() default BeanOperateConfigurationParser.class;
-
-    /**
-     * 要使用的操作者工厂
-     */
-    @AliasFor(annotation = ConfigOption.class, attribute = "operatorFactory")
-    Class<? extends OperatorFactory> operatorFactory() default BeanReflexOperatorFactory.class;
 
     /**
      * 要使用的执行器

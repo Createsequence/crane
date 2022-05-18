@@ -1,6 +1,8 @@
 package top.xiajibagao.crane.core.annotation;
 
 import org.springframework.core.annotation.AliasFor;
+import top.xiajibagao.crane.core.operator.BeanReflexDisassembler;
+import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 
 import java.lang.annotation.*;
 
@@ -34,5 +36,15 @@ public @interface Disassemble {
      * 仅当无法根据注解字段名找到key字段时，才尝试通过别名找到至少一个存在的字段。
      */
     String[] aliases() default {};
+
+    /**
+     * 装卸器
+     */
+    Class<? extends Disassembler> disassembler() default BeanReflexDisassembler.class;
+
+    /**
+     * 装卸器bean名称
+     */
+    String disassemblerName() default "";
 
 }

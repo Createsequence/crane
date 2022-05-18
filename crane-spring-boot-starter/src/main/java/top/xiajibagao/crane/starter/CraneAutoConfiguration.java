@@ -31,8 +31,8 @@ import top.xiajibagao.crane.core.handler.*;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.EnumDict;
 import top.xiajibagao.crane.core.helper.OperateTemplate;
-import top.xiajibagao.crane.core.operator.BeanReflexOperatorFactory;
-import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
+import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
+import top.xiajibagao.crane.core.operator.BeanReflexDisassembler;
 import top.xiajibagao.crane.core.parser.BeanOperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
@@ -41,7 +41,8 @@ import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.ValueNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.module.DynamicJsonNodeModule;
-import top.xiajibagao.crane.jackson.impl.operator.JacksonOperatorFactory;
+import top.xiajibagao.crane.jackson.impl.operator.JacksonAssembler;
+import top.xiajibagao.crane.jackson.impl.operator.JacksonDisassembler;
 
 import java.util.Map;
 
@@ -86,10 +87,17 @@ public class CraneAutoConfiguration {
         }
 
         @Order
-        @ConditionalOnMissingBean(BeanReflexOperatorFactory.class)
-        @Bean("DefaultCraneBeanReflexOperatorFactory")
-        public BeanReflexOperatorFactory reflexOperatorFactory(@Qualifier("DefaultCraneOrderlyOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
-            return new BeanReflexOperatorFactory(assembleHandlerChain);
+        @ConditionalOnMissingBean(BeanReflexAssembler.class)
+        @Bean("DefaultCraneBeanReflexAssembler")
+        public BeanReflexAssembler beanReflexAssembler(@Qualifier("DefaultCraneOrderlyOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
+            return new BeanReflexAssembler(assembleHandlerChain);
+        }
+
+        @Order
+        @ConditionalOnMissingBean(BeanReflexDisassembler.class)
+        @Bean("DefaultCraneBeanReflexDisassembler")
+        public BeanReflexDisassembler beanReflexDisassembler(@Qualifier("DefaultCraneOrderlyOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
+            return new BeanReflexDisassembler(assembleHandlerChain);
         }
 
         // ==================== 容器 ====================
@@ -175,16 +183,15 @@ public class CraneAutoConfiguration {
         @Bean("DefaultCraneOperateHelper")
         public OperateTemplate operateHelper(
             @Qualifier("DefaultCraneOperationConfigurationCache") ConfigurationCache configurationCache,
-            @Qualifier("DefaultCraneBeanReflexOperatorFactory") OperatorFactory defaultOperatorFactory,
             @Qualifier("DefaultCraneBeanOperateConfigurationParser") OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
             @Qualifier("DefaultCraneUnorderedOperationExecutor") OperationExecutor defaultOperationExecutor) {
-            return new OperateTemplate(configurationCache, defaultOperatorFactory, defaultOperateConfigurationParser, defaultOperationExecutor);
+            return new OperateTemplate(configurationCache, defaultOperateConfigurationParser, defaultOperationExecutor);
         }
 
     }
 
     @AutoConfigureAfter(DefaultCraneAutoConfiguration.class)
-    @ConditionalOnClass(JacksonOperatorFactory.class)
+    @ConditionalOnClass({JacksonAssembler.class, JacksonDisassembler.class})
     @Configuration
     public static class DefaultCraneJacksonAutoConfiguration {
 
@@ -208,12 +215,19 @@ public class CraneAutoConfiguration {
         }
 
         @Order
-        @ConditionalOnMissingBean(BeanReflexOperatorFactory.class)
-        @Bean("DefaultCraneJacksonOperatorFactory")
-        public JacksonOperatorFactory jacksonOperatorFactory(
+        @ConditionalOnMissingBean(JacksonAssembler.class)
+        @Bean("DefaultCraneJacksonAssembler")
+        public JacksonAssembler jacksonAssembler(
             @Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper,
             @Qualifier("DefaultCraneJacksonOrderlyOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
-            return new JacksonOperatorFactory(objectMapper, assembleHandlerChain);
+            return new JacksonAssembler(objectMapper, assembleHandlerChain);
+        }
+
+        @Order
+        @ConditionalOnMissingBean(JacksonDisassembler.class)
+        @Bean("DefaultCraneJacksonDisassembler")
+        public JacksonDisassembler jacksonDisassembler(@Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper) {
+            return new JacksonDisassembler(objectMapper);
         }
 
         @Order

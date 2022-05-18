@@ -2,6 +2,8 @@ package top.xiajibagao.crane.core.annotation;
 
 import org.springframework.core.annotation.AliasFor;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
+import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
+import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 
 import java.lang.annotation.*;
 
@@ -37,6 +39,12 @@ public @interface AssembleKV {
      */
     @AliasFor(annotation = Assemble.class, attribute = "aliases")
     String[] aliases() default {};
+
+    /**
+     * 装配器
+     */
+    @AliasFor(annotation = Assemble.class, attribute = "assembler")
+    Class<? extends Assembler> assembler() default BeanReflexAssembler.class;
 
     /**
      * 字段映射配置

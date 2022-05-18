@@ -4,8 +4,8 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.Prop;
-import top.xiajibagao.crane.core.container.KeyValueContainer;
 import top.xiajibagao.crane.jackson.impl.annotation.ProcessJacksonNode;
+import top.xiajibagao.crane.jackson.impl.operator.JacksonAssembler;
 
 /**
  * @author huangchengxing
@@ -18,11 +18,11 @@ public class Member {
 
     private Integer classroomId;
 
-    @Assemble(container = KeyValueContainer.class, namespace = "member", props = @Prop(src = "name", ref = "name"))
+    @Assemble(assembler = JacksonAssembler.class, namespace = "member", props = @Prop(src = "name", ref = "name"))
     private Integer id;
     private String name;
 
-    @Assemble(container = KeyValueContainer.class, namespace = "sex", props = @Prop("sexName"))
+    @Assemble(assembler = JacksonAssembler.class, namespace = "sex", props = @Prop("sexName"))
     private Integer sex;
     private String sexName;
 

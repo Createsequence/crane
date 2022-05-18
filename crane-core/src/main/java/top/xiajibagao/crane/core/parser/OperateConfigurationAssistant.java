@@ -6,18 +6,19 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.helper.FuncUtils;
 import top.xiajibagao.crane.core.helper.SFunc;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
-import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
+import top.xiajibagao.crane.core.operator.interfaces.Assembler;
+import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Function;
@@ -52,14 +53,13 @@ public class OperateConfigurationAssistant<T> {
      *
      * @param globalConfiguration 全局配置
      * @param targetClass 目标类型
-     * @param operatorFactory 操作者工厂
      * @author huangchengxing
      * @date 2022/4/9 22:55
      */
     public static <T> OperateConfigurationAssistant<T> basedOnBeanOperationConfiguration(
-        GlobalConfiguration globalConfiguration, Class<T> targetClass, OperatorFactory operatorFactory) {
+        GlobalConfiguration globalConfiguration, Class<T> targetClass) {
         return new OperateConfigurationAssistant<>(new BeanOperationConfiguration(
-            globalConfiguration, targetClass, operatorFactory, new ArrayList<>(), new ArrayList<>()
+            globalConfiguration, targetClass, new ArrayList<>(), new ArrayList<>()
         ));
     }
     
@@ -72,10 +72,10 @@ public class OperateConfigurationAssistant<T> {
      * @author huangchengxing
      * @date 2022/4/9 22:55
      */
-    public AssembleOperationBuilder<T> buildAssembler(String keyProperty, @NonNull Container container) {
+    public AssembleOperationBuilder<T> buildAssembler(String keyProperty, @Nonnull Container container, @Nonnull Assembler assembler) {
         Field keyField = ReflexUtils.findField(configuration.getTargetClass(), keyProperty);
         Assert.notNull(keyField, "类[{}]中找不到属性[{}]", configuration.getTargetClass(), keyProperty);
-        return new AssembleOperationBuilder<>(this, keyField, container);
+        return new AssembleOperationBuilder<>(this, keyField, container, assembler);
     }
 
     /**
@@ -87,8 +87,8 @@ public class OperateConfigurationAssistant<T> {
      * @author huangchengxing
      * @date 2022/4/9 22:55
      */
-    public AssembleOperationBuilder<T> buildAssembler(@NonNull SFunc<T, ?> keyFunc, @NonNull Container container) {
-        return buildAssembler(FuncUtils.getPropertyName(keyFunc), container);
+    public AssembleOperationBuilder<T> buildAssembler(@Nonnull SFunc<T, ?> keyFunc, @Nonnull Container container, @Nonnull Assembler assembler) {
+        return buildAssembler(FuncUtils.getPropertyName(keyFunc), container, assembler);
     }
     
     /**
@@ -100,10 +100,10 @@ public class OperateConfigurationAssistant<T> {
      * @author huangchengxing
      * @date 2022/4/9 22:56
      */
-    public DisassembleOperationBuilder<T> buildDisassembler(@NonNull String property, @NonNull OperationConfiguration targetOperateConfiguration) {
+    public DisassembleOperationBuilder<T> buildDisassembler(@Nonnull String property, @Nonnull OperationConfiguration targetOperateConfiguration, @Nonnull Disassembler assembler) {
         Field keyField = ReflexUtils.findField(configuration.getTargetClass(), property);
         Assert.notNull(keyField, "类[{}]中找不到属性[{}]", configuration.getTargetClass(), property);
-        return new DisassembleOperationBuilder<>(this, keyField, targetOperateConfiguration);
+        return new DisassembleOperationBuilder<>(this, keyField, targetOperateConfiguration, assembler);
     }
 
     /**
@@ -115,8 +115,8 @@ public class OperateConfigurationAssistant<T> {
      * @author huangchengxing
      * @date 2022/4/9 22:56
      */
-    public DisassembleOperationBuilder<T> buildDisassembler(@NonNull SFunc<T, ?> propertyFunc, @NonNull OperationConfiguration targetOperateConfiguration) {
-        return buildDisassembler(FuncUtils.getPropertyName(propertyFunc), targetOperateConfiguration);
+    public DisassembleOperationBuilder<T> buildDisassembler(@Nonnull SFunc<T, ?> propertyFunc, @Nonnull OperationConfiguration targetOperateConfiguration, @Nonnull Disassembler disassembler) {
+        return buildDisassembler(FuncUtils.getPropertyName(propertyFunc), targetOperateConfiguration, disassembler);
     }
 
     @Getter
@@ -127,6 +127,7 @@ public class OperateConfigurationAssistant<T> {
         private int sort = 0;
         private final Set<String> aliases = new HashSet<>();
         private final OperationConfiguration targetOperateConfiguration;
+        private final Disassembler disassembler;
 
         public DisassembleOperationBuilder<T> aliases(String... aliases) {
             if (ArrayUtil.isNotEmpty(aliases)) {
@@ -140,7 +141,7 @@ public class OperateConfigurationAssistant<T> {
             return this;
         }
 
-        public OperateConfigurationAssistant<T> build(Function<DisassembleOperationBuilder<T>, DisassembleOperation> operationFactory) {
+        public OperateConfigurationAssistant<T> operation(Function<DisassembleOperationBuilder<T>, DisassembleOperation> operationFactory) {
             builder.configuration.getDisassembleOperations().add(operationFactory.apply(this));
             return builder;
         }
@@ -148,7 +149,7 @@ public class OperateConfigurationAssistant<T> {
         public OperateConfigurationAssistant<T> build() {
             builder.configuration.getDisassembleOperations().add(new BeanDisassembleOperation(
                 sort,
-                builder.configuration, builder.configuration.getOperatorFactory().getDisassembler(),
+                builder.configuration, disassembler,
                 targetOperateConfiguration, targetField, aliases
             ));
             return builder;
@@ -163,6 +164,7 @@ public class OperateConfigurationAssistant<T> {
         private final Container container;
         private final Set<String> aliases = new HashSet<>();
         private final List<AssembleProperty> properties = new ArrayList<>();
+        private final Assembler assembler;
         private String namespace = "";
         private int order = 0;
 
@@ -233,7 +235,7 @@ public class OperateConfigurationAssistant<T> {
                 builder.configuration,
                 targetField, aliases,
                 namespace, container,
-                builder.configuration.getOperatorFactory().getAssembler(), properties
+                assembler, properties
             ));
             return builder;
         }

@@ -16,11 +16,12 @@ import top.xiajiabagao.crane.starter.common.TestConfig;
 import top.xiajiabagao.crane.starter.common.TestContainer;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
-import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
+import top.xiajibagao.crane.core.helper.OperateTemplate;
+import top.xiajibagao.crane.core.operator.interfaces.Assembler;
+import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 import top.xiajibagao.crane.core.parser.OperateConfigurationAssistant;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.core.helper.OperateTemplate;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,12 +51,16 @@ public class ProcessByOperateConfigurationAssistantTest {
     @Autowired
     private TestContainer testContainer;
 
-    // 解析器
     @Autowired
     private GlobalConfiguration globalConfiguration;
-    @Qualifier("DefaultCraneBeanReflexOperatorFactory")
+
+    @Qualifier("DefaultCraneBeanReflexAssembler")
     @Autowired
-    private OperatorFactory operatorFactory;
+    private Assembler assembler;
+
+    @Qualifier("DefaultCraneBeanReflexDisassembler")
+    @Autowired
+    private Disassembler disassembler;
 
     private static Person getActualPerson() {
         return new Person()
@@ -66,22 +71,22 @@ public class ProcessByOperateConfigurationAssistantTest {
 
     private OperationConfiguration getConfiguration() {
         OperateConfigurationAssistant<Person> assistant = OperateConfigurationAssistant.basedOnBeanOperationConfiguration(
-            globalConfiguration, Person.class, operatorFactory
+            globalConfiguration, Person.class
         );
-        assistant.buildAssembler(Person::getGender, enumDictContainer)
+        assistant.buildAssembler(Person::getGender, enumDictContainer, assembler)
             .namespace("gender")
             .property("id", Person::getGenderId)
             .property("name", Person::getGenderName)
             .build();
-        assistant.buildAssembler(Person::getSex, keyValueContainer)
+        assistant.buildAssembler(Person::getSex, keyValueContainer, assembler)
             .namespace("sex")
             .onlyRefProperty(Person::getSexName)
             .build();
-        assistant.buildAssembler(Person::getId, testContainer)
+        assistant.buildAssembler(Person::getId, testContainer, assembler)
             .property("beanName", "name")
             .property("beanAge", "age")
             .build();
-        assistant.buildDisassembler(Person::getRelatives, assistant.getConfiguration()).build();
+        assistant.buildDisassembler(Person::getRelatives, assistant.getConfiguration(), disassembler).build();
         return assistant.getConfiguration();
     }
 

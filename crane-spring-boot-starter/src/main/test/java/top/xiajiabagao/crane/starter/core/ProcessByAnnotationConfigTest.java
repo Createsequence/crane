@@ -16,10 +16,9 @@ import top.xiajiabagao.crane.starter.common.TestConfig;
 import top.xiajiabagao.crane.starter.common.TestContainer;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
-import top.xiajibagao.crane.core.operator.interfaces.OperatorFactory;
+import top.xiajibagao.crane.core.helper.OperateTemplate;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.core.helper.OperateTemplate;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,9 +53,6 @@ public class ProcessByAnnotationConfigTest {
     // 解析器
     @Autowired
     private OperateConfigurationParser<? extends OperationConfiguration> operateConfigurationParser;
-    @Qualifier("DefaultCraneBeanReflexOperatorFactory")
-    @Autowired
-    private OperatorFactory operatorFactory;
 
     private static Person getActualPerson() {
         return new Person()
@@ -78,7 +74,7 @@ public class ProcessByAnnotationConfigTest {
     }
 
     private void processAndLog(Object actual) throws JsonProcessingException {
-        OperationConfiguration configuration = operateConfigurationParser.parse(Person.class, operatorFactory);
+        OperationConfiguration configuration = operateConfigurationParser.parse(Person.class);
         System.out.println("before: " + objectMapper.writeValueAsString(actual));
         operateTemplate.process(actual, configuration);
         System.out.println("after: " + objectMapper.writeValueAsString(actual));
