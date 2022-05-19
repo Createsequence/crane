@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.extension;
+package top.xiajiabagao.crane.starter.aop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
