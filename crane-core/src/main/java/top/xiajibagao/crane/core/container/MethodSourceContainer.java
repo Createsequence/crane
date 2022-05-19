@@ -5,6 +5,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
@@ -26,6 +27,7 @@ import java.util.stream.Stream;
  * @author huangchengxing
  * @date 2022/03/31 21:40
  */
+@Slf4j
 @RequiredArgsConstructor
 public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object> implements Container {
 
@@ -86,15 +88,16 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
     /**
      * 注册方法
      */
-    private void registerMethod(Object methodSourceBean, Class<?> targetClass, MethodSourceBean.Method classMethod, Method method) {
-        checkMethod(method, classMethod.namespace());
-        AsmReflexUtils.findProperty(classMethod.sourceType(), classMethod.sourceKey())
+    private void registerMethod(Object methodSourceBean, Class<?> targetClass, MethodSourceBean.Method annotation, Method method) {
+        checkMethod(method, annotation.namespace());
+        AsmReflexUtils.findProperty(annotation.sourceType(), annotation.sourceKey())
             .ifPresent(property -> {
                 MethodSource cache = new MethodSource(
-                    classMethod.mappingType(), methodSourceBean, targetClass, classMethod.namespace(),
+                    annotation.mappingType(), methodSourceBean, targetClass, annotation.namespace(),
                     method, AsmReflexUtils.findMethod(targetClass, method), property
                 );
-                methodCache.put(classMethod.namespace(), cache);
+                methodCache.put(annotation.namespace(), cache);
+                log.info("注册方法数据源：[{}], 映射类型：[{}]", annotation.namespace(), annotation.mappingType().name());
             });
     }
 

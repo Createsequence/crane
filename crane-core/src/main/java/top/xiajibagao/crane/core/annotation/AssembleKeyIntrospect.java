@@ -1,7 +1,7 @@
 package top.xiajibagao.crane.core.annotation;
 
 import org.springframework.core.annotation.AliasFor;
-import top.xiajibagao.crane.core.container.IntrospectContainer;
+import top.xiajibagao.crane.core.container.KeyIntrospectContainer;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
@@ -9,17 +9,17 @@ import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import java.lang.annotation.*;
 
 /**
- * 字段使用{@link AssembleIntrospect}容器装配
+ * 字段使用{@link KeyIntrospectContainer}容器装配
  *
  * @author huangchengxing
- * @date 2022/05/13 17:49
+ * @date 2022/05/19 17:31
  */
-@Assemble(container = IntrospectContainer.class)
+@Assemble(container = KeyIntrospectContainer.class)
 @MateAnnotation
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface AssembleIntrospect {
+public @interface AssembleKeyIntrospect {
 
     /**
      * 装配容器实例在spring中的名称

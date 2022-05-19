@@ -12,7 +12,7 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
  * @date 2022/04/12 23:15
  */
 @Slf4j
-public class IntrospectContainer implements Container {
+public class BeanIntrospectContainer implements Container {
 
     @Override
     public void process(Multimap<AssembleOperation, ?> operations) {

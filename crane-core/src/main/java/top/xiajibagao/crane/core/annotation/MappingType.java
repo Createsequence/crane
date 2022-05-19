@@ -19,17 +19,17 @@ import java.util.stream.Collectors;
 public enum MappingType {
 
     /**
-     * 一个key对应多个数据源对象
+     * 一个key对应一个数据源对象
      */
-    ONE_TO_ONE((sources, keyMapper) -> CollectionUtils.isEmpty(sources) ?
+    ONE_TO_ONE("一对一", (sources, keyMapper) -> CollectionUtils.isEmpty(sources) ?
         Collections.emptyMap() : sources.stream()
         .filter(Objects::nonNull)
         .collect(Collectors.toMap(keyMapper, Function.identity()))),
 
     /**
-     * 一个key对应一个数据源对象
+     * 一个key对应多个数据源对象
      */
-    ONE_TO_MORE((sources, keyMapper) -> {
+    ONE_TO_MORE("一对多", (sources, keyMapper) -> {
         if (CollectionUtils.isEmpty(sources)) {
             return Collections.emptyMap();
         }
@@ -41,6 +41,7 @@ public enum MappingType {
         return results;
     });
 
+    private final String typeName;
     private final BiFunction<Collection<Object>, UnaryOperator<Object>, Map<Object, Object>> mapper;
 
     public Map<Object, Object> mapping(Collection<Object> sources, UnaryOperator<Object> keyMapper) {

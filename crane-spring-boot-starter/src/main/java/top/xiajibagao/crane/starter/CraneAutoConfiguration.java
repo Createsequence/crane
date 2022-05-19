@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -20,10 +21,7 @@ import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.aop.MethodResultProcessAspect;
 import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.cache.OperationConfigurationCache;
-import top.xiajibagao.crane.core.container.EnumDictContainer;
-import top.xiajibagao.crane.core.container.IntrospectContainer;
-import top.xiajibagao.crane.core.container.KeyValueContainer;
-import top.xiajibagao.crane.core.container.MethodSourceContainer;
+import top.xiajibagao.crane.core.container.*;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.SequentialOperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
@@ -52,6 +50,7 @@ import java.util.Map;
  * @author huangchengxing
  * @date 2022/03/03 13:36
  */
+@Slf4j
 @Configuration
 public class CraneAutoConfiguration {
 
@@ -83,6 +82,11 @@ public class CraneAutoConfiguration {
                 .addHandler(new ArrayOperateHandler(operateHandlerChain))
                 .addHandler(new MapOperateHandler())
                 .addHandler(new BeanOperateHandler());
+            log.info(
+                "注册处理器链 {}, 已配置节点: {}",
+                "DefaultCraneOrderlyOperateHandlerChain",
+                CollUtil.join(operateHandlerChain.handlers(), ", ", h -> h.getClass().getName())
+            );
             return new ExpressibleOperateHandlerChain(operateHandlerChain, StandardEvaluationContext::new);
         }
 
@@ -113,14 +117,45 @@ public class CraneAutoConfiguration {
         @ConditionalOnMissingBean(EnumDictContainer.class)
         @Bean("DefaultCraneEnumDictContainer")
         public EnumDictContainer enumDictContainer(EnumDict enumDict) {
+            log.info("注册容器：{}", EnumDictContainer.class);
             return new EnumDictContainer(enumDict);
         }
 
         @Order
         @ConditionalOnMissingBean(KeyValueContainer.class)
         @Bean("DefaultCraneKeyValueContainer")
-        public KeyValueContainer simpleKeyValueActuator() {
+        public KeyValueContainer simpleKeyValueContainer() {
+            log.info("注册容器：{}", KeyValueContainer.class);
             return new KeyValueContainer();
+        }
+
+        @Order
+        @ConditionalOnMissingBean(MethodSourceContainer.class)
+        @Bean("DefaultCraneMethodSourceContainer")
+        public MethodSourceContainer methodSourceContainer(ApplicationContext applicationContext) {
+            log.info("注册容器：{}", MethodSourceContainer.class);
+            MethodSourceContainer container = new MethodSourceContainer();
+            Map<String, Object> beans = applicationContext.getBeansWithAnnotation(MethodSourceBean.class);
+            if (CollUtil.isNotEmpty(beans)) {
+                beans.forEach((name, bean) -> container.register(bean));
+            }
+            return container;
+        }
+
+        @Order
+        @ConditionalOnMissingBean(BeanIntrospectContainer.class)
+        @Bean("DefaultCraneBeanIntrospectContainer")
+        public BeanIntrospectContainer introspectContainer() {
+            log.info("注册容器：{}", BeanIntrospectContainer.class);
+            return new BeanIntrospectContainer();
+        }
+
+        @Order
+        @ConditionalOnMissingBean(KeyIntrospectContainer.class)
+        @Bean("DefaultCraneKeyIntrospectContainer")
+        public KeyIntrospectContainer keyIntrospectContainer() {
+            log.info("注册容器：{}", KeyIntrospectContainer.class);
+            return new KeyIntrospectContainer();
         }
 
         // ==================== 执行器 ====================
@@ -139,30 +174,7 @@ public class CraneAutoConfiguration {
             return new SequentialOperationExecutor();
         }
 
-    }
-
-    @AutoConfigureAfter(DefaultCraneAutoConfiguration.class)
-    @Configuration
-    public static class DefaultCraneExtensionAutoConfiguration {
-
-        @Order
-        @ConditionalOnMissingBean(MethodSourceContainer.class)
-        @Bean("DefaultCraneMethodSourceContainer")
-        public MethodSourceContainer methodSourceContainer(ApplicationContext applicationContext) {
-            MethodSourceContainer container = new MethodSourceContainer();
-            Map<String, Object> beans = applicationContext.getBeansWithAnnotation(MethodSourceBean.class);
-            if (CollUtil.isNotEmpty(beans)) {
-                beans.forEach((name, bean) -> container.register(bean));
-            }
-            return container;
-        }
-
-        @Order
-        @ConditionalOnMissingBean(MethodSourceContainer.class)
-        @Bean("DefaultCraneIntrospectContainer")
-        public IntrospectContainer introspectContainer() {
-            return new IntrospectContainer();
-        }
+        // ==================== 辅助类 ====================
 
         @Order
         @ConditionalOnMissingBean(OperationConfigurationCache.class)
@@ -175,13 +187,14 @@ public class CraneAutoConfiguration {
         @ConditionalOnMissingBean(MethodResultProcessAspect.class)
         @Bean("DefaultCraneMethodResultProcessAspect")
         public MethodResultProcessAspect methodResultProcessAspect(BeanFactory beanFactory, @Qualifier("DefaultCraneOperationConfigurationCache") ConfigurationCache configurationCache) {
+            log.info("启用切面：{}", MethodResultProcessAspect.class);
             return new MethodResultProcessAspect(beanFactory, configurationCache);
         }
 
         @Order
         @ConditionalOnMissingBean(OperateTemplate.class)
-        @Bean("DefaultCraneOperateHelper")
-        public OperateTemplate operateHelper(
+        @Bean("DefaultCraneOperateTemplate")
+        public OperateTemplate operateTemplate(
             @Qualifier("DefaultCraneOperationConfigurationCache") ConfigurationCache configurationCache,
             @Qualifier("DefaultCraneBeanOperateConfigurationParser") OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
             @Qualifier("DefaultCraneUnorderedOperationExecutor") OperationExecutor defaultOperationExecutor) {
@@ -207,11 +220,16 @@ public class CraneAutoConfiguration {
         @ConditionalOnMissingBean(OrderlyOperateHandlerChain.class)
         @Bean("DefaultCraneJacksonOrderlyOperateHandlerChain")
         public OperateHandlerChain orderlyOperateHandlerChain(@Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper) {
-            OrderlyOperateHandlerChain assembleHandlerChain = new OrderlyOperateHandlerChain();
-            assembleHandlerChain.addHandler(new ArrayNodeOperateHandler(objectMapper, assembleHandlerChain))
+            OrderlyOperateHandlerChain operateHandlerChain = new OrderlyOperateHandlerChain();
+            operateHandlerChain.addHandler(new ArrayNodeOperateHandler(objectMapper, operateHandlerChain))
                 .addHandler(new ObjectNodeOperateHandler(objectMapper))
                 .addHandler(new ValueNodeOperateHandler(objectMapper));
-            return new ExpressibleOperateHandlerChain(assembleHandlerChain, StandardEvaluationContext::new);
+            log.info(
+                "注册处理器链 {}, 已配置节点: {}",
+                "DefaultCraneJacksonOrderlyOperateHandlerChain",
+                CollUtil.join(operateHandlerChain.handlers(), ", ", h -> h.getClass().getName())
+            );
+            return new ExpressibleOperateHandlerChain(operateHandlerChain, StandardEvaluationContext::new);
         }
 
         @Order
