@@ -159,7 +159,7 @@ before: Person(sex=0, sexName=女) // 处理后
 
 ## Wiki
 
-更多功能、配置与使用说明，请见仓库的 [Wiki](https://gitee.com/CreateSequence/crane/wikis/%E7%AE%80%E4%BB%8B)。
+更多功能、配置与使用说明，请见仓库的 [Wiki](https://gitee.com/CreateSequence/crane/wikis/pages)。
 
 ## 待办
 
@@ -221,9 +221,9 @@ before: Person(sex=0, sexName=女) // 处理后
 
 - [x] 使用字节码类库优化原生反射的性能；
 
-- [ ] 允许通过多个 key 字段获取数据源；
+- [x] 引入类似 validation 的 group 的概念，用于将需要处理的字段分组，从而允许指定并仅使用特定分组的操作配置；
 
-- [ ] 引入类似 validation 的 group 的概念，用于将需要处理的字段分组，从而允许指定并仅使用特定分组的操作配置；
+- [ ] 允许通过多个 key 字段获取数据源；
 
 - [ ] 添加一个完整的示例项目；
 
@@ -247,7 +247,7 @@ before: Person(sex=0, sexName=女) // 处理后
 
 - [ ] 提供支持同时对装配与拆卸操作排序的执行器；
 
-- [ ] 增加一些全局配置项，目前暂定一下几项：
+- [ ] 增加一些全局配置项，目前暂定以下几项：
 
   - 如果已有字段非空，是否使用填充值覆盖已有字段值；
   - 当某次填充发生异常时，是否终止本次填充操作；
