@@ -26,23 +26,9 @@ crane 便是为了解决这种烦恼而生。它允许通过统一配置填充�
 - 注解式配置。全部配置都支持通过注解完成，并且支持 Spring 元注解，允许自定义各种组合注解；
 - 开箱即用。引入依赖即可自动装配所有主要功能的默认配置，并且结合 Spring 提供了诸如自动填充切面等便利的辅助类；
 
-### 3、原理
+## 文档
 
-crane 的执行过程就是传统手动数据填充的过程：
-
->  从待处理对象中获取 key， 然后根据 key 去对应的缓存/接口/数据库中获取对应数据源，将数据源塞入待处理对象
-
-在 crane 中，该过程被抽象为多个步骤，并由多个组件共同完成：
-
-- 操作 `Operation`：对应上述过程描述的一次动作，与类中的一个 key 字段一一对应，表述了本次填充操作对应哪个 key 字段，然后要去何处取对应数据源，接着要如何填充到待处理对象中；
-- 类操作配置 `OperationConfiguration`：由一个 `Class`下整合聚合而来，描述了如何处理一类对象，一般与类一对一；
-- 操作配置解析器 `OperationConfigurationParser`：用于解析 `Class` 中注解，并生成操作配置；
-- 操作执行器 `OperationExecutor`：用于根据操作配置驱动完成对待处理对象的全部填充操作。
-- 操作者 `Operator`：用于完成对指定类型数据读取、写入操作的类，是执行上述过程中“获取...塞入...”的主体；
-- 操作处理器 `OperateHandler`：类似 Spring 的 Converter ，用于配合操作者完成对不同数据类型的数据的读取与写入；
-- 装配源容器 `Container`：也称为数据源容器，一般与一个数据源对应，待处理对象与操作者将在容器中获取数据源，并完成上述填充过程； 
-
-<img src="https://img.xiajibagao.top/image-20220420193512250.png" alt="image-20220420193512250" style="zoom:80%;" />
+更多功能、配置与使用说明，请见仓库的 [Wiki](https://gitee.com/CreateSequence/crane/wikis/pages)。
 
 ## 快速开始
 
@@ -157,9 +143,23 @@ before: Person(sex=0, sexName=女) // 处理后
 
 至此，即完成了 crane 的最基本功能的使用。
 
-## Wiki
+## 原理
 
-更多功能、配置与使用说明，请见仓库的 [Wiki](https://gitee.com/CreateSequence/crane/wikis/pages)。
+crane 的执行过程就是传统手动数据填充的过程：
+
+>  从待处理对象中获取 key， 然后根据 key 去对应的缓存/接口/数据库中获取对应数据源，将数据源塞入待处理对象
+
+在 crane 中，该过程被抽象为多个步骤，并由多个组件共同完成：
+
+- 操作 `Operation`：对应上述过程描述的一次动作，与类中的一个 key 字段一一对应，表述了本次填充操作对应哪个 key 字段，然后要去何处取对应数据源，接着要如何填充到待处理对象中；
+- 类操作配置 `OperationConfiguration`：由一个 `Class`下整合聚合而来，描述了如何处理一类对象，一般与类一对一；
+- 操作配置解析器 `OperationConfigurationParser`：用于解析 `Class` 中注解，并生成操作配置；
+- 操作执行器 `OperationExecutor`：用于根据操作配置驱动完成对待处理对象的全部填充操作。
+- 操作者 `Operator`：用于完成对指定类型数据读取、写入操作的类，是执行上述过程中“获取...塞入...”的主体；
+- 操作处理器 `OperateHandler`：类似 Spring 的 Converter ，用于配合操作者完成对不同数据类型的数据的读取与写入；
+- 装配源容器 `Container`：也称为数据源容器，一般与一个数据源对应，待处理对象与操作者将在容器中获取数据源，并完成上述填充过程； 
+
+<img src="https://img.xiajibagao.top/image-20220420193512250.png" alt="image-20220420193512250" style="zoom:80%;" />
 
 ## 待办
 
