@@ -1,6 +1,7 @@
 package top.xiajibagao.crane.core.container;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
@@ -152,11 +153,7 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
 
         @SuppressWarnings("unchecked")
         public Collection<Object> getSources(Collection<Object> keys) {
-            Collection<Object> params = keys;
-            if (Objects.equals(sourceGetter.getParameterTypes()[0], Set.class)) {
-                params = new HashSet<>(keys);
-            }
-            return (Collection<Object>)indexedMethod.invoke(target, params);
+            return (Collection<Object>)indexedMethod.invoke(target, Convert.convert(sourceGetter.getParameterTypes()[0], keys));
         }
 
         public Object getSourceKeyPropertyValue(Object source) {
