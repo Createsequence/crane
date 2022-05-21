@@ -49,17 +49,17 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
 
     @Override
     public BeanOperationConfiguration parse(Class<?> targetClass) {
-        return parse(targetClass, new ParseContext());
+        return parse(targetClass, new FieldAnnotationParseContext());
     }
 
-    private BeanOperationConfiguration parse(Class<?> targetClass, ParseContext parseContext) {
+    private BeanOperationConfiguration parse(Class<?> targetClass, FieldAnnotationParseContext parseContext) {
         BeanOperationConfiguration operationConfiguration = createConfiguration(targetClass);
-        List<AssembleOperation> sortedAssembleOperations = CollUtil.newArrayList(parseAssemblerAnnotationByClass(targetClass, operationConfiguration));
+        List<AssembleOperation> sortedAssembleOperations = CollUtil.newArrayList(parseAssembleAnnotationClass(targetClass, operationConfiguration));
         List<DisassembleOperation> sortedDisassembleOperations = new ArrayList<>();
         // 解析属性注解获取操作配置
         for (Field field : targetClass.getDeclaredFields()) {
-            sortedAssembleOperations.addAll(parseAssemblerAnnotationByField(field, operationConfiguration));
-            sortedDisassembleOperations.addAll(parseDisassembleAnnotationField(field, operationConfiguration, parseContext));
+            sortedAssembleOperations.addAll(parseAssembleAnnotatedField(field, operationConfiguration));
+            sortedDisassembleOperations.addAll(parseDisassembleAnnotatedField(field, operationConfiguration, parseContext));
         }
         // 按sort排序
         Collections.sort(sortedAssembleOperations);
@@ -84,21 +84,21 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
     // =========================== 解析类上的装配注解 ===========================
 
     /**
-     * 解析类上的{@link Operations}注解
+     * 解析注解{@link Operations#assembles()}
      *
      * @param targetClass 目标类
      * @param configuration 配置
      * @author huangchengxing
      * @date 2022/5/20 13:56
      */
-    protected Collection<AssembleOperation> parseAssemblerAnnotationByClass(Class<?> targetClass, BeanOperationConfiguration configuration) {
-        ClassAssembleParseContext context = new ClassAssembleParseContext();
-        parseAssemblerAnnotationByClass(targetClass, configuration, context);
+    protected Collection<AssembleOperation> parseAssembleAnnotationClass(Class<?> targetClass, BeanOperationConfiguration configuration) {
+        ClassAnnotationParseContext context = new ClassAnnotationParseContext();
+        parseAssembleAnnotationClass(targetClass, configuration, context);
         return context.getFoundOperation().values();
     }
 
     /**
-     * 解析类上的{@link Operations}注解
+     * 解析注解{@link Operations#assembles()}
      *
      * @param targetClass 目标类
      * @param configuration 配置
@@ -106,8 +106,8 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
      * @author huangchengxing
      * @date 2022/5/20 13:56
      */
-    protected void parseAssemblerAnnotationByClass(
-        Class<?> targetClass, BeanOperationConfiguration configuration, ClassAssembleParseContext parseContext) {
+    protected void parseAssembleAnnotationClass(
+        Class<?> targetClass, BeanOperationConfiguration configuration, ClassAnnotationParseContext parseContext) {
         if (parseContext.isExcluded(targetClass) || parseContext.isFound(targetClass)) {
             return;
         }
@@ -131,7 +131,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
             return;
         }
         for (Class<?> extendClass : annotation.extendFrom()) {
-            parseAssemblerAnnotationByClass(extendClass, configuration, parseContext);
+            parseAssembleAnnotationClass(extendClass, configuration, parseContext);
         }
     }
 
@@ -146,7 +146,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
      * @author huangchengxing
      * @date 2022/3/1 16:55
      */
-    protected List<AssembleOperation> parseAssemblerAnnotationByField(Field property, BeanOperationConfiguration configuration) {
+    protected List<AssembleOperation> parseAssembleAnnotatedField(Field property, BeanOperationConfiguration configuration) {
         Assemble assemble = AnnotatedElementUtils.getMergedAnnotation(property, Assemble.class);
         List<AssembleOperation> operations = ObjectUtils.computeIfNotNull(
             AnnotatedElementUtils.getMergedAnnotation(property, Assemble.List.class),
@@ -245,7 +245,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
      * @author huangchengxing
      * @date 2022/3/1 17:49
      */
-    protected List<DisassembleOperation> parseDisassembleAnnotationField(Field property, BeanOperationConfiguration configuration, ParseContext parseContext) {
+    protected List<DisassembleOperation> parseDisassembleAnnotatedField(Field property, BeanOperationConfiguration configuration, FieldAnnotationParseContext parseContext) {
         Disassemble disassemble = AnnotatedElementUtils.findMergedAnnotation(property, Disassemble.class);
         if (Objects.isNull(disassemble)) {
             return Collections.emptyList();
@@ -285,7 +285,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
      * @date 2022/3/1 17:50
      */
     protected DisassembleOperation createDisassembleOperation(
-		    Field property, Disassemble annotation, BeanOperationConfiguration configuration, OperationConfiguration operationConfiguration, ParseContext parseContext) {
+		    Field property, Disassemble annotation, BeanOperationConfiguration configuration, OperationConfiguration operationConfiguration, FieldAnnotationParseContext parseContext) {
         Disassembler disassembler = CharSequenceUtil.isBlank(annotation.disassemblerName()) ?
             beanFactory.getBean(annotation.disassembler()) : beanFactory.getBean(annotation.disassembler(), annotation.disassemblerName());
         Set<String> aliases = CollUtils.toSet(Arrays.asList(annotation.aliases()));
@@ -301,7 +301,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
         );
     }
 
-    public static class ClassAssembleParseContext {
+    protected static class ClassAnnotationParseContext {
 
         @Getter
         private final Multimap<Class<?>, AssembleOperation> foundOperation = ArrayListMultimap.create();
@@ -326,16 +326,11 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
 
     }
 
-
-    /**
-     * 解析上下文，用于处理循环依赖问题
-     *
-     * @author huangchengxing
-     * @date 2022/02/26 13:17
-     */
-    public static class ParseContext {
+    protected static class FieldAnnotationParseContext {
 
         private final Map<Class<?>, OperationConfiguration> inLookingOption = new HashMap<>();
+
+        private final Set<Class<?>> excluded = new HashSet<>();
 
         public boolean isInLooking(Class<?> target) {
             return inLookingOption.containsKey(target);
@@ -354,6 +349,14 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
         public void found(OperationConfiguration config) {
             Class<?> foundClass = config.getTargetClass();
             Assert.notNull(config, String.format("类[%s]不处于解析状态，或已经完成解析", foundClass));
+        }
+
+        public void exclude(Class<?>... excludeClass) {
+            excluded.addAll(Arrays.asList(excludeClass));
+        }
+
+        public boolean isExcluded(Class<?> excludeClass) {
+            return excluded.contains(excludeClass);
         }
 
     }
