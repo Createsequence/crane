@@ -112,7 +112,24 @@ public class ReflexUtils {
      */
     @Nullable
     public static Field findField(Class<?> targetClass, String fieldName) {
-        return ReflectionUtils.findField(targetClass, fieldName);
+        return findField(targetClass, fieldName, false);
+    }
+
+    /**
+     * 从指定类中获取属性
+     *
+     * @param targetClass 类
+     * @param fieldName 属性名
+     * @param mustExists 属性是否必须存在，为true时，若属性不存在则抛出异常
+     * @return java.lang.reflect.Field
+     * @author huangchengxing
+     * @date 2022/4/1 13:39
+     */
+    @Nullable
+    public static Field findField(Class<?> targetClass, String fieldName, boolean mustExists) {
+        Field field = ReflectionUtils.findField(targetClass, fieldName);
+        cn.hutool.core.lang.Assert.isTrue(!mustExists || Objects.nonNull(field), "类[{}]找不到名为[{}]的属性", targetClass, fieldName);
+        return field;
     }
 
     /**
