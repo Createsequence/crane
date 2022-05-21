@@ -48,18 +48,18 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
 
     private BeanOperationConfiguration parse(Class<?> targetClass, FieldAnnotationParseContext parseContext) {
         BeanOperationConfiguration operationConfiguration = createConfiguration(targetClass);
-        List<AssembleOperation> sortedAssembleOperations = CollUtil.newArrayList(parseAssembleAnnotationClass(targetClass, operationConfiguration));
-        List<DisassembleOperation> sortedDisassembleOperations = new ArrayList<>();
+        List<AssembleOperation> assembleOperations = CollUtil.newArrayList(parseAssembleAnnotationClass(targetClass, operationConfiguration));
+        List<DisassembleOperation> disassembleOperations = new ArrayList<>();
         // 解析属性注解获取操作配置
-        for (Field field : targetClass.getDeclaredFields()) {
-            sortedAssembleOperations.addAll(parseAssembleAnnotatedField(field, operationConfiguration));
-            sortedDisassembleOperations.addAll(parseDisassembleAnnotatedField(field, operationConfiguration, parseContext));
-        }
+        ReflexUtils.forEachFromClass(targetClass, Class::getDeclaredFields, f -> {
+            assembleOperations.addAll(parseAssembleAnnotatedField(f, operationConfiguration));
+            disassembleOperations.addAll(parseDisassembleAnnotatedField(f, operationConfiguration, parseContext));
+        });
         // 按sort排序
-        Collections.sort(sortedAssembleOperations);
-        operationConfiguration.getAssembleOperations().addAll(sortedAssembleOperations);
-        Collections.sort(sortedDisassembleOperations);
-        operationConfiguration.getDisassembleOperations().addAll(sortedDisassembleOperations);
+        Collections.sort(assembleOperations);
+        operationConfiguration.getAssembleOperations().addAll(assembleOperations);
+        Collections.sort(disassembleOperations);
+        operationConfiguration.getDisassembleOperations().addAll(disassembleOperations);
         return operationConfiguration;
     }
 
@@ -114,7 +114,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
         List<AssembleOperation> parsedOperations = new ArrayList<>();
         for (Assemble assemble : annotation.assembles()) {
             Field property = ReflexUtils.findField(targetClass, assemble.key(), true);
-            AssembleOperation operation = parseAssembleAnnotation(property, assemble, configuration);
+            AssembleOperation operation = createAssembleAnnotation(property, assemble, configuration);
             parsedOperations.add(operation);
         }
         parseContext.found(targetClass, parsedOperations);
@@ -145,11 +145,11 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
         List<AssembleOperation> operations = ObjectUtils.computeIfNotNull(
             AnnotatedElementUtils.getMergedAnnotation(key, Assemble.List.class),
             list -> CollStreamUtil.toList(
-                Arrays.asList(list.value()), a -> parseAssembleAnnotation(key, a, configuration)
+                Arrays.asList(list.value()), a -> createAssembleAnnotation(key, a, configuration)
             ), new ArrayList<>()
         );
         if (Objects.nonNull(assemble)) {
-            operations.add(parseAssembleAnnotation(key, assemble, configuration));
+            operations.add(createAssembleAnnotation(key, assemble, configuration));
         }
 
         CraneException.throwIfFalse(
@@ -170,7 +170,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
      * @author huangchengxing
      * @date 2022/3/1 17:14
      */
-    protected AssembleOperation parseAssembleAnnotation(Field key, Assemble annotation, BeanOperationConfiguration configuration) {
+    protected AssembleOperation createAssembleAnnotation(Field key, Assemble annotation, BeanOperationConfiguration configuration) {
         // 解析属性配置
         List<AssembleProperty> properties = new ArrayList<>(CollStreamUtil.toList(
             Arrays.asList(annotation.props()), this::parsePropAnnotation)
@@ -282,8 +282,7 @@ public class BeanOperateConfigurationParser implements OperateConfigurationParse
 		    Field key, Disassemble annotation, BeanOperationConfiguration configuration, OperationConfiguration operationConfiguration, FieldAnnotationParseContext parseContext) {
         return new BeanDisassembleOperation(
             ObjectUtils.computeIfNotNull(
-                AnnotatedElementUtils.getMergedAnnotation(key, Order.class),
-                Order::value, Ordered.LOWEST_PRECEDENCE
+                AnnotatedElementUtils.getMergedAnnotation(key, Order.class), Order::value, Ordered.LOWEST_PRECEDENCE
             ),
             configuration,
             BeanFactoryUtils.getBean(beanFactory, annotation.disassembler(), annotation.disassemblerName()),
