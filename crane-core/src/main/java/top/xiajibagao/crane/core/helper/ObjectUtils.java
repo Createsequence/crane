@@ -29,7 +29,35 @@ public class ObjectUtils {
     }
 
     /**
-     * 若指定值不为空，则对其机芯操作
+     * 若校验通过，则对其操作
+     *
+     * @param target 指定值
+     * @param predicate 校验
+     * @param consumer 操作
+     * @author huangchengxing
+     * @date 2022/3/1 13:39
+     */
+    public static <T> void acceptIfRight(T target, Predicate<T> predicate, Consumer<T> consumer) {
+        if (predicate.test(target)) {
+            consumer.accept(target);
+        }
+    }
+
+    /**
+     * 若校验不通过，则对其操作
+     *
+     * @param target 指定值
+     * @param predicate 校验
+     * @param consumer 操作
+     * @author huangchengxing
+     * @date 2022/3/1 13:39
+     */
+    public static <T> void acceptIfFalse(T target, Predicate<T> predicate, Consumer<T> consumer) {
+        acceptIfRight(target, predicate.negate(), consumer);
+    }
+
+    /**
+     * 若指定值不为空，则对其操作
      *
      * @param target 指定值
      * @param consumer 操作

@@ -1,20 +1,20 @@
 package top.xiajibagao.crane.core.helper.reflex;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -30,9 +30,9 @@ public class ReflexUtils {
     private static final BeanPropertyFactory REFLEX_PROPERTY_FACTORY = new BeanPropertyFactory(
         (targetClass, field) -> {
             Method getter = findGetterMethod(targetClass, field);
-            Assert.notNull(getter, String.format("属性[%s]找不到对应的Getter方法", field));
+            Assert.notNull(getter, "属性{}找不到对应的Getter方法", field);
             Method setter = findSetterMethod(targetClass, field);
-            Assert.notNull(setter, String.format("属性[%s]找不到对应的Setter方法", field));
+            Assert.notNull(setter, "属性{}找不到对应的Setter方法", field);
             return new ReflexBeanProperty(targetClass, field, getter, setter);
         }
     );
@@ -248,11 +248,44 @@ public class ReflexUtils {
     }
 
     /**
+     * 递归遍历当前类，当前类的父类及其实现的接口
+     *
+     * @param targetClass 类
+     * @param classOperate 对类的操作，入参不会重复
+     * @author huangchengxing
+     * @date 2022/5/21 20:48
+     */
+    public static void forEachClass(Class<?> targetClass, Consumer<Class<?>> classOperate) {
+        Deque<Class<?>> classDeque = CollUtil.newLinkedList(targetClass);
+        Set<Class<?>> operatedClass = new HashSet<>();
+        while (!classDeque.isEmpty()) {
+            Class<?> target = classDeque.removeFirst();
+            // 若当前类已经访问过，则无需再次处理
+            if (operatedClass.contains(target)) {
+                continue;
+            }
+            operatedClass.add(target);
+            classOperate.accept(target);
+
+            // 父类
+            Class<?> superClass = target.getSuperclass();
+            if (!Objects.equals(superClass, Object.class) && Objects.nonNull(superClass)) {
+                classDeque.addLast(superClass);
+            }
+            // 接口
+            Class<?>[] interfaces = target.getInterfaces();
+            if (ArrayUtil.isNotEmpty(interfaces)) {
+                CollUtil.addAll(classDeque, interfaces);
+            }
+        }
+    }
+
+    /**
      * 从类及其父类中操作指定的元素
      *
      * @param targetClass 类
      * @param targetMapping 指定元素的映射方法
-     * @param consumer 操作
+     * @param consumer 操作，操作接受到的参数皆不为null
      * @author huangchengxing
      * @date 2022/4/1 12:58
      */
@@ -260,8 +293,10 @@ public class ReflexUtils {
         Class<?> targetClass, Function<Class<?>, T[]> targetMapping, Consumer<T> consumer) {
         while (!Objects.equals(targetClass, Object.class) && Objects.nonNull(targetClass)) {
             T[] targets = targetMapping.apply(targetClass);
-            for (T t : targets) {
-                consumer.accept(t);
+            if (Objects.nonNull(targets)) {
+                for (T t : targets) {
+                    ObjectUtils.acceptIfNotNull(t, consumer);
+                }
             }
             targetClass = targetClass.getSuperclass();
         }
@@ -272,18 +307,21 @@ public class ReflexUtils {
      *
      * @param targetClass 类
      * @param targetMapping 指定元素的映射方法
-     * @param predicate 是否返回
+     * @param predicate 是否返回，接受到的参数有可能为null
      * @return T
      * @author huangchengxing
      * @date 2022/4/1 12:58
      */
+    @Nullable
     public static <T> T findFromClass(
         Class<?> targetClass, Function<Class<?>, T[]> targetMapping, Predicate<T> predicate) {
         while (!Objects.equals(targetClass, Object.class) && Objects.nonNull(targetClass)) {
             T[] targets = targetMapping.apply(targetClass);
-            for (T t : targets) {
-                if (predicate.test(t)) {
-                    return t;
+            if (Objects.nonNull(targets)) {
+                for (T t : targets) {
+                    if (predicate.test(t)) {
+                        return t;
+                    }
                 }
             }
             targetClass = targetClass.getSuperclass();
