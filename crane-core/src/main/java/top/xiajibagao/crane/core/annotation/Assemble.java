@@ -24,15 +24,20 @@ import java.lang.annotation.*;
 public @interface Assemble {
 
     /**
-     * 指定完成装配操作的装配容器，该实例需要可以用spring容器获取
+     * 本次装配操作对应的key字段，当注解在类属性上时，该属性将强制覆盖该值
      */
-    @AliasFor("container")
-    Class<? extends Container> value() default KeyValueContainer.class;
+    @AliasFor("key")
+    String value() default "";
+
+    /**
+     * 本次装配操作对应的key字段，当注解在类属性上时，该属性将强制覆盖该值
+     */
+    @AliasFor("value")
+    String key() default "";
 
     /**
      * 指定完成装配操作的容器，该实例需要可以用spring容器获取
      */
-    @AliasFor("value")
     Class<? extends Container> container() default KeyValueContainer.class;
 
     /**

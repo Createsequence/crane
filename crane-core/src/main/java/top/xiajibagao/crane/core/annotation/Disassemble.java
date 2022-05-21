@@ -32,6 +32,11 @@ public @interface Disassemble {
     Class<?> targetClass() default Void.class;
 
     /**
+     * 待处理的字段，当注解在类属性上时该属性将强制覆盖该值
+     */
+    String key() default "";
+
+    /**
      * 字段别名。
      * 仅当无法根据注解字段名找到key字段时，才尝试通过别名找到至少一个存在的字段。
      */
