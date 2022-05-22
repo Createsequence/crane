@@ -4,7 +4,7 @@ import top.xiajibagao.crane.core.annotation.MateAnnotation;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
-import top.xiajibagao.crane.core.parser.BeanOperateConfigurationParser;
+import top.xiajibagao.crane.core.parser.FieldAnnotationConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
 import java.lang.annotation.*;
@@ -24,7 +24,7 @@ public @interface ProcessJacksonNode {
     /**
      * 要使用的配置解析器
      */
-    Class<? extends OperateConfigurationParser<?>> parser() default BeanOperateConfigurationParser.class;
+    Class<? extends OperateConfigurationParser<?>> parser() default FieldAnnotationConfigurationParser.class;
 
     /**
      * 要使用的执行器

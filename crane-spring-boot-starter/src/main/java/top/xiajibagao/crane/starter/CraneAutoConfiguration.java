@@ -31,7 +31,7 @@ import top.xiajibagao.crane.core.helper.EnumDict;
 import top.xiajibagao.crane.core.helper.OperateTemplate;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
 import top.xiajibagao.crane.core.operator.BeanReflexDisassembler;
-import top.xiajibagao.crane.core.parser.BeanOperateConfigurationParser;
+import top.xiajibagao.crane.core.parser.FieldAnnotationConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
@@ -64,10 +64,10 @@ public class CraneAutoConfiguration {
         // ==================== 解析器 ====================
 
         @Order
-        @ConditionalOnMissingBean(BeanOperateConfigurationParser.class)
+        @ConditionalOnMissingBean(FieldAnnotationConfigurationParser.class)
         @Bean("DefaultCraneBeanOperateConfigurationParser")
-        public BeanOperateConfigurationParser beanOperateConfigurationParser(GlobalConfiguration configuration, BeanFactory beanFactory) {
-            return new BeanOperateConfigurationParser(configuration, beanFactory);
+        public FieldAnnotationConfigurationParser beanOperateConfigurationParser(GlobalConfiguration configuration, BeanFactory beanFactory) {
+            return new FieldAnnotationConfigurationParser(configuration, beanFactory);
         }
 
         // ==================== 操作者 ====================

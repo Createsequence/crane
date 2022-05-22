@@ -251,17 +251,18 @@ public class ReflexUtils {
      * 递归遍历当前类，当前类的父类及其实现的接口
      *
      * @param targetClass 类
+     * @param filter 是否处理当前类及其父类和接口
      * @param classOperate 对类的操作，入参不会重复
      * @author huangchengxing
      * @date 2022/5/21 20:48
      */
-    public static void forEachClass(Class<?> targetClass, Consumer<Class<?>> classOperate) {
+    public static void forEachClass(Class<?> targetClass, Predicate<Class<?>> filter, Consumer<Class<?>> classOperate) {
         Deque<Class<?>> classDeque = CollUtil.newLinkedList(targetClass);
         Set<Class<?>> operatedClass = new HashSet<>();
         while (!classDeque.isEmpty()) {
             Class<?> target = classDeque.removeFirst();
             // 若当前类已经访问过，则无需再次处理
-            if (operatedClass.contains(target)) {
+            if (operatedClass.contains(target) || filter.negate().test(target)) {
                 continue;
             }
             operatedClass.add(target);
