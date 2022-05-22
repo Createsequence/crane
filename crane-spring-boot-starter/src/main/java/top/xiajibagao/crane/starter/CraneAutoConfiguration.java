@@ -31,6 +31,9 @@ import top.xiajibagao.crane.core.helper.EnumDict;
 import top.xiajibagao.crane.core.helper.OperateTemplate;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
 import top.xiajibagao.crane.core.operator.BeanReflexDisassembler;
+import top.xiajibagao.crane.core.parser.BeanOperationConfiguration;
+import top.xiajibagao.crane.core.parser.ClassAnnotationConfigurationParser;
+import top.xiajibagao.crane.core.parser.CombineOperationConfigurationParser;
 import top.xiajibagao.crane.core.parser.FieldAnnotationConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
@@ -42,6 +45,7 @@ import top.xiajibagao.crane.jackson.impl.module.DynamicJsonNodeModule;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonAssembler;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonDisassembler;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -65,9 +69,25 @@ public class CraneAutoConfiguration {
 
         @Order
         @ConditionalOnMissingBean(FieldAnnotationConfigurationParser.class)
-        @Bean("DefaultCraneBeanOperateConfigurationParser")
-        public FieldAnnotationConfigurationParser beanOperateConfigurationParser(GlobalConfiguration configuration, BeanFactory beanFactory) {
+        @Bean("DefaultCraneFieldAnnotationConfigurationParser")
+        public FieldAnnotationConfigurationParser fieldAnnotationConfigurationParser(GlobalConfiguration configuration, BeanFactory beanFactory) {
             return new FieldAnnotationConfigurationParser(configuration, beanFactory);
+        }
+
+        @Order
+        @ConditionalOnMissingBean(ClassAnnotationConfigurationParser.class)
+        @Bean("DefaultCraneClassAnnotationConfigurationParser")
+        public ClassAnnotationConfigurationParser classAnnotationConfigurationParser(GlobalConfiguration configuration, BeanFactory beanFactory) {
+            return new ClassAnnotationConfigurationParser(configuration, beanFactory);
+        }
+
+        @Order
+        @ConditionalOnMissingBean(ClassAnnotationConfigurationParser.class)
+        @Bean("DefaultCraneCombineOperationConfigurationParser")
+        public CombineOperationConfigurationParser<BeanOperationConfiguration> classAnnotationConfigurationParser(Collection<OperateConfigurationParser<BeanOperationConfiguration>> parsers) {
+            CombineOperationConfigurationParser<BeanOperationConfiguration> parser = new CombineOperationConfigurationParser<>();
+            parsers.forEach(parser::addParser);
+            return parser;
         }
 
         // ==================== 操作者 ====================
@@ -196,7 +216,7 @@ public class CraneAutoConfiguration {
         @Bean("DefaultCraneOperateTemplate")
         public OperateTemplate operateTemplate(
             @Qualifier("DefaultCraneOperationConfigurationCache") ConfigurationCache configurationCache,
-            @Qualifier("DefaultCraneBeanOperateConfigurationParser") OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
+            @Qualifier("DefaultCraneFieldAnnotationConfigurationParser") OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser,
             @Qualifier("DefaultCraneUnorderedOperationExecutor") OperationExecutor defaultOperationExecutor) {
             return new OperateTemplate(configurationCache, defaultOperateConfigurationParser, defaultOperationExecutor);
         }
