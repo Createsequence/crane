@@ -32,6 +32,6 @@ public @interface Operations {
     /**
      * 继承当前类父类及实现接口上的注解
      */
-    boolean enableExtend() default false;
+    boolean enableExtend() default true;
 
 }
