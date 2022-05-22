@@ -215,6 +215,7 @@ public final class CollUtils {
 	 * @author huangchengxing
 	 * @date 2021/10/19 10:25
 	 */
+	@SafeVarargs
 	public static <T> Set<T> toSet(T... source) {
 		if (ArrayUtil.isEmpty(source)) {
 			return Collections.emptySet();
@@ -349,6 +350,34 @@ public final class CollUtils {
 				consumer.accept(k, v);
 			}
 		}));
+	}
+
+	/**
+	 * 将数组适配为集合
+	 *
+	 * @param collFactory 创建集合的方法
+	 * @param array 数组
+	 * @return C
+	 * @author huangchengxing
+	 * @date 2022/5/22 16:21
+	 */
+	public static <T, C extends Collection<T>> C toCollection(Supplier<C> collFactory, T... array) {
+		return ArrayUtil.isEmpty(array) ? collFactory.get() : Stream.of(array)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toCollection(collFactory));
+	}
+
+	/**
+	 * 将数组适配为List集合
+	 *
+	 * @param array 数组
+	 * @return C
+	 * @author huangchengxing
+	 * @date 2022/5/22 16:21
+	 */
+	@SafeVarargs
+	public static <T> List<T> toList(T... array) {
+		return toCollection(ArrayList::new, array);
 	}
 
 }

@@ -29,6 +29,37 @@ public class ObjectUtils {
     }
 
     /**
+     * 若校验通过，则将其映射并返回另一值，否则返回默认值
+     *
+     * @param target 指定值
+     * @param predicate 校验
+     * @param mapping 映射
+     * @param def 默认值
+     * @author huangchengxing
+     * @date 2022/3/1 13:39
+     */
+    public static <T, R> R supplyIfRight(T target, Predicate<T> predicate, Function<T, R> mapping, R def) {
+        if (predicate.test(target)) {
+            mapping.apply(target);
+        }
+        return def;
+    }
+
+    /**
+     * 若校验不通过，则将其映射并返回另一值，否则返回默认值
+     *
+     * @param target 指定值
+     * @param predicate 校验
+     * @param mapping 映射
+     * @param def 默认值
+     * @author huangchengxing
+     * @date 2022/3/1 13:39
+     */
+    public static <T, R> R supplyIfFalse(T target, Predicate<T> predicate, Function<T, R> mapping, R def) {
+        return supplyIfRight(target, predicate.negate(), mapping, def);
+    }
+
+    /**
      * 若校验通过，则对其操作
      *
      * @param target 指定值

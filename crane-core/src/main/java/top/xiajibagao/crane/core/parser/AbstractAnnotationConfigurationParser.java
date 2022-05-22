@@ -17,6 +17,7 @@ import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.parser.interfaces.*;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +34,24 @@ public abstract class AbstractAnnotationConfigurationParser<T extends OperationC
     protected final GlobalConfiguration globalConfiguration;
     protected final BeanFactory beanFactory;
 
+    @Nonnull
+    @Override
+    public T parse(Class<?> targetClass) {
+        return parse(targetClass, new ParseContext());
+    }
+    
+    /**
+     * 基于当前上下文解析目标类的操作配置
+     *
+     * @param targetClass 目标类型
+     * @param parseContext 解析上下文
+     * @return T
+     * @author huangchengxing
+     * @date 2022/5/22 17:08
+     */
+    @Nonnull
+    protected abstract T parse(Class<?> targetClass, ParseContext parseContext);
+
     /**
      * 根据{@link Assemble}注解创建{@link AssembleOperation}
      *
@@ -43,7 +62,7 @@ public abstract class AbstractAnnotationConfigurationParser<T extends OperationC
      * @author huangchengxing
      * @date 2022/3/1 17:14
      */
-    protected AssembleOperation createAssembleAnnotation(Field key, Assemble annotation, BeanOperationConfiguration configuration) {
+    protected AssembleOperation createAssembleOperation(Field key, Assemble annotation, OperationConfiguration configuration) {
         // 解析属性配置
         List<AssembleProperty> properties = new ArrayList<>(CollStreamUtil.toList(
             Arrays.asList(annotation.props()), this::parsePropAnnotation)
@@ -61,7 +80,7 @@ public abstract class AbstractAnnotationConfigurationParser<T extends OperationC
             ),
             configuration,
             key,
-            CollUtils.toSet(Arrays.asList(annotation.aliases())),
+            CollUtils.toSet(annotation.aliases()),
             annotation.namespace(),
             BeanFactoryUtils.getBean(beanFactory, annotation.container(), annotation.containerName()),
             BeanFactoryUtils.getBean(beanFactory, annotation.assembler(), annotation.assemblerName()),
@@ -106,22 +125,61 @@ public abstract class AbstractAnnotationConfigurationParser<T extends OperationC
      * @param key 属性
      * @param annotation {@link Disassemble}注解
      * @param configuration 当前正在构建的配置
-     * @param operationConfiguration 待拆卸属性的类型配置
+     * @param disassembleConfiguration 待装卸属性的类型配置
      * @return DisassembleOperation
      * @author huangchengxing
      * @date 2022/3/1 17:50
      */
-    protected DisassembleOperation createDisassembleOperation(Field key, Disassemble annotation, BeanOperationConfiguration configuration, OperationConfiguration operationConfiguration) {
+    protected DisassembleOperation createDisassembleOperation(
+        Field key, Disassemble annotation, OperationConfiguration configuration, OperationConfiguration disassembleConfiguration) {
         return new BeanDisassembleOperation(
             ObjectUtils.computeIfNotNull(
                 AnnotatedElementUtils.getMergedAnnotation(key, Order.class), Order::value, Ordered.LOWEST_PRECEDENCE
             ),
             configuration,
             BeanFactoryUtils.getBean(beanFactory, annotation.disassembler(), annotation.disassemblerName()),
-            operationConfiguration,
+            disassembleConfiguration,
             key,
-            CollUtils.toSet(Arrays.asList(annotation.aliases()))
+            CollUtils.toSet(annotation.aliases())
         );
+    }
+
+    /**
+     * 解析上下文，用于缓存一次解析操作中涉及到的配置类，以处理循环依赖问题
+     *
+     * @author huangchengxing 
+     * @date 2022/5/22 17:11
+     */
+    @RequiredArgsConstructor
+    protected static class ParseContext {
+
+        private final Map<Class<?>, OperationConfiguration> lookingForConfigurations;
+        private final Set<Class<?>> excluded = new HashSet<>();
+
+        public ParseContext() {
+            this(new HashMap<>(4));
+        }
+
+        public boolean isInLooking(Class<?> targetClass) {
+            return lookingForConfigurations.containsKey(targetClass);
+        }
+
+        public void looking(Class<?> targetClass, OperationConfiguration configuration) {
+            lookingForConfigurations.put(targetClass, configuration);
+        }
+
+        public OperationConfiguration get(Class<?> targetClass) {
+            return lookingForConfigurations.get(targetClass);
+        }
+
+        public void exclude(Class<?>... excludeClass) {
+            CollUtil.addAll(excluded, excludeClass);
+        }
+
+        public boolean isExcluded(Class<?> targetClass) {
+            return excluded.contains(targetClass);
+        }
+
     }
 
 }

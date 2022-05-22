@@ -5,6 +5,7 @@ import org.springframework.lang.NonNull;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
+import javax.annotation.Nonnull;
 import java.util.Objects;
 
 /**
@@ -24,6 +25,7 @@ public class CacheConfigurationParserWrapper<T extends OperationConfiguration> i
     }
     
     @SuppressWarnings("unchecked")
+    @Nonnull
     @Override
     public T parse(@NonNull Class<?> targetClass) {
         Objects.requireNonNull(targetClass);

@@ -25,13 +25,13 @@ public @interface Operations {
     Disassemble[] disassembles() default {};
 
     /**
-     * 扩展注解，效果类似继承，将从指定类型上获取{@link Operations}注解
-     */
-    Class<?>[] extendFrom() default {};
-
-    /**
-     * 不扩展的{@link #extendFrom()}指定的类或该类扩展树上的类
+     * 不继承指定类及其父类或接口上的注解
      */
     Class<?>[] extendExcludes() default {};
+
+    /**
+     * 继承当前类父类及实现接口上的注解
+     */
+    boolean enableExtend() default false;
 
 }

@@ -3,6 +3,8 @@ package top.xiajibagao.crane.core.parser.interfaces;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 
+import javax.annotation.Nonnull;
+
 /**
  * 操作配置解析器
  * <p>将指定类型中的各项字段的装配与装卸操作配置解析并整合为操作配置
@@ -26,6 +28,7 @@ public interface OperateConfigurationParser<T extends OperationConfiguration> {
      * @author huangchengxing
      * @date 2022/3/1 15:54
      */
+    @Nonnull
     T parse(Class<?> targetClass);
 
 }

@@ -252,7 +252,7 @@ public class ReflexUtils {
      *
      * @param targetClass 类
      * @param filter 是否处理当前类及其父类和接口
-     * @param classOperate 对类的操作，入参不会重复
+     * @param classOperate 对类的操作，入参不会重复，且不为null
      * @author huangchengxing
      * @date 2022/5/21 20:48
      */
@@ -262,7 +262,7 @@ public class ReflexUtils {
         while (!classDeque.isEmpty()) {
             Class<?> target = classDeque.removeFirst();
             // 若当前类已经访问过，则无需再次处理
-            if (operatedClass.contains(target) || filter.negate().test(target)) {
+            if (Objects.isNull(target) || operatedClass.contains(target) || filter.negate().test(target)) {
                 continue;
             }
             operatedClass.add(target);
