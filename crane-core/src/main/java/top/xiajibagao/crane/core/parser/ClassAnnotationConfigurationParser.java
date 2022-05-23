@@ -1,6 +1,7 @@
 package top.xiajibagao.crane.core.parser;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -119,10 +120,13 @@ public class ClassAnnotationConfigurationParser
             assembleKeys.put(annotation.key(), annotation);
         }
         List<AssembleOperation> results = new ArrayList<>();
+        Class<?> targetClass = configuration.getTargetClass();
         assembleKeys.asMap().forEach((keyName, annotations) -> {
-            Field key = ReflexUtils.findField(configuration.getTargetClass(), keyName, true);
+            // 先根据key寻找属性，若不存在则根据key别名寻找
+            Field key = ReflexUtils.findField(targetClass, keyName, false);
+            boolean keyExists = Objects.nonNull(key);
             annotations.stream()
-                .map(a -> createAssembleOperation(key, a, configuration))
+                .map(a -> createAssembleOperation(keyExists ? key : ReflexUtils.findAnyMatchField(targetClass, true, a.aliases()), a, configuration))
                 .forEach(results::add);
         });
         return results;
@@ -146,7 +150,7 @@ public class ClassAnnotationConfigurationParser
             .collect(Collectors.toMap(Disassemble::key, Function.identity(), (k1, k2) -> k1));
         List<DisassembleOperation> results = new ArrayList<>();
         disassembleKeys.forEach((keyName, annotation) -> {
-            Field key = ReflexUtils.findField(configuration.getTargetClass(), keyName, true);
+            Field key = ReflexUtils.findAnyMatchField(configuration.getTargetClass(), true, ArrayUtil.insert(annotation.aliases(), 0, annotation.key()));
             Class<?> disassembleType = annotation.targetClass();
             // 若存在循环依赖，则直接从上下文获取配置的引用，否则递归解析待装卸的字段类型
             OperationConfiguration disassembleConfiguration = parseContext.isInLooking(disassembleType) ?

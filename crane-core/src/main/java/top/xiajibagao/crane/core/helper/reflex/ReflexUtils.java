@@ -122,14 +122,38 @@ public class ReflexUtils {
      * @param fieldName 属性名
      * @param mustExists 属性是否必须存在，为true时，若属性不存在则抛出异常
      * @return java.lang.reflect.Field
+     * @throws IllegalArgumentException mustExists为true，且在类中找不到该属性时抛出
      * @author huangchengxing
      * @date 2022/4/1 13:39
      */
     @Nullable
     public static Field findField(Class<?> targetClass, String fieldName, boolean mustExists) {
         Field field = ReflectionUtils.findField(targetClass, fieldName);
-        cn.hutool.core.lang.Assert.isTrue(!mustExists || Objects.nonNull(field), "类[{}]找不到名为[{}]的属性", targetClass, fieldName);
+        Assert.isTrue(!mustExists || Objects.nonNull(field), "类[{}]找不到名为[{}]的属性", targetClass, fieldName);
         return field;
+    }
+
+    /**
+     * 从类中找到至少一个与名称相符的属性
+     *
+     * @param targetClass 目标类型
+     * @param mustExists 是否必须存在至少一个符合的属性
+     * @param fieldNames 属性名称
+     * @throws IllegalArgumentException  mustExists为true，且在类中找不到任意符合的属性时抛出
+     * @return java.lang.reflect.Field
+     * @author huangchengxing
+     * @date 2022/5/23 17:10
+     */
+    public static Field findAnyMatchField(Class<?> targetClass, boolean mustExists, String... fieldNames) {
+        Field key = null;
+        for (String field : fieldNames) {
+            key = ReflexUtils.findField(targetClass, field, false);
+            if (Objects.nonNull(key)) {
+                return key;
+            }
+        }
+        Assert.isFalse(mustExists, "类[{}]无法从以下名称中找到任何一个存在的属性：{}", targetClass, Arrays.asList(fieldNames));
+        return null;
     }
 
     /**
