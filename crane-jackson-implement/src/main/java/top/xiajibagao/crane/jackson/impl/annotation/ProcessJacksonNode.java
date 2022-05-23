@@ -37,6 +37,11 @@ public @interface ProcessJacksonNode {
     Class<? extends OperationExecutor> executor() default UnorderedOperationExecutor.class;
 
     /**
+     * 要使用的执行器在容器中的bean名称
+     */
+    String executorName() default "";
+
+    /**
      * 分组
      */
     Class<?>[] groups() default { DefaultGroup.class };

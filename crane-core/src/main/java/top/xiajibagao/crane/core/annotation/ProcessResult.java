@@ -59,6 +59,12 @@ public @interface ProcessResult {
     Class<? extends OperationExecutor> executor() default UnorderedOperationExecutor.class;
 
     /**
+     * 要使用的执行器在容器中的bean名称
+     */
+    @AliasFor(annotation = ConfigOption.class, attribute = "executorName")
+    String executorName() default "";
+
+    /**
      * <p>执行条件SpEL表达式
      *
      * <p>当该项不为空或空字符串时，该表达时的解析执行后必须返回布尔值true或false,当表达式解析发生异常时，将默认为true。<br />

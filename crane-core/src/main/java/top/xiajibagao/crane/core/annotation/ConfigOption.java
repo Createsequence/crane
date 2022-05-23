@@ -53,4 +53,9 @@ public @interface ConfigOption {
      */
     Class<? extends OperationExecutor> executor() default UnorderedOperationExecutor.class;
 
+    /**
+     * 要使用的执行器在容器中的bean名称
+     */
+    String executorName() default "";
+
 }

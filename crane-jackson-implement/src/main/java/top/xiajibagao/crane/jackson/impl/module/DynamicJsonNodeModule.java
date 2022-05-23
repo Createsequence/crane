@@ -59,7 +59,7 @@ public class DynamicJsonNodeModule extends Module {
             }
             OperateConfigurationParser configurationParser = BeanFactoryUtils.getBean(beanFactory, annotation.parser(), annotation.parserName());
             OperationConfiguration operationConfiguration = configurationParser.parse(beanDesc.getBeanClass());
-            OperationExecutor operationExecutor = beanFactory.getBean(annotation.executor());
+            OperationExecutor operationExecutor = BeanFactoryUtils.getBean(beanFactory, annotation.executor(), annotation.executorName());
             return new DynamicJsonNodeBeanSerializer<>(
                 beanDesc.getBeanClass(), objectMapper,
                 ArrayUtil.isNotEmpty(annotation.groups()) ? CollUtil.newHashSet(annotation.groups()) : Collections.emptySet(),

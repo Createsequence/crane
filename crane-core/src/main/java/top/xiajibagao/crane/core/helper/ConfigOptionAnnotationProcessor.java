@@ -42,7 +42,7 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
         OperationConfiguration configuration = configurationCache.getOrCached(
             getNamespace(parser), targetClass, parser::parse
         );
-        OperationExecutor executor = beanFactory.getBean(annotation.executor());
+        OperationExecutor executor = BeanFactoryUtils.getBean(beanFactory, annotation.executor(), annotation.executorName());
         executor.execute(CollUtils.adaptToCollection(target), configuration, targetGroups);
     }
     
