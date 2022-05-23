@@ -21,11 +21,10 @@ import javax.annotation.Nonnull;
  * @see DisassembleOperation
  * @see Assembler
  * @see Disassembler
- * @param <T> 解析器解析处的配置类
  * @author huangchengxing
  * @date 2022/03/01 15:52
  */
-public interface OperateConfigurationParser<T extends OperationConfiguration> extends Orderly {
+public interface OperateConfigurationParser extends Orderly {
     
     /**
      * 解析目标类型，获取该类型对应的类操作配置实例
@@ -36,6 +35,6 @@ public interface OperateConfigurationParser<T extends OperationConfiguration> ex
      * @date 2022/3/1 15:54
      */
     @Nonnull
-    T parse(Class<?> targetClass);
+    OperationConfiguration parse(Class<?> targetClass);
 
 }

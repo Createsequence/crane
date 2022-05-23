@@ -55,7 +55,7 @@ public class DynamicJsonNodeModule extends Module {
             if (Objects.isNull(annotation)) {
                 return serializer;
             }
-            OperateConfigurationParser<? extends OperationConfiguration> configurationParser = beanFactory.getBean(annotation.parser());
+            OperateConfigurationParser configurationParser = beanFactory.getBean(annotation.parser());
             OperationConfiguration operationConfiguration = configurationParser.parse(beanDesc.getBeanClass());
             OperationExecutor operationExecutor = beanFactory.getBean(annotation.executor());
             return new DynamicJsonNodeBeanSerializer<>(

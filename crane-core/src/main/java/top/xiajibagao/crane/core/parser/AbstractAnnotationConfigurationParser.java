@@ -29,14 +29,14 @@ import java.util.stream.Stream;
  */
 @Slf4j
 @RequiredArgsConstructor
-public abstract class AbstractAnnotationConfigurationParser<T extends OperationConfiguration> implements OperateConfigurationParser<T> {
+public abstract class AbstractAnnotationConfigurationParser implements OperateConfigurationParser {
 
     protected final GlobalConfiguration globalConfiguration;
     protected final BeanFactory beanFactory;
 
     @Nonnull
     @Override
-    public T parse(Class<?> targetClass) {
+    public OperationConfiguration parse(Class<?> targetClass) {
         return parse(targetClass, new ParseContext());
     }
     
@@ -50,7 +50,7 @@ public abstract class AbstractAnnotationConfigurationParser<T extends OperationC
      * @date 2022/5/22 17:08
      */
     @Nonnull
-    protected abstract T parse(Class<?> targetClass, ParseContext parseContext);
+    protected abstract OperationConfiguration parse(Class<?> targetClass, ParseContext parseContext);
 
     /**
      * 根据{@link Assemble}注解创建{@link AssembleOperation}

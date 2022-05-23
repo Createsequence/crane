@@ -15,21 +15,20 @@ import java.util.Objects;
  * @date 2022/03/24 11:32
  */
 @RequiredArgsConstructor
-public class CacheConfigurationParserWrapper<T extends OperationConfiguration> implements OperateConfigurationParser<T> {
+public class CacheConfigurationParserWrapper implements OperateConfigurationParser {
 
     private final ConfigurationCache configurationCache;
-    private final OperateConfigurationParser<T> configurationParser;
+    private final OperateConfigurationParser configurationParser;
 
     protected String getNamespace() {
         return configurationParser.getClass().getName();
     }
     
-    @SuppressWarnings("unchecked")
     @Nonnull
     @Override
-    public T parse(@NonNull Class<?> targetClass) {
+    public OperationConfiguration parse(@NonNull Class<?> targetClass) {
         Objects.requireNonNull(targetClass);
-        return (T) configurationCache.getOrCached(getNamespace(), targetClass, configurationParser::parse);
+        return configurationCache.getOrCached(getNamespace(), targetClass, configurationParser::parse);
     }
 
     

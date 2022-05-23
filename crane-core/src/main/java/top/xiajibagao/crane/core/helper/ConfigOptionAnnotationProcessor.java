@@ -38,7 +38,7 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
         }
 
         // 从缓存中获取解析器
-        OperateConfigurationParser<OperationConfiguration> parser = beanFactory.getBean(annotation.parser());
+        OperateConfigurationParser parser = beanFactory.getBean(annotation.parser());
         OperationConfiguration configuration = configurationCache.getOrCached(
             getNamespace(parser), targetClass, parser::parse
         );
@@ -54,7 +54,7 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
      * @author huangchengxing
      * @date 2022/5/5 22:56
      */
-    protected String getNamespace(OperateConfigurationParser<OperationConfiguration> parser) {
+    protected String getNamespace(OperateConfigurationParser parser) {
         return parser.getClass().getName();
     }
     

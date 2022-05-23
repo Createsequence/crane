@@ -23,7 +23,7 @@ import java.util.Objects;
 public class OperateTemplate {
 
     private final ConfigurationCache configurationCache;
-    private final OperateConfigurationParser<? extends OperationConfiguration> defaultOperateConfigurationParser;
+    private final OperateConfigurationParser defaultOperateConfigurationParser;
     private final OperationExecutor defaultOperationExecutor;
 
     /**
@@ -65,7 +65,7 @@ public class OperateTemplate {
      */
     public void process(
         Object target,
-        OperateConfigurationParser<? extends OperationConfiguration> parser,
+        OperateConfigurationParser parser,
         OperationExecutor executor,
         @Nullable Class<?>... groups) {
 
@@ -96,7 +96,7 @@ public class OperateTemplate {
      * @author huangchengxing
      * @date 2022/4/9 23:43
      */
-    public void process(Object target, OperateConfigurationParser<? extends OperationConfiguration> parser, @Nullable Class<?>... groups) {
+    public void process(Object target, OperateConfigurationParser parser, @Nullable Class<?>... groups) {
         process(target, parser, defaultOperationExecutor, groups);
     }
 

@@ -18,29 +18,28 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/05/22 17:11
  */
-public class CombineOperationConfigurationParser<T extends OperationConfiguration>
-    implements OperateConfigurationParser<T> {
+public class CombineOperationConfigurationParser implements OperateConfigurationParser {
 
-    private final List<OperateConfigurationParser<T>> parserChain = new ArrayList<>();
+    private final List<OperateConfigurationParser> parserChain = new ArrayList<>();
 
     /**
      * 添加解析器
      *
      * @param parser 解析器
-     * @return top.xiajibagao.crane.core.parser.CombineOperationConfigurationParser<T>
+     * @return top.xiajibagao.crane.core.parser.CombineOperationConfigurationParser
      * @author huangchengxing
      * @date 2022/5/22 17:14
      */
-    public CombineOperationConfigurationParser<T> addParser(OperateConfigurationParser<T> parser) {
+    public CombineOperationConfigurationParser addParser(OperateConfigurationParser parser) {
         parserChain.add(parser);
         return this;
     }
 
     @Nonnull
     @Override
-    public T parse(Class<?> targetClass) {
-        List<T> configurations = CollStreamUtil.toList(parserChain, p -> p.parse(targetClass));
-        T result = CollUtil.getFirst(configurations);
+    public OperationConfiguration parse(Class<?> targetClass) {
+        List<OperationConfiguration> configurations = CollStreamUtil.toList(parserChain, p -> p.parse(targetClass));
+        OperationConfiguration result = CollUtil.getFirst(configurations);
         Objects.requireNonNull(result);
         configurations.stream()
             .skip(1L)

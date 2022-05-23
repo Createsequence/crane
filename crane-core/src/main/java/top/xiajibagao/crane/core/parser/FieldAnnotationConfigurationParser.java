@@ -26,8 +26,8 @@ import java.util.*;
  */
 @Slf4j
 public class FieldAnnotationConfigurationParser
-    extends AbstractAnnotationConfigurationParser<BeanOperationConfiguration>
-    implements OperateConfigurationParser<BeanOperationConfiguration> {
+    extends AbstractAnnotationConfigurationParser
+    implements OperateConfigurationParser {
 
     public FieldAnnotationConfigurationParser(GlobalConfiguration globalConfiguration, BeanFactory beanFactory) {
         super(globalConfiguration, beanFactory);

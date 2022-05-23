@@ -24,7 +24,7 @@ public @interface ProcessJacksonNode {
     /**
      * 要使用的配置解析器
      */
-    Class<? extends OperateConfigurationParser<?>> parser() default FieldAnnotationConfigurationParser.class;
+    Class<? extends OperateConfigurationParser> parser() default FieldAnnotationConfigurationParser.class;
 
     /**
      * 要使用的执行器

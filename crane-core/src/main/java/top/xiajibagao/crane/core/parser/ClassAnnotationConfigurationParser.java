@@ -32,8 +32,8 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class ClassAnnotationConfigurationParser
-    extends AbstractAnnotationConfigurationParser<BeanOperationConfiguration>
-    implements OperateConfigurationParser<BeanOperationConfiguration> {
+    extends AbstractAnnotationConfigurationParser
+    implements OperateConfigurationParser {
 
     public ClassAnnotationConfigurationParser(GlobalConfiguration globalConfiguration, BeanFactory beanFactory) {
         super(globalConfiguration, beanFactory);
