@@ -1,6 +1,7 @@
 package top.xiajibagao.crane.core.parser;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ArrayListMultimap;
@@ -126,6 +127,11 @@ public class ClassAnnotationConfigurationParser
             Field key = ReflexUtils.findField(targetClass, keyName, false);
             boolean keyExists = Objects.nonNull(key);
             annotations.stream()
+                .peek(a -> Assert.isTrue(
+                    keyExists || ArrayUtil.isNotEmpty(a.aliases()),
+                    "类[{}]不存在key[{}], 且未指定任何别名",
+                    targetClass, keyName
+                ))
                 .map(a -> createAssembleOperation(keyExists ? key : ReflexUtils.findAnyMatchField(targetClass, true, a.aliases()), a, configuration))
                 .forEach(results::add);
         });
