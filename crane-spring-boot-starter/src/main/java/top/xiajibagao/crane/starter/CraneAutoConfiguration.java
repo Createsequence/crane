@@ -125,7 +125,7 @@ public class CraneAutoConfiguration {
     @ConditionalOnMissingBean(EnumDictContainer.class)
     @Bean("DefaultCraneEnumDictContainer")
     public EnumDictContainer enumDictContainer(EnumDict enumDict) {
-        log.info("注册容器：{}", EnumDictContainer.class);
+        logContainerRegistered(EnumDictContainer.class);
         return new EnumDictContainer(enumDict);
     }
 
@@ -133,7 +133,7 @@ public class CraneAutoConfiguration {
     @ConditionalOnMissingBean(KeyValueContainer.class)
     @Bean("DefaultCraneKeyValueContainer")
     public KeyValueContainer simpleKeyValueContainer() {
-        log.info("注册容器：{}", KeyValueContainer.class);
+        logContainerRegistered(KeyValueContainer.class);
         return new KeyValueContainer();
     }
 
@@ -141,7 +141,7 @@ public class CraneAutoConfiguration {
     @ConditionalOnMissingBean(MethodSourceContainer.class)
     @Bean("DefaultCraneMethodSourceContainer")
     public MethodSourceContainer methodSourceContainer(ApplicationContext applicationContext) {
-        log.info("注册容器：{}", MethodSourceContainer.class);
+        logContainerRegistered(MethodSourceContainer.class);
         MethodSourceContainer container = new MethodSourceContainer();
         Map<String, Object> beans = applicationContext.getBeansWithAnnotation(MethodSourceBean.class);
         if (CollUtil.isNotEmpty(beans)) {
@@ -154,7 +154,7 @@ public class CraneAutoConfiguration {
     @ConditionalOnMissingBean(BeanIntrospectContainer.class)
     @Bean("DefaultCraneBeanIntrospectContainer")
     public BeanIntrospectContainer introspectContainer() {
-        log.info("注册容器：{}", BeanIntrospectContainer.class);
+        logContainerRegistered(BeanIntrospectContainer.class);
         return new BeanIntrospectContainer();
     }
 
@@ -162,7 +162,7 @@ public class CraneAutoConfiguration {
     @ConditionalOnMissingBean(KeyIntrospectContainer.class)
     @Bean("DefaultCraneKeyIntrospectContainer")
     public KeyIntrospectContainer keyIntrospectContainer() {
-        log.info("注册容器：{}", KeyIntrospectContainer.class);
+        logContainerRegistered(KeyIntrospectContainer.class);
         return new KeyIntrospectContainer();
     }
 
@@ -207,6 +207,10 @@ public class CraneAutoConfiguration {
         @Qualifier("DefaultCraneFieldAnnotationConfigurationParser") OperateConfigurationParser defaultOperateConfigurationParser,
         @Qualifier("DefaultCraneUnorderedOperationExecutor") OperationExecutor defaultOperationExecutor) {
         return new OperateTemplate(configurationCache, defaultOperateConfigurationParser, defaultOperationExecutor);
+    }
+
+    private void logContainerRegistered(Class<?> containerClass) {
+        log.info("注册容器：{}", containerClass);
     }
 
 }
