@@ -4,7 +4,7 @@ import org.springframework.core.annotation.AliasFor;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
-import top.xiajibagao.crane.core.parser.FieldAnnotationConfigurationParser;
+import top.xiajibagao.crane.core.parser.CombineOperationConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
 import java.lang.annotation.*;
@@ -44,7 +44,13 @@ public @interface ProcessResult {
      * 要使用的配置解析器
      */
     @AliasFor(annotation = ConfigOption.class, attribute = "parser")
-    Class<? extends OperateConfigurationParser<?>> parser() default FieldAnnotationConfigurationParser.class;
+    Class<? extends OperateConfigurationParser> parser() default CombineOperationConfigurationParser.class;
+
+    /**
+     * 要使用的配置解析器在容器中的bean名称
+     */
+    @AliasFor(annotation = ConfigOption.class, attribute = "parserName")
+    String parserName() default "";
 
     /**
      * 要使用的执行器

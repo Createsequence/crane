@@ -44,6 +44,11 @@ public @interface ConfigOption {
     Class<? extends OperateConfigurationParser> parser() default FieldAnnotationConfigurationParser.class;
 
     /**
+     * 要使用的配置解析器在容器中的bean名称
+     */
+    String parserName() default "";
+
+    /**
      * 要使用的执行器
      */
     Class<? extends OperationExecutor> executor() default UnorderedOperationExecutor.class;

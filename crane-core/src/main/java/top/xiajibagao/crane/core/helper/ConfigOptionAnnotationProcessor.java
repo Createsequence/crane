@@ -38,7 +38,7 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
         }
 
         // 从缓存中获取解析器
-        OperateConfigurationParser parser = beanFactory.getBean(annotation.parser());
+        OperateConfigurationParser parser = BeanFactoryUtils.getBean(beanFactory, annotation.parser(), annotation.parserName());
         OperationConfiguration configuration = configurationCache.getOrCached(
             getNamespace(parser), targetClass, parser::parse
         );
