@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import top.xiajiabagao.crane.starter.common.TestConfig;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
-import top.xiajibagao.crane.starter.CraneAutoConfiguration;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ import java.util.Map;
  * @date 2022/04/17 19:20
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {CraneAutoConfiguration.class})
+@SpringBootTest(classes = {TestConfig.class})
 public class JacksonTest {
 
     @Qualifier("DefaultCraneJacksonSerializeObjectMapper")

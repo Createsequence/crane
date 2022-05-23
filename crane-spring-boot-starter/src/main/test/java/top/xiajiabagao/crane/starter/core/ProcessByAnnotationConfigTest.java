@@ -51,8 +51,9 @@ public class ProcessByAnnotationConfigTest {
     private TestContainer testContainer;
 
     // 解析器
+    @Qualifier("DefaultCraneCombineOperationConfigurationParser")
     @Autowired
-    private OperateConfigurationParser<? extends OperationConfiguration> operateConfigurationParser;
+    private OperateConfigurationParser operateConfigurationParser;
 
     private static Person getActualPerson() {
         return new Person()
