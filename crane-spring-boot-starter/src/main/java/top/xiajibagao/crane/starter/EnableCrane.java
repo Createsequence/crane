@@ -15,6 +15,6 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(CraneAutoConfiguration.class)
+@Import({CraneAutoConfigurationProperties.class, CraneAutoConfiguration.class, CraneJacksonAutoConfiguration.class})
 public @interface EnableCrane {
 }
