@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.Objects;
 
 /**
+ * {@link JsonNode}数据装配器
+ *
  * @author huangchengxing
  * @date 2022/03/02 10:03
  */

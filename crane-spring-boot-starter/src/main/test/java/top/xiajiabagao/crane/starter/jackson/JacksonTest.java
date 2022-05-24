@@ -30,11 +30,11 @@ import java.util.Map;
 @SpringBootTest(classes = {TestConfig.class})
 public class JacksonTest {
 
-    @Qualifier("DefaultCraneJacksonSerializeObjectMapper")
+    @Qualifier("SerializeObjectMapper")
     @Autowired
     private ObjectMapper serializeObjectMapper;
 
-    @Qualifier("DefaultCraneJacksonObjectMapper")
+    @Qualifier("TestObjectMapper")
     @Autowired
     private ObjectMapper objectMapper;
 

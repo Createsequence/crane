@@ -1,6 +1,7 @@
 package top.xiajibagao.crane.jackson.impl.module;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.*;
@@ -41,6 +42,10 @@ public class DynamicJsonNodeModule extends Module {
 
     @Override
     public void setupModule(SetupContext context) {
+        Assert.isFalse(
+            objectMapper.getRegisteredModuleIds().contains(getModuleName()),
+            "ObjectMapper实例{}已经注册DynamicJsonNodeModule模块，该实例无法再注册至模块内部"
+        );
         context.addBeanSerializerModifier(new DynamicJsonNodeBeanSerializerModifier(beanFactory, objectMapper));
     }
 

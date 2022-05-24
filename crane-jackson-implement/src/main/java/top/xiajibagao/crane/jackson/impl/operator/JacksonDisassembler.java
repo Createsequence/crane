@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * {@link JsonNode}数据装卸器
+ *
  * @author huangchengxing
  * @date 2022/03/02 10:04
  */

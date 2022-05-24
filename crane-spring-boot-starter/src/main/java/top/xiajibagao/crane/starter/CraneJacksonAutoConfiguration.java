@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -33,8 +34,20 @@ import top.xiajibagao.crane.jackson.impl.operator.JacksonDisassembler;
 @Configuration
 public class CraneJacksonAutoConfiguration {
 
+    public static final String CRANE_INNER_OBJECT_MAPPER = "CraneInnerObjectMapper";
+    
+    /**
+     * 默认的ObjectMapper实例，用于crane的Jackson模块相关组件读写JsonNode。
+     * <b>该实例不能用于注册{@link DynamicJsonNodeModule}</b>
+     * 其余配置应当与用于注册{@link DynamicJsonNodeModule}的实例保持一致
+     *
+     * @return com.fasterxml.jackson.databind.ObjectMapper
+     * @author huangchengxing
+     * @date 2022/5/24 12:28
+     */
     @Order
-    @Bean("DefaultCraneJacksonObjectMapper")
+    @ConditionalOnMissingBean(value = ObjectMapper.class, name = CRANE_INNER_OBJECT_MAPPER)
+    @Bean(CRANE_INNER_OBJECT_MAPPER)
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -42,9 +55,10 @@ public class CraneJacksonAutoConfiguration {
     }
 
     @Order
+    @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
     @ConditionalOnMissingBean(OrderlyOperateHandlerChain.class)
     @Bean("DefaultCraneJacksonOrderlyOperateHandlerChain")
-    public OperateHandlerChain orderlyOperateHandlerChain(@Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper) {
+    public OperateHandlerChain orderlyOperateHandlerChain(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
         OrderlyOperateHandlerChain operateHandlerChain = new OrderlyOperateHandlerChain();
         operateHandlerChain.addHandler(new ArrayNodeOperateHandler(objectMapper, operateHandlerChain))
             .addHandler(new ObjectNodeOperateHandler(objectMapper))
@@ -55,31 +69,26 @@ public class CraneJacksonAutoConfiguration {
     }
 
     @Order
+    @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
     @ConditionalOnMissingBean(JacksonAssembler.class)
     @Bean("DefaultCraneJacksonAssembler")
-    public JacksonAssembler jacksonAssembler(@Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper, @Qualifier("DefaultCraneJacksonOrderlyOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
+    public JacksonAssembler jacksonAssembler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, @Qualifier("DefaultCraneJacksonOrderlyOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
         return new JacksonAssembler(objectMapper, assembleHandlerChain);
     }
 
     @Order
+    @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
     @ConditionalOnMissingBean(JacksonDisassembler.class)
     @Bean("DefaultCraneJacksonDisassembler")
-    public JacksonDisassembler jacksonDisassembler(@Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper objectMapper) {
+    public JacksonDisassembler jacksonDisassembler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
         return new JacksonDisassembler(objectMapper);
     }
 
     @Order
+    @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
     @Bean("DefaultCraneJacksonDynamicJsonNodeModule")
-    public DynamicJsonNodeModule dynamicJsonNodeModule(BeanFactory beanFactory, @Qualifier("DefaultCraneJacksonObjectMapper") ObjectMapper defaultObjectMapper) {
-        return new DynamicJsonNodeModule(beanFactory, defaultObjectMapper);
-    }
-
-    @Order
-    @Bean("DefaultCraneJacksonSerializeObjectMapper")
-    public ObjectMapper serializeObjectMapper(@Qualifier("DefaultCraneJacksonDynamicJsonNodeModule") DynamicJsonNodeModule dynamicJsonNodeModule) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(dynamicJsonNodeModule);
-        return objectMapper;
+    public DynamicJsonNodeModule dynamicJsonNodeModule(BeanFactory beanFactory, @Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
+        return new DynamicJsonNodeModule(beanFactory, objectMapper);
     }
 
 }
