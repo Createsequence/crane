@@ -73,8 +73,22 @@ crane 便是为了解决这种烦恼而生。它允许通过统一配置填充�
 </dependency>
 ~~~
 
+若还需要使用 Jackson 相关的功能，则还需要引入 `crane-jackson-implement`
+
+~~~xml
+<dependency>
+    <groupId>top.xiajibagao</groupId>
+    <artifactId>crane-jackson-implement</artifactId>
+    <version>${last-version}</version>
+</dependency>
+~~~
+
+ 
+
 > - 若无法从 maven 仓库引入 crane 依赖，则可以把代码拉到本地，然后执行 `mvn clean install`命令安装到本地后即可引用；
 > - 由于 Crane 尚未有正式的发行版，因此最好每次引入的依赖都为最新的；
+
+
 
 ### 2、引入配置
 
