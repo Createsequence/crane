@@ -45,22 +45,28 @@ public class ClassAnnotationConfigurationParser
     @Override
     protected BeanOperationConfiguration parse(Class<?> targetClass, ParseContext parseContext) {
         BeanOperationConfiguration configuration = createConfiguration(targetClass);
+        parseContext.looking(targetClass, configuration);
+        if (parseContext.isExcluded(targetClass)) {
+            return configuration;
+        }
         List<AssembleOperation> assembleOperations = new ArrayList<>();
         List<DisassembleOperation> disassembleOperations = new ArrayList<>();
 
-        // 优先解析父节点
-        Operations rootAnnotation = parseAnnotation(parseContext, configuration, assembleOperations, disassembleOperations);
-        if (Objects.isNull(rootAnnotation)) {
+        Operations annotation = AnnotatedElementUtils.findMergedAnnotation(targetClass, Operations.class);
+        if (Objects.isNull(annotation)) {
             return configuration;
         }
-
         // 若允许继承父类及接口的注解的配置，则一并解析
-        if (rootAnnotation.enableExtend()) {
+        if (annotation.enableExtend()) {
             ReflexUtils.forEachClass(
                 targetClass, Predicates.not(parseContext::isExcluded),
-                t -> parseAnnotation(parseContext, configuration, assembleOperations, disassembleOperations)
+                t -> parseAnnotation(parseContext, t, configuration, assembleOperations, disassembleOperations)
             );
+        } else {
+            // 否则只解析根节点
+            parseAnnotation(parseContext, configuration.getTargetClass(), configuration, assembleOperations, disassembleOperations);
         }
+
         // 排序
         configuration.getAssembleOperations().addAll(CollUtil.sort(assembleOperations, Orderly::compareTo));
         configuration.getDisassembleOperations().addAll(CollUtil.sort(disassembleOperations, Orderly::compareTo));
@@ -74,21 +80,17 @@ public class ClassAnnotationConfigurationParser
      * @param configuration 当前正在构建的配置
      * @param assembleOperations 正在收集的装配操作
      * @param disassembleOperations 正在收集的装卸操作
-     * @return top.xiajibagao.crane.core.annotation.Operations
      * @author huangchengxing
      * @date 2022/5/22 16:44
      */
-    private Operations parseAnnotation(ParseContext parseContext, BeanOperationConfiguration configuration, List<AssembleOperation> assembleOperations, List<DisassembleOperation> disassembleOperations) {
-        Class<?> targetClass = configuration.getTargetClass();
+    private void parseAnnotation(ParseContext parseContext, Class<?> targetClass, BeanOperationConfiguration configuration, List<AssembleOperation> assembleOperations, List<DisassembleOperation> disassembleOperations) {
         Operations annotation = AnnotatedElementUtils.findMergedAnnotation(targetClass, Operations.class);
-        if (Objects.nonNull(annotation)) {
-            assembleOperations.addAll(parseAssembleAnnotations(configuration, annotation));
-            disassembleOperations.addAll(parseDisassembleAnnotations(configuration, annotation, parseContext));
-            // 在上下文中表明当前配置类正在构建
-            parseContext.looking(targetClass, configuration);
-            parseContext.exclude(annotation.extendExcludes());
+        if (Objects.isNull(annotation)) {
+            return;
         }
-        return annotation;
+        assembleOperations.addAll(parseAssembleAnnotations(configuration, annotation));
+        disassembleOperations.addAll(parseDisassembleAnnotations(configuration, annotation, parseContext));
+        parseContext.exclude(annotation.extendExcludes());
     }
 
     /**
