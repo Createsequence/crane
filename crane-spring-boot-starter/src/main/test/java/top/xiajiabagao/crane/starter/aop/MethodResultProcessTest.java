@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import top.xiajiabagao.crane.starter.common.TestConfig;
@@ -32,7 +31,6 @@ import java.util.*;
 @SpringBootTest(classes = {TestConfig.class, MethodResultProcessTest.TestService.class})
 public class MethodResultProcessTest {
 
-    @Qualifier("TestObjectMapper")
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired

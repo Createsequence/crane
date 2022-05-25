@@ -37,7 +37,6 @@ import java.util.Map;
 @SpringBootTest(classes = TestConfig.class)
 public class ProcessByOperateConfigurationAssistantTest {
 
-    @Qualifier("TestObjectMapper")
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired

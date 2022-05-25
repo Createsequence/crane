@@ -40,7 +40,6 @@ import java.util.Map;
 @SpringBootTest(classes = TestConfig.class)
 public class ExpressionTest {
 
-    @Qualifier("TestObjectMapper")
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
