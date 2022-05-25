@@ -1,16 +1,22 @@
 package top.xiajibagao.crane.starter;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ClassUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.stereotype.Component;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.aop.MethodResultProcessAspect;
 import top.xiajibagao.crane.core.cache.ConfigurationCache;
@@ -34,6 +40,7 @@ import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 默认配置
@@ -69,6 +76,7 @@ public class CraneAutoConfiguration {
         return new ClassAnnotationConfigurationParser(configuration, beanFactory);
     }
 
+    @Primary
     @Order
     @ConditionalOnMissingBean(CombineOperationConfigurationParser.class)
     @Bean("DefaultCraneCombineOperationConfigurationParser")
@@ -114,6 +122,7 @@ public class CraneAutoConfiguration {
 
     // ==================== 容器 ====================
 
+    @Primary
     @Order
     @ConditionalOnMissingBean(EnumDict.class)
     @Bean("DefaultCraneEnumDict")
@@ -168,6 +177,8 @@ public class CraneAutoConfiguration {
 
     // ==================== 执行器 ====================
 
+
+    @Primary
     @Order
     @ConditionalOnMissingBean(UnorderedOperationExecutor.class)
     @Bean("DefaultCraneUnorderedOperationExecutor")
@@ -184,6 +195,7 @@ public class CraneAutoConfiguration {
 
     // ==================== 辅助类 ====================
 
+    @Primary
     @Order
     @ConditionalOnMissingBean(OperationConfigurationCache.class)
     @Bean("DefaultCraneOperationConfigurationCache")
