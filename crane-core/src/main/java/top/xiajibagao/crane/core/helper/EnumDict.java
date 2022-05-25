@@ -1,9 +1,12 @@
 package top.xiajibagao.crane.core.helper;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.cglib.beans.BeanMap;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.lang.NonNull;
+import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,7 +14,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * 枚举字典，用于将枚举适配为字典项，并提供根据类型与名称的查询功能
@@ -40,7 +42,7 @@ public class EnumDict {
     // ================================ register ================================
 
     /**
-     * 添加一组枚举，类型名称为枚举类名，字典项枚举实例名称
+     * 添加一组枚举，类型名称为枚举类名，字典项枚举实例名称，当枚举类上存在{@link Item}注解时，将优先使用注解指定的配置
      *
      * @param targetType 目标类型
      * @author huangchengxing
@@ -51,7 +53,7 @@ public class EnumDict {
     }
 
     /**
-     * 添加一组枚举
+     * 添加一组枚举，并指定类型名称和字典项名称，当枚举类上存在{@link Item}注解时，将优先使用注解指定的配置
      *
      * @param targetType 目标类型
      * @param typeName 类型名称，若为空则默认取枚举类名
@@ -61,14 +63,26 @@ public class EnumDict {
      */
     public <T extends Enum<?>> void register(
         Class<T> targetType, String typeName, Function<T, String> itemNameGetter) {
-
+        // 获取类名称与枚举项名称
+        Item annotation = AnnotatedElementUtils.findMergedAnnotation(targetType, Item.class);
+        if (Objects.nonNull(annotation)) {
+            typeName = annotation.typeName();
+            itemNameGetter = t -> ReflexUtils.findProperty(targetType, annotation.itemNameProperty())
+                .map(p -> p.getValue(t))
+                .map(String::valueOf)
+                .orElseThrow(() -> new IllegalArgumentException(CharSequenceUtil.format(
+                    "枚举项名称为空，枚举类{}无法注册到字典"
+                )));
+        }
         typeName = ObjectUtils.defaultIfNull(typeName, targetType.getSimpleName());
+        itemNameGetter = ObjectUtils.defaultIfNull(itemNameGetter, T::name);
+
+        // 生成对应的枚举实例
         EnumDictType<T> type = new EnumDictType<>(targetType, typeName);
-        List<EnumDictItem<T>> targets = Arrays.stream(targetType.getEnumConstants())
-            .map(item -> new EnumDictItem<>(
-                type, item, ObjectUtils.defaultIfNull(itemNameGetter, T::name).apply(item)
-            ))
-            .collect(Collectors.toList());
+        List<EnumDictItem<T>> targets = new ArrayList<>();
+        for (T item : targetType.getEnumConstants()) {
+            targets.add(new EnumDictItem<>(type, item, itemNameGetter.apply(item)));
+        }
         targets.forEach(type::addItem);
 
         nameCache.put(typeName, type);
@@ -239,7 +253,7 @@ public class EnumDict {
             this.name = name;
             this.target = target;
 
-            Map<String, Object> properties = new HashMap<>(BeanMap.create(target));
+            Map<String, Object> properties = new HashMap<>((Map<String, Object>)BeanMap.create(target));
             properties.remove("declaringClass");
             putAll(properties);
         }
@@ -257,12 +271,12 @@ public class EnumDict {
     public @interface Item {
 
         /**
-         * 类型名，默认为枚举实例名称
+         * 类型名，指定从枚举中哪个属性获得，默认为{@link Enum#name()}
          */
-        String itemName() default "";
+        String itemNameProperty() default "";
 
         /**
-         * 枚举识别名称，默认为类名
+         * 枚举类在字典中的名称，默认为类名
          */
         String typeName() default "";
 
