@@ -34,7 +34,6 @@ public class JacksonTest {
     @Autowired
     private ObjectMapper serializeObjectMapper;
 
-    @Qualifier("TestObjectMapper")
     @Autowired
     private ObjectMapper objectMapper;
 
