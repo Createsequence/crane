@@ -221,6 +221,60 @@ public class CraneAutoConfiguration {
         return new OperateTemplate(configurationCache, defaultOperateConfigurationParser, defaultOperationExecutor);
     }
 
+    @Component
+    @RequiredArgsConstructor
+    public static class AfterConfigurationInitedRunner implements ApplicationRunner {
+
+        private final BeanFactory beanFactory;
+        private final CraneAutoConfigurationProperties properties;
+        private final ConfigurationCache configurationCache;
+        private final EnumDict enumDict;
+
+        @Override
+        public void run(ApplicationArguments args) throws Exception {
+            preRegisteredEnum();
+            if (properties.isEnablePreParse()) {
+                preParsedAndCacheClassOperationConfiguration();
+            }
+        }
+
+        /**
+         * 扫描枚举并注册到枚举字典
+         */
+        private void preRegisteredEnum() {
+            properties.getDictEnumPackages().stream()
+                .map(ClassUtil::scanPackage)
+                .flatMap(Collection::stream)
+                .filter(Class::isEnum)
+                .map(c -> (Class<? extends Enum<?>>)c)
+                .forEach(enumDict::register);
+        }
+
+        /**
+         * 解析配置并加入缓存
+         */
+        private void preParsedAndCacheClassOperationConfiguration() {
+            Map<String, Set<String>> parserAndPreParsedClassPackages = properties.getParserAndPreParsedClassPackages();
+            parserAndPreParsedClassPackages.forEach((parserName, packages) -> {
+                OperateConfigurationParser parser = beanFactory.getBean(OperateConfigurationParser.class, parserName);
+                cacheClassOperationConfiguration(parser, packages);
+            });
+            Set<String> preParsedClassPackages = properties.getPreParsedClassPackages();
+            OperateConfigurationParser parser = beanFactory.getBean(OperateConfigurationParser.class);
+            cacheClassOperationConfiguration(parser, preParsedClassPackages);
+        }
+
+        private void cacheClassOperationConfiguration(OperateConfigurationParser parser, Set<String> packages) {
+            String cacheName = parser.getClass().getName();
+            packages.stream()
+                .map(ClassUtil::scanPackage)
+                .flatMap(Collection::stream)
+                .distinct()
+                .map(parser::parse)
+                .forEach(conf -> configurationCache.setConfigurationCache(cacheName, conf.getTargetClass(), conf));
+        }
+    }
+
     private void logContainerRegistered(Class<?> containerClass) {
         log.info("注册容器：{}", containerClass);
     }
