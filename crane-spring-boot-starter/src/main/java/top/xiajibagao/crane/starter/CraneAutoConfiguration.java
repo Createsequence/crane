@@ -80,7 +80,7 @@ public class CraneAutoConfiguration {
     @Order
     @ConditionalOnMissingBean(CombineOperationConfigurationParser.class)
     @Bean("DefaultCraneCombineOperationConfigurationParser")
-    public CombineOperationConfigurationParser classAnnotationConfigurationParser(Collection<OperateConfigurationParser> parsers) {
+    public CombineOperationConfigurationParser combineOperationConfigurationParser(Collection<OperateConfigurationParser> parsers) {
         CombineOperationConfigurationParser parser = new CombineOperationConfigurationParser();
         parsers.forEach(parser::addParser);
         return parser;
