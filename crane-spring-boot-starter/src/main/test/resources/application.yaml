@@ -1,0 +1,12 @@
+crane:
+  enums:
+    dict_enum_packages: top.xiajiabagao.crane.starter.common
+  caches:
+    enable_pre_parse_class: true
+    pre_parsed_class_packages:
+      - top.xiajiabagao.crane.starter.aop
+      - top.xiajiabagao.crane.starter.classanno
+      - top.xiajiabagao.crane.starter.common
+      - top.xiajiabagao.crane.starter.core
+      - top.xiajiabagao.crane.starter.group
+      - top.xiajiabagao.crane.starter.jackson

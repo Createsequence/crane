@@ -231,9 +231,9 @@ public class CraneAutoConfiguration {
         private final EnumDict enumDict;
 
         @Override
-        public void run(ApplicationArguments args) throws Exception {
+        public void run(ApplicationArguments args) {
             preRegisteredEnum();
-            if (properties.isEnablePreParse()) {
+            if (properties.getCache().isEnablePreParseClass()) {
                 preParsedAndCacheClassOperationConfiguration();
             }
         }
@@ -242,7 +242,7 @@ public class CraneAutoConfiguration {
          * 扫描枚举并注册到枚举字典
          */
         private void preRegisteredEnum() {
-            properties.getDictEnumPackages().stream()
+            properties.getEnums().getDictEnumPackages().stream()
                 .map(ClassUtil::scanPackage)
                 .flatMap(Collection::stream)
                 .filter(Class::isEnum)
@@ -254,12 +254,13 @@ public class CraneAutoConfiguration {
          * 解析配置并加入缓存
          */
         private void preParsedAndCacheClassOperationConfiguration() {
-            Map<String, Set<String>> parserAndPreParsedClassPackages = properties.getParserAndPreParsedClassPackages();
+            CraneAutoConfigurationProperties.CacheConfigProperties cacheConfigProperties = properties.getCache();
+            Map<String, Set<String>> parserAndPreParsedClassPackages = cacheConfigProperties.getParserAndPreParsedClassPackages();
             parserAndPreParsedClassPackages.forEach((parserName, packages) -> {
                 OperateConfigurationParser parser = beanFactory.getBean(OperateConfigurationParser.class, parserName);
                 cacheClassOperationConfiguration(parser, packages);
             });
-            Set<String> preParsedClassPackages = properties.getPreParsedClassPackages();
+            Set<String> preParsedClassPackages = cacheConfigProperties.getPreParsedClassPackages();
             OperateConfigurationParser parser = beanFactory.getBean(OperateConfigurationParser.class);
             cacheClassOperationConfiguration(parser, preParsedClassPackages);
         }
@@ -271,6 +272,7 @@ public class CraneAutoConfiguration {
                 .flatMap(Collection::stream)
                 .distinct()
                 .map(parser::parse)
+                .peek(c -> log.info("缓存预解析配置[{}]", c.getTargetClass()))
                 .forEach(conf -> configurationCache.setConfigurationCache(cacheName, conf.getTargetClass(), conf));
         }
     }

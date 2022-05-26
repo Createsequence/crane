@@ -3,7 +3,6 @@ package top.xiajibagao.crane.starter;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import top.xiajibagao.crane.core.helper.EnumDict;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,24 +18,44 @@ import java.util.Set;
 @Data
 public class CraneAutoConfigurationProperties {
 
-    /**
-     * 需要预先扫描注册到{@link EnumDict}的包路径
-     */
-    private Set<String> dictEnumPackages = new HashSet<>();
+    private EnumConfigProperties enums = new EnumConfigProperties();
+
+    private CacheConfigProperties cache = new CacheConfigProperties();
 
     /**
-     * 是否允许预解析类操作配置
+     * 枚举配置
      */
-    private boolean enablePreParse = false;
+    @Data
+    public static class EnumConfigProperties {
+
+        /**
+         * 需要预先注册到枚举指点中的枚举类
+         */
+        private Set<String> dictEnumPackages = new HashSet<>();
+
+    }
 
     /**
-     * 需要预解析并缓存配置的类所在的包路径
+     * 缓存配置
      */
-    private Set<String> preParsedClassPackages = new HashSet<>();
+    @Data
+    public static class CacheConfigProperties {
 
-    /**
-     * 解析器bean名称，与需要使用对应解析器预解析并缓存配置的类所在的包路径
-     */
-    private Map<String, Set<String>> parserAndPreParsedClassPackages = new HashMap<>(4);
+        /**
+         * 是否允许预解析类操作配置
+         */
+        private boolean enablePreParseClass = false;
+
+        /**
+         * 需要预解析并缓存配置的类所在的包路径
+         */
+        private Set<String> preParsedClassPackages = new HashSet<>();
+
+        /**
+         * 解析器bean名称，与需要使用对应解析器预解析并缓存配置的类所在的包路径
+         */
+        private Map<String, Set<String>> parserAndPreParsedClassPackages = new HashMap<>(4);
+
+    }
 
 }

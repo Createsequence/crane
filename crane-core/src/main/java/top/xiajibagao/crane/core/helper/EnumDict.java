@@ -3,6 +3,7 @@ package top.xiajibagao.crane.core.helper;
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.lang.NonNull;
@@ -14,6 +15,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 枚举字典，用于将枚举适配为字典项，并提供根据类型与名称的查询功能
@@ -21,6 +23,7 @@ import java.util.function.Function;
  * @author huangchengxing
  * @date 2022/01/07 13:59
  */
+@Slf4j
 public class EnumDict {
 
     private final Map<String, EnumDictType<?>> nameCache = new HashMap<>();
@@ -84,6 +87,13 @@ public class EnumDict {
             targets.add(new EnumDictItem<>(type, item, itemNameGetter.apply(item)));
         }
         targets.forEach(type::addItem);
+        log.info(
+            "注册枚举[{}]({})：[{}]",
+            typeName, targetType,
+            targets.stream()
+                .map(t -> CharSequenceUtil.format("{}->{}", t.getName(), t.getTarget().name()))
+                .collect(Collectors.joining(", "))
+        );
 
         nameCache.put(typeName, type);
         classCache.put(targetType, type);
