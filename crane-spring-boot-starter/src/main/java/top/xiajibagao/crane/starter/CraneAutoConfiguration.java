@@ -93,7 +93,7 @@ public class CraneAutoConfiguration {
     @ConditionalOnMissingBean(BeanReflexOperateHandlerChain.class)
     @Bean("DefaultCraneBeanReflexOperateHandlerChain")
     public BeanReflexOperateHandlerChain beanReflexOperateHandlerChain() {
-        BeanReflexOperateHandlerChain operateHandlerChain = new ExpressibleOperateHandlerChain(StandardEvaluationContext::new);
+        BeanReflexOperateHandlerChain operateHandlerChain = new ExpressibleBeanReflexOperateHandlerChain(StandardEvaluationContext::new);
         operateHandlerChain.addHandler(new MapOperateHandler())
             .addHandler(new CollectionOperateHandler(operateHandlerChain))
             .addHandler(new ArrayOperateHandler(operateHandlerChain))
