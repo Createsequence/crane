@@ -2,16 +2,12 @@ package top.xiajibagao.crane.core.handler;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.ExpressionUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
-import top.xiajibagao.crane.core.parser.interfaces.Operation;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -24,46 +20,18 @@ import java.util.function.Supplier;
  * @date 2022/04/13 0:06
  */
 @Getter
-@RequiredArgsConstructor
-public class ExpressibleOperateHandlerChain implements OperateHandlerChain {
+public class ExpressibleOperateHandlerChain extends BeanReflexOperateHandlerChain implements OperateHandlerChain {
 
-    private final OperateHandlerChain handlerChain;
     private final Supplier<StandardEvaluationContext> contextFactory;
 
-    @Override
-    public int getOrder() {
-        return -1;
-    }
-
-    @Override
-    public List<OperateHandler> handlers() {
-        return handlerChain.handlers();
-    }
-
-    @Override
-    public OperateHandlerChain addHandler(OperateHandler handler) {
-        return handlerChain.addHandler(handler);
-    }
-
-    @Override
-    public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
-        return handlerChain.sourceCanRead(source, property, operation);
-    }
-
-    @Override
-    public boolean targetCanWrite(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
-        return handlerChain.targetCanWrite(sourceData, target, property, operation);
-    }
-
-    @Override
-    public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
-        return handlerChain.readFromSource(source, property, operation);
+    public ExpressibleOperateHandlerChain(Supplier<StandardEvaluationContext> contextFactory) {
+        this.contextFactory = contextFactory;
     }
 
     @Override
     public void writeToTarget(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
         if (CharSequenceUtil.isBlank(property.getExp())) {
-            handlerChain.writeToTarget(sourceData, target, property, operation);
+            super.writeToTarget(sourceData, target, property, operation);
             return;
         }
         StandardEvaluationContext context = contextFactory.get();
@@ -73,6 +41,6 @@ public class ExpressibleOperateHandlerChain implements OperateHandlerChain {
         context.setVariable("src", property.getResource());
         context.setVariable("ref", property.getReference());
         sourceData = ExpressionUtils.execute(property.getExp(), context, property.getExpType(), true);
-        handlerChain.writeToTarget(sourceData, target, property, operation);
+        super.writeToTarget(sourceData, target, property, operation);
     }
 }
