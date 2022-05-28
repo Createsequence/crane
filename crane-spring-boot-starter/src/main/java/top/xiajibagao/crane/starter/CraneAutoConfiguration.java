@@ -91,9 +91,9 @@ public class CraneAutoConfiguration {
     @Primary
     @Order
     @ConditionalOnMissingBean(BeanReflexOperateHandlerChain.class)
-    @Bean("DefaultCraneOrderlyOperateHandlerChain")
-    public OperateHandlerChain orderlyOperateHandlerChain() {
-        BeanReflexOperateHandlerChain operateHandlerChain = new BeanReflexOperateHandlerChain();
+    @Bean("DefaultCraneBeanReflexOperateHandlerChain")
+    public BeanReflexOperateHandlerChain beanReflexOperateHandlerChain() {
+        BeanReflexOperateHandlerChain operateHandlerChain = new ExpressibleOperateHandlerChain(StandardEvaluationContext::new);
         operateHandlerChain.addHandler(new MapOperateHandler())
             .addHandler(new CollectionOperateHandler(operateHandlerChain))
             .addHandler(new ArrayOperateHandler(operateHandlerChain))
@@ -101,23 +101,23 @@ public class CraneAutoConfiguration {
             .addHandler(new BeanOperateHandler());
         log.info(
             "注册处理器链 {}, 已配置节点: {}",
-            "DefaultCraneOrderlyOperateHandlerChain",
+            "DefaultCraneBeanReflexOperateHandlerChain",
             CollUtil.join(operateHandlerChain.handlers(), ", ", h -> h.getClass().getName())
         );
-        return new ExpressibleOperateHandlerChain(operateHandlerChain, StandardEvaluationContext::new);
+        return operateHandlerChain;
     }
 
     @Order
     @ConditionalOnMissingBean(BeanReflexAssembler.class)
     @Bean("DefaultCraneBeanReflexAssembler")
-    public BeanReflexAssembler beanReflexAssembler(@Qualifier("DefaultCraneOrderlyOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
+    public BeanReflexAssembler beanReflexAssembler(@Qualifier("DefaultCraneBeanReflexOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
         return new BeanReflexAssembler(assembleHandlerChain);
     }
 
     @Order
     @ConditionalOnMissingBean(BeanReflexDisassembler.class)
     @Bean("DefaultCraneBeanReflexDisassembler")
-    public BeanReflexDisassembler beanReflexDisassembler(@Qualifier("DefaultCraneOrderlyOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
+    public BeanReflexDisassembler beanReflexDisassembler(@Qualifier("DefaultCraneBeanReflexOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
         return new BeanReflexDisassembler(assembleHandlerChain);
     }
 

@@ -13,7 +13,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.JacksonOperateHandlerChain;
 import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
@@ -55,8 +54,8 @@ public class CraneJacksonAutoConfiguration {
     @Order
     @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
     @ConditionalOnMissingBean(JacksonOperateHandlerChain.class)
-    @Bean("DefaultCraneJacksonOrderlyOperateHandlerChain")
-    public JacksonOperateHandlerChain orderlyOperateHandlerChain(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
+    @Bean("DefaultCraneJacksonOperateHandlerChain")
+    public JacksonOperateHandlerChain jacksonOperateHandlerChain(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
         JacksonOperateHandlerChain operateHandlerChain = new JacksonOperateHandlerChain();
         operateHandlerChain.addHandler(new ArrayNodeOperateHandler(objectMapper, operateHandlerChain))
             .addHandler(new ObjectNodeOperateHandler(objectMapper))
@@ -70,8 +69,8 @@ public class CraneJacksonAutoConfiguration {
     @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
     @ConditionalOnMissingBean(JacksonAssembler.class)
     @Bean("DefaultCraneJacksonAssembler")
-    public JacksonAssembler jacksonAssembler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, @Qualifier("DefaultCraneJacksonOrderlyOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
-        return new JacksonAssembler(objectMapper, assembleHandlerChain);
+    public JacksonAssembler jacksonAssembler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, JacksonOperateHandlerChain operateHandlerChain) {
+        return new JacksonAssembler(objectMapper, operateHandlerChain);
     }
 
     @Order
