@@ -88,11 +88,12 @@ public class CraneAutoConfiguration {
 
     // ==================== 操作者 ====================
 
+    @Primary
     @Order
-    @ConditionalOnMissingBean(OrderlyOperateHandlerChain.class)
+    @ConditionalOnMissingBean(BeanReflexOperateHandlerChain.class)
     @Bean("DefaultCraneOrderlyOperateHandlerChain")
     public OperateHandlerChain orderlyOperateHandlerChain() {
-        OrderlyOperateHandlerChain operateHandlerChain = new OrderlyOperateHandlerChain();
+        BeanReflexOperateHandlerChain operateHandlerChain = new BeanReflexOperateHandlerChain();
         operateHandlerChain.addHandler(new MapOperateHandler())
             .addHandler(new CollectionOperateHandler(operateHandlerChain))
             .addHandler(new ArrayOperateHandler(operateHandlerChain))
@@ -246,7 +247,7 @@ public class CraneAutoConfiguration {
                 .map(ClassUtil::scanPackage)
                 .flatMap(Collection::stream)
                 .filter(Class::isEnum)
-                .map(c -> (Class<? extends Enum<?>>)c)
+                .map(Class.class::cast)
                 .forEach(enumDict::register);
         }
 

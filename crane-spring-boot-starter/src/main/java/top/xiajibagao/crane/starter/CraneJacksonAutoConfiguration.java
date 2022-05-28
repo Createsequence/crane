@@ -13,11 +13,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
-import top.xiajibagao.crane.core.handler.ExpressibleOperateHandlerChain;
-import top.xiajibagao.crane.core.handler.OrderlyOperateHandlerChain;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
+import top.xiajibagao.crane.jackson.impl.handler.JacksonOperateHandlerChain;
 import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.ValueNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.module.DynamicJsonNodeModule;
@@ -56,16 +54,16 @@ public class CraneJacksonAutoConfiguration {
 
     @Order
     @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
-    @ConditionalOnMissingBean(OrderlyOperateHandlerChain.class)
+    @ConditionalOnMissingBean(JacksonOperateHandlerChain.class)
     @Bean("DefaultCraneJacksonOrderlyOperateHandlerChain")
-    public OperateHandlerChain orderlyOperateHandlerChain(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
-        OrderlyOperateHandlerChain operateHandlerChain = new OrderlyOperateHandlerChain();
+    public JacksonOperateHandlerChain orderlyOperateHandlerChain(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
+        JacksonOperateHandlerChain operateHandlerChain = new JacksonOperateHandlerChain();
         operateHandlerChain.addHandler(new ArrayNodeOperateHandler(objectMapper, operateHandlerChain))
             .addHandler(new ObjectNodeOperateHandler(objectMapper))
             .addHandler(new ValueNodeOperateHandler(objectMapper));
         log.info("注册处理器链 {}, 已配置节点: {}", "DefaultCraneJacksonOrderlyOperateHandlerChain", CollUtil.join(operateHandlerChain.handlers(), ", ", h -> h.getClass()
             .getName()));
-        return new ExpressibleOperateHandlerChain(operateHandlerChain, StandardEvaluationContext::new);
+        return operateHandlerChain;
     }
 
     @Order

@@ -16,9 +16,9 @@ import java.util.List;
  */
 @Getter
 @Accessors(fluent = true)
-public class OrderlyOperateHandlerChain implements OperateHandlerChain {
+public class AbstractOrderlyHandlerChain implements OperateHandlerChain {
 
-    private final List<OperateHandler> handlers = new ArrayList<>();
+    protected final List<OperateHandler> handlers = new ArrayList<>();
 
     @Override
     public OperateHandlerChain addHandler(OperateHandler handler) {
@@ -26,5 +26,4 @@ public class OrderlyOperateHandlerChain implements OperateHandlerChain {
         handlers.sort(OperateHandler::compareTo);
         return this;
     }
-
 }
