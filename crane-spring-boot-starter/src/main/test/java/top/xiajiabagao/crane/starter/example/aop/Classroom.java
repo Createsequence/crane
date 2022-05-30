@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.aop;
+package top.xiajiabagao.crane.starter.example.aop;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

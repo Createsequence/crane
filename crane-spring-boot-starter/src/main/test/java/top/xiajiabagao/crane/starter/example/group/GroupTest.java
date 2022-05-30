@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.group;
+package top.xiajiabagao.crane.starter.example.group;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -9,9 +9,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.common.Gender;
-import top.xiajiabagao.crane.starter.common.TestConfig;
-import top.xiajiabagao.crane.starter.common.TestContainer;
+import top.xiajiabagao.crane.starter.example.common.Gender;
+import top.xiajiabagao.crane.starter.example.common.TestConfig;
+import top.xiajiabagao.crane.starter.example.common.TestContainer;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
 import top.xiajibagao.crane.core.helper.OperateTemplate;

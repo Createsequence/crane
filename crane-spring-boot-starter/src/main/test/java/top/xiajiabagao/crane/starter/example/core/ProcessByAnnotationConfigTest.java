@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.core;
+package top.xiajiabagao.crane.starter.example.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,17 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.common.Gender;
-import top.xiajiabagao.crane.starter.common.TestConfig;
-import top.xiajiabagao.crane.starter.common.TestContainer;
+import top.xiajiabagao.crane.starter.example.common.Gender;
+import top.xiajiabagao.crane.starter.example.common.TestConfig;
+import top.xiajiabagao.crane.starter.example.common.TestContainer;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
-import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.helper.OperateTemplate;
-import top.xiajibagao.crane.core.operator.interfaces.Assembler;
-import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
-import top.xiajibagao.crane.core.parser.OperateConfigurationAssistant;
-import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
+import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
 import java.util.Arrays;
@@ -29,16 +25,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 表达式测试
- * 1、测试是字段映射配置的SpEL表达式是否能正确执行；
- * 2、测试是使用顺序执行器时，是否能按照排序正确执行；
+ * 测试javaBean基于注解配置
+ * 1、是否能正确处理单个/多个的嵌套/非嵌套对象；
+ * 2、是否能正确处理字段映射模板；
  *
  * @author huangchengxing
- * @date 2022/04/13 12:55
+ * @date 2022/04/10 15:15
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConfig.class)
-public class ExpressionTest {
+public class ProcessByAnnotationConfigTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -53,20 +49,10 @@ public class ExpressionTest {
     @Autowired
     private TestContainer testContainer;
 
+    // 解析器
+    @Qualifier("DefaultCraneCombineOperationConfigurationParser")
     @Autowired
-    private GlobalConfiguration globalConfiguration;
-
-    @Qualifier("DefaultCraneBeanReflexAssembler")
-    @Autowired
-    private Assembler assembler;
-
-    @Qualifier("DefaultCraneBeanReflexDisassembler")
-    @Autowired
-    private Disassembler disassemble;
-
-    @Qualifier("DefaultCraneSequentialOperationExecutor")
-    @Autowired
-    OperationExecutor operationExecutor;
+    private OperateConfigurationParser operateConfigurationParser;
 
     private static Person getActualPerson() {
         return new Person()
@@ -75,47 +61,22 @@ public class ExpressionTest {
             .setGender(Gender.MALE);
     }
 
-    private OperationConfiguration getConfiguration() {
-        OperateConfigurationAssistant<Person> assistant = OperateConfigurationAssistant.basedOnBeanOperationConfiguration(
-            globalConfiguration, Person.class
-        );
-        assistant.buildAssembler(Person::getGender, enumDictContainer, assembler)
-            .namespace("gender")
-            .property("id", Person::getGenderId)
-            .property("name", Person::getGenderName)
-            .sort(2)
-            .build();
-        assistant.buildAssembler(Person::getSex, keyValueContainer, assembler)
-            .namespace("sex")
-            .property("", "sexName", "#source == '男' ? 'male' : 'female'", String.class)
-            .property("", "name", "#source == '男' ? #target.name + '先生' : #target.name + '女士'", String.class)
-            .sort(1)
-            .build();
-        assistant.buildAssembler(Person::getId, testContainer, assembler)
-            .property("beanName", "name")
-            .property("beanAge", "age")
-            .sort(0)
-            .build();
-        assistant.buildDisassembler(Person::getRelatives, assistant.getConfiguration(), disassemble).build();
-        return assistant.getConfiguration();
-    }
-
     private static Person getExpectedPerson() {
         return new Person()
             .setId(1)
             .setSex(1)
             .setGender(Gender.MALE)
             .setAge(35)
-            .setName("小明先生")
-            .setSexName("male")
+            .setName("小明")
+            .setSexName("男")
             .setGenderId(Gender.MALE.getId())
             .setGenderName(Gender.MALE.getName());
     }
 
     private void processAndLog(Object actual) throws JsonProcessingException {
-        OperationConfiguration configuration = getConfiguration();
+        OperationConfiguration configuration = operateConfigurationParser.parse(Person.class);
         System.out.println("before: " + objectMapper.writeValueAsString(actual));
-        operateTemplate.process(actual, configuration, operationExecutor);
+        operateTemplate.process(actual, configuration);
         System.out.println("after: " + objectMapper.writeValueAsString(actual));
     }
 
@@ -168,7 +129,7 @@ public class ExpressionTest {
      */
     @SneakyThrows
     @Test
-    public void testSingleNestBeanByAnnotationConfig() {
+    public void testMultiNestBeanByAnnotationConfig() {
         Person actual = getActualPerson()
             .setRelatives(Arrays.asList(getActualPerson(), getActualPerson()));
         processAndLog(actual);
@@ -183,7 +144,7 @@ public class ExpressionTest {
      */
     @SneakyThrows
     @Test
-    public void testMultiNestBeanByAnnotationConfig() {
+    public void testSingleNestBeanByAnnotationConfig() {
         Person[] actual = new Person[] {
             getActualPerson()
                 .setRelatives(Arrays.asList(getActualPerson(), getActualPerson())),

@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.core;
+package top.xiajiabagao.crane.starter.example.classanno;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.common.Gender;
-import top.xiajiabagao.crane.starter.common.TestConfig;
-import top.xiajiabagao.crane.starter.common.TestContainer;
+import top.xiajiabagao.crane.starter.example.common.Gender;
+import top.xiajiabagao.crane.starter.example.common.TestConfig;
+import top.xiajiabagao.crane.starter.example.common.TestContainer;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
 import top.xiajibagao.crane.core.helper.OperateTemplate;
@@ -25,16 +25,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 测试javaBean基于注解配置
+ * 测试javaBean基于类注解配置
  * 1、是否能正确处理单个/多个的嵌套/非嵌套对象；
  * 2、是否能正确处理字段映射模板；
+ * 3、能否正确继承父类以及父接口的配置；
+ * 4、能否在key字段不存在时正确使用别名寻找备选key字段；
+ * 5、能否正确排除继承指定类的注解；
  *
  * @author huangchengxing
  * @date 2022/04/10 15:15
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConfig.class)
-public class ProcessByAnnotationConfigTest {
+public class ProcessByClassAnnotationConfigTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -50,7 +53,7 @@ public class ProcessByAnnotationConfigTest {
     private TestContainer testContainer;
 
     // 解析器
-    @Qualifier("DefaultCraneCombineOperationConfigurationParser")
+    @Qualifier("DefaultCraneClassAnnotationConfigurationParser")
     @Autowired
     private OperateConfigurationParser operateConfigurationParser;
 
@@ -68,7 +71,6 @@ public class ProcessByAnnotationConfigTest {
             .setGender(Gender.MALE)
             .setAge(35)
             .setName("小明")
-            .setSexName("男")
             .setGenderId(Gender.MALE.getId())
             .setGenderName(Gender.MALE.getName());
     }
@@ -109,7 +111,7 @@ public class ProcessByAnnotationConfigTest {
         processAndLog(actual);
 
         Person expected = getExpectedPerson();
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertEquals(objectMapper.writeValueAsString(expected), objectMapper.writeValueAsString(actual));
     }
 
     /**
@@ -121,7 +123,10 @@ public class ProcessByAnnotationConfigTest {
         Person[] actual = new Person[]{getActualPerson(), getActualPerson()};
         processAndLog(actual);
 
-        Assertions.assertEquals(Arrays.asList(getExpectedPerson(), getExpectedPerson()), Arrays.asList(actual));
+        Assertions.assertEquals(
+            objectMapper.writeValueAsString(Arrays.asList(getExpectedPerson(), getExpectedPerson())),
+            objectMapper.writeValueAsString(Arrays.asList(actual))
+        );
     }
 
     /**
@@ -136,7 +141,7 @@ public class ProcessByAnnotationConfigTest {
 
         Person expected = getExpectedPerson()
             .setRelatives(Arrays.asList(getExpectedPerson(), getExpectedPerson()));
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertEquals(objectMapper.writeValueAsString(expected), objectMapper.writeValueAsString(actual));
     }
 
     /**
@@ -159,7 +164,7 @@ public class ProcessByAnnotationConfigTest {
             getExpectedPerson()
                 .setRelatives(Arrays.asList(getExpectedPerson(), getExpectedPerson()))
         };
-        Assertions.assertEquals(Arrays.asList(expected), Arrays.asList(actual));
+        Assertions.assertEquals(objectMapper.writeValueAsString(Arrays.asList(expected)), objectMapper.writeValueAsString(Arrays.asList(actual)));
     }
 
 }

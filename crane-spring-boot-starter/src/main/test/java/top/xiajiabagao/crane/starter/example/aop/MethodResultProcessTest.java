@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.aop;
+package top.xiajiabagao.crane.starter.example.aop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -9,8 +9,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.common.TestConfig;
-import top.xiajiabagao.crane.starter.common.TestContainer;
+import top.xiajiabagao.crane.starter.example.common.TestConfig;
+import top.xiajiabagao.crane.starter.example.common.TestContainer;
 import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.annotation.ProcessResult;

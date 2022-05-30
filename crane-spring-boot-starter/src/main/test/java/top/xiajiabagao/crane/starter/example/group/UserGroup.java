@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.group;
+package top.xiajiabagao.crane.starter.example.group;
 
 /**
  * @author huangchengxing

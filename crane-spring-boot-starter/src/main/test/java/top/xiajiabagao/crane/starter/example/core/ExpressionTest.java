@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.classanno;
+package top.xiajiabagao.crane.starter.example.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,13 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.common.Gender;
-import top.xiajiabagao.crane.starter.common.TestConfig;
-import top.xiajiabagao.crane.starter.common.TestContainer;
+import top.xiajiabagao.crane.starter.example.common.Gender;
+import top.xiajiabagao.crane.starter.example.common.TestConfig;
+import top.xiajiabagao.crane.starter.example.common.TestContainer;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
+import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.helper.OperateTemplate;
-import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
+import top.xiajibagao.crane.core.operator.interfaces.Assembler;
+import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
+import top.xiajibagao.crane.core.parser.OperateConfigurationAssistant;
+import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
 import java.util.Arrays;
@@ -25,19 +29,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 测试javaBean基于类注解配置
- * 1、是否能正确处理单个/多个的嵌套/非嵌套对象；
- * 2、是否能正确处理字段映射模板；
- * 3、能否正确继承父类以及父接口的配置；
- * 4、能否在key字段不存在时正确使用别名寻找备选key字段；
- * 5、能否正确排除继承指定类的注解；
+ * 表达式测试
+ * 1、测试是字段映射配置的SpEL表达式是否能正确执行；
+ * 2、测试是使用顺序执行器时，是否能按照排序正确执行；
  *
  * @author huangchengxing
- * @date 2022/04/10 15:15
+ * @date 2022/04/13 12:55
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConfig.class)
-public class ProcessByClassAnnotationConfigTest {
+public class ExpressionTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -52,10 +53,20 @@ public class ProcessByClassAnnotationConfigTest {
     @Autowired
     private TestContainer testContainer;
 
-    // 解析器
-    @Qualifier("DefaultCraneClassAnnotationConfigurationParser")
     @Autowired
-    private OperateConfigurationParser operateConfigurationParser;
+    private GlobalConfiguration globalConfiguration;
+
+    @Qualifier("DefaultCraneBeanReflexAssembler")
+    @Autowired
+    private Assembler assembler;
+
+    @Qualifier("DefaultCraneBeanReflexDisassembler")
+    @Autowired
+    private Disassembler disassemble;
+
+    @Qualifier("DefaultCraneSequentialOperationExecutor")
+    @Autowired
+    OperationExecutor operationExecutor;
 
     private static Person getActualPerson() {
         return new Person()
@@ -64,21 +75,47 @@ public class ProcessByClassAnnotationConfigTest {
             .setGender(Gender.MALE);
     }
 
+    private OperationConfiguration getConfiguration() {
+        OperateConfigurationAssistant<Person> assistant = OperateConfigurationAssistant.basedOnBeanOperationConfiguration(
+            globalConfiguration, Person.class
+        );
+        assistant.buildAssembler(Person::getGender, enumDictContainer, assembler)
+            .namespace("gender")
+            .property("id", Person::getGenderId)
+            .property("name", Person::getGenderName)
+            .sort(2)
+            .build();
+        assistant.buildAssembler(Person::getSex, keyValueContainer, assembler)
+            .namespace("sex")
+            .property("", "sexName", "#source == '男' ? 'male' : 'female'", String.class)
+            .property("", "name", "#source == '男' ? #target.name + '先生' : #target.name + '女士'", String.class)
+            .sort(1)
+            .build();
+        assistant.buildAssembler(Person::getId, testContainer, assembler)
+            .property("beanName", "name")
+            .property("beanAge", "age")
+            .sort(0)
+            .build();
+        assistant.buildDisassembler(Person::getRelatives, assistant.getConfiguration(), disassemble).build();
+        return assistant.getConfiguration();
+    }
+
     private static Person getExpectedPerson() {
         return new Person()
             .setId(1)
             .setSex(1)
             .setGender(Gender.MALE)
             .setAge(35)
-            .setName("小明")
+            .setName("小明先生")
+            .setSexName("male")
             .setGenderId(Gender.MALE.getId())
             .setGenderName(Gender.MALE.getName());
     }
 
     private void processAndLog(Object actual) throws JsonProcessingException {
-        OperationConfiguration configuration = operateConfigurationParser.parse(Person.class);
+        OperationConfiguration configuration = getConfiguration();
         System.out.println("before: " + objectMapper.writeValueAsString(actual));
-        operateTemplate.process(actual, configuration);
+        operateTemplate.process(actual, configuration, operationExecutor);
         System.out.println("after: " + objectMapper.writeValueAsString(actual));
     }
 
@@ -111,7 +148,7 @@ public class ProcessByClassAnnotationConfigTest {
         processAndLog(actual);
 
         Person expected = getExpectedPerson();
-        Assertions.assertEquals(objectMapper.writeValueAsString(expected), objectMapper.writeValueAsString(actual));
+        Assertions.assertEquals(expected, actual);
     }
 
     /**
@@ -123,10 +160,7 @@ public class ProcessByClassAnnotationConfigTest {
         Person[] actual = new Person[]{getActualPerson(), getActualPerson()};
         processAndLog(actual);
 
-        Assertions.assertEquals(
-            objectMapper.writeValueAsString(Arrays.asList(getExpectedPerson(), getExpectedPerson())),
-            objectMapper.writeValueAsString(Arrays.asList(actual))
-        );
+        Assertions.assertEquals(Arrays.asList(getExpectedPerson(), getExpectedPerson()), Arrays.asList(actual));
     }
 
     /**
@@ -134,14 +168,14 @@ public class ProcessByClassAnnotationConfigTest {
      */
     @SneakyThrows
     @Test
-    public void testMultiNestBeanByAnnotationConfig() {
+    public void testSingleNestBeanByAnnotationConfig() {
         Person actual = getActualPerson()
             .setRelatives(Arrays.asList(getActualPerson(), getActualPerson()));
         processAndLog(actual);
 
         Person expected = getExpectedPerson()
             .setRelatives(Arrays.asList(getExpectedPerson(), getExpectedPerson()));
-        Assertions.assertEquals(objectMapper.writeValueAsString(expected), objectMapper.writeValueAsString(actual));
+        Assertions.assertEquals(expected, actual);
     }
 
     /**
@@ -149,7 +183,7 @@ public class ProcessByClassAnnotationConfigTest {
      */
     @SneakyThrows
     @Test
-    public void testSingleNestBeanByAnnotationConfig() {
+    public void testMultiNestBeanByAnnotationConfig() {
         Person[] actual = new Person[] {
             getActualPerson()
                 .setRelatives(Arrays.asList(getActualPerson(), getActualPerson())),
@@ -164,7 +198,7 @@ public class ProcessByClassAnnotationConfigTest {
             getExpectedPerson()
                 .setRelatives(Arrays.asList(getExpectedPerson(), getExpectedPerson()))
         };
-        Assertions.assertEquals(objectMapper.writeValueAsString(Arrays.asList(expected)), objectMapper.writeValueAsString(Arrays.asList(actual)));
+        Assertions.assertEquals(Arrays.asList(expected), Arrays.asList(actual));
     }
 
 }

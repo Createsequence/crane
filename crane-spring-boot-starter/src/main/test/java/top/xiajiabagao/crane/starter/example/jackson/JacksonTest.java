@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.jackson;
+package top.xiajiabagao.crane.starter.example.jackson;
 
 import cn.hutool.core.collection.CollStreamUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.common.TestConfig;
+import top.xiajiabagao.crane.starter.example.common.TestConfig;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
 
 import java.util.Arrays;

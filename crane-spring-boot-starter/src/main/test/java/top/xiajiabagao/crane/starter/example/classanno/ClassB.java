@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.classanno;
+package top.xiajiabagao.crane.starter.example.classanno;
 
 import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.Operations;

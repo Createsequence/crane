@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.jackson;
+package top.xiajiabagao.crane.starter.example.jackson;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

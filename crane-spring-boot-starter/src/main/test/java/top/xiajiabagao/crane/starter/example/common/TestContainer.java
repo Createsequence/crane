@@ -1,4 +1,4 @@
-package top.xiajiabagao.crane.starter.common;
+package top.xiajiabagao.crane.starter.example.common;
 
 import lombok.Getter;
 import top.xiajibagao.crane.core.container.BaseKeyContainer;

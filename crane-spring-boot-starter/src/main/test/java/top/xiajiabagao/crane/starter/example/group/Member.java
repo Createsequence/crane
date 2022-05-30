@@ -1,8 +1,8 @@
-package top.xiajiabagao.crane.starter.group;
+package top.xiajiabagao.crane.starter.example.group;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import top.xiajiabagao.crane.starter.common.TestContainer;
+import top.xiajiabagao.crane.starter.example.common.TestContainer;
 import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.Disassemble;
 import top.xiajibagao.crane.core.annotation.Prop;

@@ -1,10 +1,10 @@
-package top.xiajiabagao.crane.starter.classanno;
+package top.xiajiabagao.crane.starter.example.classanno;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import top.xiajiabagao.crane.starter.common.Gender;
-import top.xiajiabagao.crane.starter.common.TestContainer;
+import top.xiajiabagao.crane.starter.example.common.Gender;
+import top.xiajiabagao.crane.starter.example.common.TestContainer;
 import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.Operations;
 import top.xiajibagao.crane.core.annotation.Prop;
