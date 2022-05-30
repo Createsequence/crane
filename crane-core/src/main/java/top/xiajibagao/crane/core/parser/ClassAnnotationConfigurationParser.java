@@ -12,6 +12,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.Disassemble;
 import top.xiajibagao.crane.core.annotation.Operations;
+import top.xiajibagao.crane.core.helper.BeanFactoryUtils;
 import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
@@ -161,8 +162,15 @@ public class ClassAnnotationConfigurationParser
             Field key = ReflexUtils.findAnyMatchField(configuration.getTargetClass(), true, ArrayUtil.insert(annotation.aliases(), 0, annotation.key()));
             Class<?> disassembleType = annotation.targetClass();
             // 若存在循环依赖，则直接从上下文获取配置的引用，否则递归解析待装卸的字段类型
-            OperationConfiguration disassembleConfiguration = parseContext.isInLooking(disassembleType) ?
-                parseContext.get(disassembleType) : parse(disassembleType, parseContext);
+            OperationConfiguration disassembleConfiguration;
+            if (parseContext.isInLooking(disassembleType)) {
+                disassembleConfiguration = parseContext.get(disassembleType);
+            } else {
+                disassembleConfiguration = annotation.useCurrParser() ?
+                    parse(disassembleType, parseContext) :
+                    BeanFactoryUtils.getBean(beanFactory, annotation.parser(), annotation.parserName())
+                        .parse(disassembleType);
+            }
             DisassembleOperation disassembleOperation = createDisassembleOperation(
                 key, annotation, configuration, disassembleConfiguration
             );

@@ -3,6 +3,8 @@ package top.xiajibagao.crane.core.annotation;
 import org.springframework.core.annotation.AliasFor;
 import top.xiajibagao.crane.core.operator.BeanReflexDisassembler;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
+import top.xiajibagao.crane.core.parser.CombineOperationConfigurationParser;
+import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
 import java.lang.annotation.*;
 
@@ -51,5 +53,27 @@ public @interface Disassemble {
      * 装卸器bean名称
      */
     String disassemblerName() default "";
+
+    /**
+     * 是否使用外层解析器
+     * <ul>
+     *     <li>false：将使用解析当前装卸操作的解析器解析{@link #targetClass()};</li>
+     *     <li>
+     *         true：将根据{@link #parser()}与{@link #parserName()}从spring容器中获取解析器，
+     *         并用于解析{@link #targetClass()};
+     *     </li>
+     * </ul>
+     */
+    boolean useCurrParser() default true;
+
+    /**
+     * 当{@link #useCurrParser()}为false时，要使用的配置解析器
+     */
+    Class<? extends OperateConfigurationParser> parser() default CombineOperationConfigurationParser.class;
+
+    /**
+     * 当{@link #useCurrParser()}为false时，要使用的配置解析器在容器中的bean名称
+     */
+    String parserName() default "";
 
 }

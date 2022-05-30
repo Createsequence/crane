@@ -9,6 +9,7 @@ import org.springframework.util.CollectionUtils;
 import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.Disassemble;
 import top.xiajibagao.crane.core.exception.CraneException;
+import top.xiajibagao.crane.core.helper.BeanFactoryUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
@@ -107,8 +108,8 @@ public class FieldAnnotationConfigurationParser
      * @date 2022/3/1 17:49
      */
     protected List<DisassembleOperation> parseDisassembleAnnotationOnField(Field key, BeanOperationConfiguration configuration, ParseContext parseContext) {
-        Disassemble disassemble = AnnotatedElementUtils.findMergedAnnotation(key, Disassemble.class);
-        if (Objects.isNull(disassemble)) {
+        Disassemble annotation = AnnotatedElementUtils.findMergedAnnotation(key, Disassemble.class);
+        if (Objects.isNull(annotation)) {
             return Collections.emptyList();
         }
         CraneException.throwIfTrue(
@@ -118,16 +119,19 @@ public class FieldAnnotationConfigurationParser
 
         // 递归解析拆卸字段类型
         parseContext.looking(configuration.getTargetClass(), configuration);
-        Class<?> operateClass = disassemble.value();
-        OperationConfiguration operationConfiguration;
-        if (parseContext.isInLooking(operateClass)) {
+        Class<?> disassembleType = annotation.value();
+        OperationConfiguration disassembleConfiguration;
+        if (parseContext.isInLooking(disassembleType)) {
             // 存在循环依赖，则先通过缓存获取引用
-            log.info("类{}与嵌套的成员变量类型{}形成循环依赖...", configuration.getTargetClass(), operateClass);
-            operationConfiguration = parseContext.get(operateClass);
+            log.info("类{}与嵌套的成员变量类型{}形成循环依赖...", configuration.getTargetClass(), disassembleType);
+            disassembleConfiguration = parseContext.get(disassembleType);
         } else {
-            operationConfiguration = parse(operateClass, parseContext);
+            disassembleConfiguration = annotation.useCurrParser() ?
+                parse(disassembleType, parseContext) :
+                BeanFactoryUtils.getBean(beanFactory, annotation.parser(), annotation.parserName())
+                    .parse(disassembleType);
         }
-        DisassembleOperation operation = createDisassembleOperation(key, disassemble, configuration, operationConfiguration);
+        DisassembleOperation operation = createDisassembleOperation(key, annotation, configuration, disassembleConfiguration);
 
         return Collections.singletonList(operation);
     }
