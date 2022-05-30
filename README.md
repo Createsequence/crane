@@ -30,7 +30,9 @@ crane 便是为了解决这种烦恼而生。它允许通过统一配置填充�
 
 更多功能、配置与使用说明，请见仓库的 [**Wiki**](https://gitee.com/CreateSequence/crane/wikis/pages)。
 
-一些新的点子、意见、建议或者吐槽可以反馈在[**这里**](https://gitee.com/CreateSequence/crane/issues/I59IUO)。
+功能的基本使用，可运行的实例，请参考项目的 [**测试用例**](https://gitee.com/CreateSequence/crane/tree/master/crane-spring-boot-starter/src/main/test/java/top/xiajiabagao/crane/starter)。
+
+一些新的点子、意见、建议或者吐槽可以反馈在 [**这里**](https://gitee.com/CreateSequence/crane/issues/I59IUO)。
 
 ## 概念
 
