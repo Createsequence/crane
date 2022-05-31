@@ -9,6 +9,7 @@ import top.xiajibagao.crane.core.parser.interfaces.Operation;
 /**
  * 处理对象类型数据源与待处理对象，也是用于兜底的处理器
  *
+ * @since 0.2.0
  * @author huangchengxing
  * @date 2022/04/08 16:44
  */

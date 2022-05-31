@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * 按{@link OperateHandler#getOrder()}排序的装配器链
  *
+ * @since 0.2.0
  * @author huangchengxing
  * @date 2022/04/08 21:02
  */

@@ -68,6 +68,8 @@ public @interface Assemble {
 
     /**
      * 分组
+     *
+     * @since 0.5.0
      */
     Class<?>[] groups() default { DefaultGroup.class };
 

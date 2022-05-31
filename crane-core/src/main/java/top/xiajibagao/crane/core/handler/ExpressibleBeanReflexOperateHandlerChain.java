@@ -16,6 +16,7 @@ import java.util.function.Supplier;
  * 该处理器将拦截数据并执行表达式获取返回值作为新的数据源，并再次调用处理器链尝试写入该值。
  * 此外，其他行为皆与原处理器链保持一致。
  *
+ * @since 0.5.3
  * @author huangchengxing
  * @date 2022/04/13 0:06
  */

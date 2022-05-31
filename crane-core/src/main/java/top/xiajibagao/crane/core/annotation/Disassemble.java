@@ -63,16 +63,22 @@ public @interface Disassemble {
      *         并用于解析{@link #targetClass()};
      *     </li>
      * </ul>
+     *
+     * @since 0.5.4
      */
     boolean useCurrParser() default true;
 
     /**
      * 当{@link #useCurrParser()}为false时，要使用的配置解析器
+     *
+     * @since 0.5.4
      */
     Class<? extends OperateConfigurationParser> parser() default CombineOperationConfigurationParser.class;
 
     /**
      * 当{@link #useCurrParser()}为false时，要使用的配置解析器在容器中的bean名称
+     *
+     * @since 0.5.4
      */
     String parserName() default "";
 

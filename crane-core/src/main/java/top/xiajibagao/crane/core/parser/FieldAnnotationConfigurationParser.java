@@ -22,6 +22,7 @@ import java.util.*;
 /**
  * 解析类属性中的{@link Assemble}与{@link Disassemble}注解，生成配置类
  *
+ * @since 0.5.0
  * @author huangchengxing
  * @date 2022/03/01 16:13
  */

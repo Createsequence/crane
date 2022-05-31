@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 /**
  * 处理Collection类型的数据源与待处理对象
  *
+ * @since 0.2.0
  * @author huangchengxing
  * @date 2022/04/08 10:24
  */

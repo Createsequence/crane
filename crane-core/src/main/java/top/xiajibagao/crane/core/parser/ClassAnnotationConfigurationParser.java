@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 /**
  * 解析类{@link Operations}注解，生成配置类
  *
+ * @since 0.5.0
  * @author huangchengxing
  * @date 2022/05/22 14:52
  */

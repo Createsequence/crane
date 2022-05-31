@@ -12,6 +12,7 @@ import java.util.Objects;
 /**
  * 处理Map类型的数据源与待处理对象
  *
+ * @since 0.2.0
  * @author huangchengxing
  * @date 2022/04/08 9:54
  */

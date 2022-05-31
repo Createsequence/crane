@@ -15,6 +15,7 @@ import java.util.Objects;
  * 然后合并得到的配置类中{@link OperationConfiguration#getAssembleOperations()}
  * 与{@link OperationConfiguration#getDisassembleOperations()}
  *
+ * @since 0.5.0
  * @author huangchengxing
  * @date 2022/05/22 17:11
  */

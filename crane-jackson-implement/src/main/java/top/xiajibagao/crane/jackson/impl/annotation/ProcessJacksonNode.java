@@ -43,6 +43,8 @@ public @interface ProcessJacksonNode {
 
     /**
      * 分组
+     *
+     * @since 0.5.0
      */
     Class<?>[] groups() default { DefaultGroup.class };
 

@@ -13,6 +13,9 @@ import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 import java.util.Objects;
 
 /**
+ * {@link ValueNode}节点处理器
+ *
+ * @since 0.2.0
  * @author huangchengxing
  * @date 2022/04/12 13:07
  */
