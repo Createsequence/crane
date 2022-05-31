@@ -43,7 +43,7 @@ public class ObjectNodeOperateHandler extends AbstractJacksonNodeOperateHandler 
             return NullNode.getInstance();
         }
         return property.hasResource() ?
-            parse(source).get(translatePropertyName(property.getResource())) : source;
+            parse(source).get(translatePropertyName(property.getSource())) : source;
     }
 
     @Override

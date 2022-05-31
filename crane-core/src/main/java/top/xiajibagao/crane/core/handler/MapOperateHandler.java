@@ -35,7 +35,7 @@ public class MapOperateHandler implements OperateHandler {
         }
         Map<String, Object> sourceMap = parseMap(source);
         return property.hasResource() ?
-            sourceMap.get(property.getResource()) : sourceMap;
+            sourceMap.get(property.getSource()) : sourceMap;
     }
 
     @Override

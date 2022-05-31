@@ -30,7 +30,7 @@ public class EmptyAssembleProperty implements AssembleProperty {
     @Override
     public Class<?> getExpType() { return Void.class; }
     @Override
-    public String getResource() {
+    public String getSource() {
         return "";
     }
 

@@ -64,7 +64,7 @@ public class ClassAnnotationParserTest {
         Assertions.assertEquals(1, assembleOperation.getProperties().size());
 
         AssembleProperty assembleProperty = assembleOperation.getProperties().get(0);
-        Assertions.assertEquals("sourceRef", assembleProperty.getResource());
+        Assertions.assertEquals("sourceRef", assembleProperty.getSource());
         Assertions.assertEquals("targetRef", assembleProperty.getReference());
         Assertions.assertEquals("exp", assembleProperty.getExp());
         Assertions.assertEquals(Integer.class, assembleProperty.getExpType());
@@ -89,7 +89,7 @@ public class ClassAnnotationParserTest {
         Assertions.assertEquals(1, disassembleConfigurationAssembleOperation.getProperties().size());
 
         AssembleProperty disassembleConfigurationAssembleProperty = assembleOperation.getProperties().get(0);
-        Assertions.assertEquals("sourceRef", disassembleConfigurationAssembleProperty.getResource());
+        Assertions.assertEquals("sourceRef", disassembleConfigurationAssembleProperty.getSource());
         Assertions.assertEquals("targetRef", disassembleConfigurationAssembleProperty.getReference());
         Assertions.assertEquals("exp", disassembleConfigurationAssembleProperty.getExp());
         Assertions.assertEquals(Integer.class, disassembleConfigurationAssembleProperty.getExpType());

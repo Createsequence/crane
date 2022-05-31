@@ -70,7 +70,7 @@ public class CombineAnnotationParserTest {
         Assertions.assertEquals(1, assembleOperation.getProperties().size());
 
         AssembleProperty assembleProperty = assembleOperation.getProperties().get(0);
-        Assertions.assertEquals("sourceRef", assembleProperty.getResource());
+        Assertions.assertEquals("sourceRef", assembleProperty.getSource());
         Assertions.assertEquals("targetRef", assembleProperty.getReference());
         Assertions.assertEquals("exp", assembleProperty.getExp());
         Assertions.assertEquals(Integer.class, assembleProperty.getExpType());
@@ -85,9 +85,8 @@ public class CombineAnnotationParserTest {
         OperationConfiguration disassembleConfiguration = disassembleOperation.getTargetOperateConfiguration();
         Assertions.assertEquals(globalConfiguration, disassembleConfiguration.getGlobalConfiguration());
         Assertions.assertEquals(NestExample.class, disassembleConfiguration.getTargetClass());
-        Assertions.assertEquals(0, disassembleConfiguration.getAssembleOperations().size());
-        Assertions.assertEquals(1, disassembleConfiguration.getDisassembleOperations().size());
-        Assertions.assertEquals(beanReflexDisassembler, disassembleConfiguration.getDisassembleOperations().get(0).getDisassembler());
+        Assertions.assertEquals(1, disassembleConfiguration.getAssembleOperations().size());
+        Assertions.assertEquals(0, disassembleConfiguration.getDisassembleOperations().size());
 
     }
 
@@ -116,7 +115,9 @@ public class CombineAnnotationParserTest {
     @Operations(disassembles = @Disassemble(
         key = "exampleList",
         targetClass = NestExample.class,
-        disassembler = BeanReflexDisassembler.class
+        disassembler = BeanReflexDisassembler.class,
+        useCurrParser = false,
+        parser = FieldAnnotationConfigurationParser.class
     ))
     public interface ExampleConfigInterface extends ExcludedExampleConfigInterface {
         // 该接口配置应当在解析Example时一并解析

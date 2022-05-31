@@ -53,11 +53,12 @@ public interface AssembleProperty {
     /**
      * 获取数据源字段
      *
+     * @since 0.5.4
      * @return java.lang.String
      * @author huangchengxing
      * @date 2022/3/3 13:20
      */
-    String getResource();
+    String getSource();
 
     /**
      * 是否存在数据源字段
@@ -67,7 +68,7 @@ public interface AssembleProperty {
      * @date 2022/4/8 16:49
      */
     default boolean hasResource() {
-        return CharSequenceUtil.isNotBlank(getResource());
+        return CharSequenceUtil.isNotBlank(getSource());
     }
 
     /**

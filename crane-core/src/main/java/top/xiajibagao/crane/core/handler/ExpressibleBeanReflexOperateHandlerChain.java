@@ -41,7 +41,7 @@ public class ExpressibleBeanReflexOperateHandlerChain extends BeanReflexOperateH
         context.setVariable("target", target);
         context.setVariable("source", sourceData);
         context.setVariable("key", operation.getAssembler().getKey(target, operation));
-        context.setVariable("src", property.getResource());
+        context.setVariable("src", property.getSource());
         context.setVariable("ref", property.getReference());
         sourceData = ExpressionUtils.execute(property.getExp(), context, property.getExpType(), true);
         super.writeToTarget(sourceData, target, property, operation);

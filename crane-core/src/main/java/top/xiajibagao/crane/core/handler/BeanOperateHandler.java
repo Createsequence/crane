@@ -29,7 +29,7 @@ public class BeanOperateHandler implements OperateHandler {
     public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
         // 若指定数据源字段，则尝试从数据源上获取数据
         if (property.hasResource()) {
-            return AsmReflexUtils.findProperty(source.getClass(), property.getResource())
+            return AsmReflexUtils.findProperty(source.getClass(), property.getSource())
                 .map(bp -> bp.getValue(source))
                 .orElse(null);
         }

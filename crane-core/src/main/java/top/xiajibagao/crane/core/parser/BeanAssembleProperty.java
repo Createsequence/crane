@@ -13,7 +13,7 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 public class BeanAssembleProperty implements AssembleProperty {
 
     private final String reference;
-    private final String resource;
+    private final String source;
     private final String exp;
     private final Class<?> expType;
 
