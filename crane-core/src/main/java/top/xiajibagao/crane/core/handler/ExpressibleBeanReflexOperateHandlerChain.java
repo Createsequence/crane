@@ -1,7 +1,8 @@
 package top.xiajibagao.crane.core.handler;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.ExpressionUtils;
@@ -20,10 +21,11 @@ import java.util.function.Supplier;
  * @author huangchengxing
  * @date 2022/04/13 0:06
  */
-@Getter
+@RequiredArgsConstructor
+@Setter
 public class ExpressibleBeanReflexOperateHandlerChain extends BeanReflexOperateHandlerChain implements OperateHandlerChain {
 
-    private final Supplier<StandardEvaluationContext> contextFactory;
+    private Supplier<StandardEvaluationContext> contextFactory;
 
     public ExpressibleBeanReflexOperateHandlerChain(Supplier<StandardEvaluationContext> contextFactory) {
         this.contextFactory = contextFactory;
