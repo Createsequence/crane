@@ -23,6 +23,11 @@ public class CraneAutoConfigurationProperties {
     private CacheConfigProperties cache = new CacheConfigProperties();
 
     /**
+     * 是否允许使用reflectasm优化反射性能
+     */
+    private boolean enableAsmReflect = true;
+
+    /**
      * 枚举配置
      */
     @Data

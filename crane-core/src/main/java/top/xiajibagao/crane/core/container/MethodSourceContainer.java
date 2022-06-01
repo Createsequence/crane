@@ -13,8 +13,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
+import top.xiajibagao.crane.core.component.BeanProperty;
+import top.xiajibagao.crane.core.component.BeanPropertyFactory;
 import top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils;
-import top.xiajibagao.crane.core.helper.reflex.BeanProperty;
 import top.xiajibagao.crane.core.helper.reflex.IndexedMethod;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
 public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object> implements Container {
 
     public final Map<String, MethodSource> methodCache = new HashMap<>();
+    private final BeanPropertyFactory beanPropertyFactory;
 
     /**
      * 注销已注册方法数据源

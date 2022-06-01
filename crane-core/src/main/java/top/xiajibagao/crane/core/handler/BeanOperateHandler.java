@@ -1,7 +1,8 @@
 package top.xiajibagao.crane.core.handler;
 
+import lombok.RequiredArgsConstructor;
+import top.xiajibagao.crane.core.component.BeanPropertyFactory;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
-import top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
@@ -13,7 +14,10 @@ import top.xiajibagao.crane.core.parser.interfaces.Operation;
  * @author huangchengxing
  * @date 2022/04/08 16:44
  */
+@RequiredArgsConstructor
 public class BeanOperateHandler implements OperateHandler {
+
+    private final BeanPropertyFactory beanPropertyFactory;
 
     @Override
     public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
@@ -29,7 +33,7 @@ public class BeanOperateHandler implements OperateHandler {
     public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
         // 若指定数据源字段，则尝试从数据源上获取数据
         if (property.hasResource()) {
-            return AsmReflexUtils.findProperty(source.getClass(), property.getSource())
+            return beanPropertyFactory.getProperty(source.getClass(), property.getSource())
                 .map(bp -> bp.getValue(source))
                 .orElse(null);
         }
@@ -40,7 +44,7 @@ public class BeanOperateHandler implements OperateHandler {
     public void writeToTarget(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
         String operateProperty = property.hasReference() ?
             property.getReference() : operation.getTargetProperty().getName();
-        AsmReflexUtils.findProperty(target.getClass(), operateProperty)
+        beanPropertyFactory.getProperty(target.getClass(), operateProperty)
             .ifPresent(bp -> bp.setValue(target, sourceData));
     }
 

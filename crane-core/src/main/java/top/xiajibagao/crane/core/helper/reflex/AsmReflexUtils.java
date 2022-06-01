@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.util.Assert;
+import top.xiajibagao.crane.core.component.BeanProperty;
+import top.xiajibagao.crane.core.component.BeanPropertyFactory;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 
 import javax.annotation.Nonnull;

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import top.xiajibagao.crane.core.component.BeanPropertyFactory;
 import top.xiajibagao.crane.core.handler.ArrayOperateHandler;
 import top.xiajibagao.crane.core.handler.BeanOperateHandler;
 import top.xiajibagao.crane.core.handler.BeanReflexOperateHandlerChain;
@@ -41,7 +42,7 @@ public class ArrayOperateHandlerTest {
 
         // source.xxx -> target.xxx
         OperateHandlerChain operateHandlerChain = new BeanReflexOperateHandlerChain()
-            .addHandler(new BeanOperateHandler())
+            .addHandler(new BeanOperateHandler(BeanPropertyFactory.ASM_REFLEX_PROPERTY_FACTORY))
             .addHandler(new MapOperateHandler());
         OperateHandler handler = new ArrayOperateHandler(operateHandlerChain);
         Example[] target = new Example[] {new Example(1, "小明", null, null), new Example(2, "小李", null, null)};

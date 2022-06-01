@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import top.xiajibagao.crane.core.component.BeanPropertyFactory;
 import top.xiajibagao.crane.core.handler.BeanOperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
@@ -32,7 +33,7 @@ public class BeanOperateHandlerTest {
         );
 
         // source.xxx -> target.xxx
-        OperateHandler handler = new BeanOperateHandler();
+        OperateHandler handler = new BeanOperateHandler(BeanPropertyFactory.ASM_REFLEX_PROPERTY_FACTORY);
         Example target = new Example(1, "小明", null);
         Example source = new Example(2, "小红", null);
         AssembleProperty targetPropertyAndSourceProperty = new BeanAssembleProperty("name", "name", "", Void.class);

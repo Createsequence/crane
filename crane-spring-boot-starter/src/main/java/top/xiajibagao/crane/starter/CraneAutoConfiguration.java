@@ -21,6 +21,7 @@ import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.aop.MethodResultProcessAspect;
 import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.cache.OperationConfigurationCache;
+import top.xiajibagao.crane.core.component.BeanPropertyFactory;
 import top.xiajibagao.crane.core.container.*;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.SequentialOperationExecutor;
@@ -60,6 +61,14 @@ public class CraneAutoConfiguration {
         return new BeanGlobalConfiguration();
     }
 
+    @Order
+    @ConditionalOnMissingBean(BeanPropertyFactory.class)
+    @Bean("CraneDefaultBeanPropertyFactory")
+    public BeanPropertyFactory beanPropertyFactory(CraneAutoConfigurationProperties craneAutoConfigurationProperties) {
+        return craneAutoConfigurationProperties.isEnableAsmReflect() ?
+            BeanPropertyFactory.ASM_REFLEX_PROPERTY_FACTORY : BeanPropertyFactory.REFLEX_PROPERTY_FACTORY;
+    }
+
     // ==================== 解析器 ====================
 
     @Order
@@ -92,13 +101,13 @@ public class CraneAutoConfiguration {
     @Order
     @ConditionalOnMissingBean(BeanReflexOperateHandlerChain.class)
     @Bean("DefaultCraneBeanReflexOperateHandlerChain")
-    public BeanReflexOperateHandlerChain beanReflexOperateHandlerChain() {
+    public BeanReflexOperateHandlerChain beanReflexOperateHandlerChain(BeanPropertyFactory beanPropertyFactory) {
         BeanReflexOperateHandlerChain operateHandlerChain = new ExpressibleBeanReflexOperateHandlerChain(StandardEvaluationContext::new);
         operateHandlerChain.addHandler(new MapOperateHandler())
             .addHandler(new CollectionOperateHandler(operateHandlerChain))
             .addHandler(new ArrayOperateHandler(operateHandlerChain))
             .addHandler(new MapOperateHandler())
-            .addHandler(new BeanOperateHandler());
+            .addHandler(new BeanOperateHandler(beanPropertyFactory));
         log.info(
             "注册处理器链 {}, 已配置节点: {}",
             "DefaultCraneBeanReflexOperateHandlerChain",
@@ -150,9 +159,9 @@ public class CraneAutoConfiguration {
     @Order
     @ConditionalOnMissingBean(MethodSourceContainer.class)
     @Bean("DefaultCraneMethodSourceContainer")
-    public MethodSourceContainer methodSourceContainer(ApplicationContext applicationContext) {
+    public MethodSourceContainer methodSourceContainer(ApplicationContext applicationContext, BeanPropertyFactory beanPropertyFactory) {
         logContainerRegistered(MethodSourceContainer.class);
-        MethodSourceContainer container = new MethodSourceContainer();
+        MethodSourceContainer container = new MethodSourceContainer(beanPropertyFactory);
         Map<String, Object> beans = applicationContext.getBeansWithAnnotation(MethodSourceBean.class);
         if (CollUtil.isNotEmpty(beans)) {
             beans.forEach((name, bean) -> container.register(bean));
