@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import top.xiajiabagao.crane.starter.core.ExampleConfig;
-import top.xiajibagao.crane.core.container.KeyIntrospectContainer;
+import top.xiajibagao.crane.core.container.BeanIntrospectContainer;
 import top.xiajibagao.crane.core.handler.BeanReflexOperateHandlerChain;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
@@ -41,14 +41,14 @@ public class BeanIntrospectContainerTest {
 
     @Test
     public void testBeanIntrospectContainer() {
-        KeyIntrospectContainer keyIntrospectContainer = new KeyIntrospectContainer();
+        BeanIntrospectContainer beanIntrospectContainer = new BeanIntrospectContainer();
 
         // 获取配置
         Assembler assembler = new BeanReflexAssembler(beanReflexOperateHandlerChain);
         OperationConfiguration configuration = new BeanOperationConfiguration(globalConfiguration, Example.class, new ArrayList<>(), new ArrayList<>());
         AssembleOperation assembleOperation = new BeanAssembleOperation(
             0, configuration, ReflexUtils.findField(Example.class, "id"),
-            Collections.emptySet(), "", keyIntrospectContainer, assembler,
+            Collections.emptySet(), "", beanIntrospectContainer, assembler,
             Collections.singletonList(new BeanAssembleProperty("value", "id", "", Void.class)),
             Collections.singleton(DefaultGroup.class)
         );
@@ -61,7 +61,7 @@ public class BeanIntrospectContainerTest {
         );
         Multimap<AssembleOperation, Example> operations = ArrayListMultimap.create();
         examples.forEach(t -> operations.put(assembleOperation, t));
-        keyIntrospectContainer.process(operations);
+        beanIntrospectContainer.process(operations);
 
         Map<Integer, Example> exampleMap = CollUtil.toMap(examples, new HashMap<>(4), Example::getId);
         Assertions.assertEquals(3, exampleMap.size());
