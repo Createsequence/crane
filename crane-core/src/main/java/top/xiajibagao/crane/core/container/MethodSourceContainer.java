@@ -34,6 +34,25 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
 
     public final Map<String, MethodSource> methodCache = new HashMap<>();
 
+    /**
+     * 注销已注册方法数据源
+     *
+     * @param namespace 命名空间
+     * @author huangchengxing
+     * @date 2022/6/1 8:01
+     * @since 0.5.4
+     */
+    public void unregister(String namespace) {
+        methodCache.remove(namespace);
+    }
+    
+    /**
+     * 注册方法数据源
+     *
+     * @param methodSourceBean 方法数据源
+     * @author huangchengxing
+     * @date 2022/6/1 9:23
+     */
     public void register(Object methodSourceBean) {
         if (Objects.isNull(methodSourceBean)) {
             return;
