@@ -45,7 +45,7 @@ public class MapOperateHandler implements OperateHandler {
         }
         Map<String, Object> targetMap = parseMap(target);
         // 不存在引用字段时，尝试将数据添加到key字段对应的位置
-        if (property.hasReference()) {
+        if (!property.hasReference()) {
             targetMap.put(operation.getTargetProperty().getName(), sourceData);
             return;
         }
