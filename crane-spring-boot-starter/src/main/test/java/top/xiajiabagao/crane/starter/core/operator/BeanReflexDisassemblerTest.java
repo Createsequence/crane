@@ -61,7 +61,7 @@ public class BeanReflexDisassemblerTest {
     }
 
     @Data
-    public static class Example {
+    private static class Example {
 
         private List<List<Example>> exampleList;
 

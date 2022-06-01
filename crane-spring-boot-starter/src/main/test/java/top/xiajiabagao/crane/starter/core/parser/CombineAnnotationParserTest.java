@@ -96,7 +96,7 @@ public class CombineAnnotationParserTest {
         enableExtend = true,
         extendExcludes = ExcludedExampleConfigInterface.class
     )
-    public static class Example implements ExampleConfigInterface {
+    private static class Example implements ExampleConfigInterface {
 
         @Assemble(
             container = KeyValueContainer.class,
@@ -119,7 +119,7 @@ public class CombineAnnotationParserTest {
         useCurrParser = false,
         parser = FieldAnnotationConfigurationParser.class
     ))
-    public interface ExampleConfigInterface extends ExcludedExampleConfigInterface {
+    private interface ExampleConfigInterface extends ExcludedExampleConfigInterface {
         // 该接口配置应当在解析Example时一并解析
     }
 
@@ -131,7 +131,7 @@ public class CombineAnnotationParserTest {
         namespace = "namespace",
         props = @Prop(src = "sourceRef", ref = "targetRef", exp = "exp", expType = Integer.class)
     ))
-    public interface ExcludedExampleConfigInterface {
+    private interface ExcludedExampleConfigInterface {
         // 该接口配置应当不被解析
     }
 
@@ -140,7 +140,7 @@ public class CombineAnnotationParserTest {
     @Operations(
         enableExtend = true
     )
-    public static class NestExample implements NestExampleConfigInterface {
+    private static class NestExample implements NestExampleConfigInterface {
 
         @Assemble(
             container = MethodSourceContainer.class,
@@ -161,7 +161,7 @@ public class CombineAnnotationParserTest {
         targetClass = Example.class,
         disassembler = BeanReflexDisassembler.class
     ))
-    public interface NestExampleConfigInterface {
+    private interface NestExampleConfigInterface {
         // 该接口配置应当在解析NestExample时一并解析
     }
 
