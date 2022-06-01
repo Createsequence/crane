@@ -31,6 +31,30 @@ public class EnumDictContainer extends BaseNamespaceContainer<String, EnumDict.E
         enumDict.register(targetClass);
     }
 
+    /**
+     * 注销已注册的枚举
+     *
+     * @param targetType 目标类型
+     * @author huangchengxing
+     * @date 2022/1/7 08:05
+     * @since 0.5.4
+     */
+    public <T extends Enum<?>> void unregister(Class<T> targetType) {
+        enumDict.unregister(targetType);
+    }
+
+    /**
+     * 注销已注册的枚举
+     *
+     * @param targetTypeName 目标类型名称
+     * @author huangchengxing
+     * @date 2022/1/7 08:05
+     * @since 0.5.4
+     */
+    public void unregister(String targetTypeName) {
+        enumDict.unregister(targetTypeName);
+    }
+
     @Nonnull
     @Override
     protected Map<String, Map<String, EnumDict.EnumDictItem<?>>> getSources(@Nonnull Multimap<String, String> namespaceAndKeys) {

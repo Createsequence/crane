@@ -24,6 +24,31 @@ public class KeyValueContainer extends BaseNamespaceContainer<String, Object> im
     public final Table<String, String, Object> cache = HashBasedTable.create();
 
     /**
+     * 注销已注册的键值对缓存
+     *
+     * @param namespace 命名空间
+     * @param key key
+     * @author huangchengxing
+     * @date 2022/6/1 9:23
+     * @since 0.5.4
+     */
+    public void unregister(String namespace, Object key) {
+        cache.remove(namespace, key);
+    }
+
+    /**
+     * 注销已注册的缓存
+     *
+     * @param namespace 命名空间
+     * @author huangchengxing
+     * @date 2022/6/1 9:23
+     * @since 0.5.4
+     */
+    public void unregister(String namespace) {
+        cache.rowMap().remove(namespace);
+    }
+
+    /**
      * 注册值
      *
      * @param namespace 命名空间

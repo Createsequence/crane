@@ -56,6 +56,32 @@ public class EnumDict {
     }
 
     /**
+     * 注销已注册的枚举
+     *
+     * @param targetType 目标类型
+     * @author huangchengxing
+     * @date 2022/1/7 8:05
+     * @since 0.5.4
+     */
+    public <T extends Enum<?>> void unregister(Class<T> targetType) {
+        Optional.ofNullable(classCache.remove(targetType))
+            .ifPresent(t -> nameCache.remove(t.getName()));
+    }
+
+    /**
+     * 注销已注册的枚举
+     *
+     * @param targetTypeName 目标类型名称
+     * @author huangchengxing
+     * @date 2022/1/7 8:05
+     * @since 0.5.4
+     */
+    public void unregister(String targetTypeName) {
+        Optional.ofNullable(nameCache.remove(targetTypeName))
+            .ifPresent(t -> classCache.remove(t.getType()));
+    }
+
+    /**
      * 添加一组枚举，并指定类型名称和字典项名称，当枚举类上存在{@link Item}注解时，将优先使用注解指定的配置
      *
      * @param targetType 目标类型
@@ -198,9 +224,13 @@ public class EnumDict {
      * @author huangchengxing 
      * @date 2022/1/7 15:45
      */
+    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
     @Getter
     public static class EnumDictType<T extends Enum<?>> {
+
+        @EqualsAndHashCode.Include
         private final Class<T> type;
+        @EqualsAndHashCode.Include
         private final String name;
 
         private final Map<String, EnumDictItem<T>> nameCache;
@@ -253,7 +283,7 @@ public class EnumDict {
     @EqualsAndHashCode(callSuper = false)
     @Getter
     public static class EnumDictItem<T extends Enum<?>> extends HashMap<String, Object> {
-        private final EnumDictType<T> type;
+        private final transient EnumDictType<T> type;
         private final T target;
         private final String name;
 
