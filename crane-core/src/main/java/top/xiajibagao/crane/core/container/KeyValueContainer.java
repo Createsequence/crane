@@ -4,6 +4,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 import org.springframework.util.CollectionUtils;
+import top.xiajibagao.crane.core.helper.ObjectUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,11 +57,13 @@ public class KeyValueContainer extends BaseNamespaceContainer<String, Object> im
      * @author huangchengxing
      * @date 2022/2/25 14:57
      */
-    public void register(String namespace, Map<String, ?> values) {
+    public void register(String namespace, Map<?, ?> values) {
         if (CollectionUtils.isEmpty(values)) {
             return;
         }
-        values.forEach((k, v) -> cache.put(namespace, k, v));
+        values.forEach((k, v) -> ObjectUtils.acceptIfNotNull(
+            parseKey(k), keyStr -> cache.put(namespace, keyStr, v)
+        ));
     }
 
     /**
