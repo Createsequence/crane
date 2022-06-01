@@ -1,6 +1,7 @@
 package top.xiajibagao.crane.core.helper;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ReflectUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -96,8 +97,8 @@ public class EnumDict {
         Item annotation = AnnotatedElementUtils.findMergedAnnotation(targetType, Item.class);
         if (Objects.nonNull(annotation)) {
             typeName = annotation.typeName();
-            itemNameGetter = t -> ReflexUtils.findProperty(targetType, annotation.itemNameProperty())
-                .map(p -> p.getValue(t))
+            itemNameGetter = t -> Optional.ofNullable(ReflexUtils.findGetterMethod(targetType, annotation.itemNameProperty()))
+                .map(m -> ReflectUtil.invoke(t, m))
                 .map(String::valueOf)
                 .orElseThrow(() -> new IllegalArgumentException(CharSequenceUtil.format(
                     "枚举项名称为空，枚举类{}无法注册到字典"
