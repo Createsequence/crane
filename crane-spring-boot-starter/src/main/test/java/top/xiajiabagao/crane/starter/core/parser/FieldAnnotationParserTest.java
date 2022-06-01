@@ -98,7 +98,7 @@ public class FieldAnnotationParserTest {
 
     }
 
-    public static class Example {
+    private static class Example {
 
         @Assemble(
             container = KeyValueContainer.class,
@@ -120,7 +120,7 @@ public class FieldAnnotationParserTest {
         }
     }
 
-    public static class NestExample {
+    private static class NestExample {
 
         @Assemble(
             container = MethodSourceContainer.class,

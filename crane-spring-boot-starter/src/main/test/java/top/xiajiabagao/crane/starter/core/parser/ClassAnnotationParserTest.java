@@ -113,7 +113,7 @@ public class ClassAnnotationParserTest {
         enableExtend = true,
         extendExcludes = ExcludedExampleConfigInterface.class
     )
-    public static class Example implements ExampleConfigInterface {
+    private static class Example implements ExampleConfigInterface {
 
         private Integer id;
         private String targetRef;
@@ -127,7 +127,7 @@ public class ClassAnnotationParserTest {
         targetClass = NestExample.class,
         disassembler = BeanReflexDisassembler.class
     ))
-    public interface ExampleConfigInterface extends ExcludedExampleConfigInterface {
+    private interface ExampleConfigInterface extends ExcludedExampleConfigInterface {
         // 该接口配置应当在解析Example时一并解析
     }
 
@@ -139,7 +139,7 @@ public class ClassAnnotationParserTest {
         namespace = "namespace",
         props = @Prop(src = "sourceRef", ref = "targetRef", exp = "exp", expType = Integer.class)
     ))
-    public interface ExcludedExampleConfigInterface {
+    private interface ExcludedExampleConfigInterface {
         // 该接口配置应当不被解析
     }
 
@@ -156,7 +156,7 @@ public class ClassAnnotationParserTest {
         ),
         enableExtend = true
     )
-    public static class NestExample implements NestExampleConfigInterface {
+    private static class NestExample implements NestExampleConfigInterface {
 
         private Integer id;
         private String targetRef;
@@ -170,7 +170,7 @@ public class ClassAnnotationParserTest {
         targetClass = Example.class,
         disassembler = BeanReflexDisassembler.class
     ))
-    public interface NestExampleConfigInterface {
+    private interface NestExampleConfigInterface {
         // 该接口配置应当在解析NestExample时一并解析
     }
 

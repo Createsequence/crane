@@ -79,7 +79,7 @@ public class BeanReflexAssemblerTest {
 
     @AllArgsConstructor
     @Data
-    public static class Example {
+    private static class Example {
 
         public Example(Integer id) {
             this.id = id;
