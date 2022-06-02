@@ -11,7 +11,6 @@ import top.xiajibagao.crane.core.helper.CounterSet;
 import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
 import javax.annotation.Nonnull;
@@ -44,13 +43,10 @@ public class SequentialOperationExecutor implements OperationExecutor {
             targetsList, configuration, LinkedListMultimap.create()
         );
 
-        execute(configuration.getGlobalConfiguration(), groups, collectedConfigurations);
+        execute(groups, collectedConfigurations);
     }
 
-    protected void execute(
-        @Nonnull GlobalConfiguration globalConfiguration,
-        @Nonnull Set<Class<?>> targetGroups,
-        @Nonnull Multimap<OperationConfiguration, Object> collectedConfigurations) {
+    protected void execute(@Nonnull Set<Class<?>> targetGroups, @Nonnull Multimap<OperationConfiguration, Object> collectedConfigurations) {
         // TODO 优化算法，提高执行效率
         // 获取操作配置，并按类配置分别将全部的操作配置与待处理数据装入桶中，然后对同一桶中的操作按sort排序
         Set<Bucket> buckets = collectedConfigurations.asMap().entrySet()
