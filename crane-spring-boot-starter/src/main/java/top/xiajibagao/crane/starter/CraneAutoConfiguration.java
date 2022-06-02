@@ -21,7 +21,9 @@ import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.aop.MethodResultProcessAspect;
 import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.cache.OperationConfigurationCache;
+import top.xiajibagao.crane.core.component.AsmReflexBeanPropertyFactory;
 import top.xiajibagao.crane.core.component.BeanPropertyFactory;
+import top.xiajibagao.crane.core.component.ReflexBeanPropertyFactory;
 import top.xiajibagao.crane.core.container.*;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.SequentialOperationExecutor;
@@ -61,12 +63,13 @@ public class CraneAutoConfiguration {
         return new BeanGlobalConfiguration();
     }
 
+    @Primary
     @Order
     @ConditionalOnMissingBean(BeanPropertyFactory.class)
     @Bean("CraneDefaultBeanPropertyFactory")
     public BeanPropertyFactory beanPropertyFactory(CraneAutoConfigurationProperties craneAutoConfigurationProperties) {
         return craneAutoConfigurationProperties.isEnableAsmReflect() ?
-            BeanPropertyFactory.ASM_REFLEX_PROPERTY_FACTORY : BeanPropertyFactory.REFLEX_PROPERTY_FACTORY;
+            new AsmReflexBeanPropertyFactory() : new ReflexBeanPropertyFactory();
     }
 
     // ==================== 解析器 ====================

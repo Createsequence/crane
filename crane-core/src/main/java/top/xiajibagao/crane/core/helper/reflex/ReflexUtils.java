@@ -4,13 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
-import top.xiajibagao.crane.core.component.BeanProperty;
-import top.xiajibagao.crane.core.component.BeanPropertyFactory;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 
 import javax.annotation.Nullable;
@@ -29,15 +24,6 @@ import java.util.function.Predicate;
  */
 public class ReflexUtils {
 
-    private static final BeanPropertyFactory REFLEX_PROPERTY_FACTORY = new BeanPropertyFactory(
-        (targetClass, field) -> {
-            Method getter = findGetterMethod(targetClass, field);
-            Assert.notNull(getter, "属性{}找不到对应的Getter方法", field);
-            Method setter = findSetterMethod(targetClass, field);
-            Assert.notNull(setter, "属性{}找不到对应的Setter方法", field);
-            return new ReflexBeanProperty(targetClass, field, getter, setter);
-        }
-    );
     public static final String GET_PREFIX = "get";
     public static final String SET_PREFIX = "set";
     public static final String IS_PREFIX = "is";
@@ -87,20 +73,6 @@ public class ReflexUtils {
             }
             return true;
         });
-    }
-
-    /**
-     * 获取字段缓存
-     *
-     * @param targetClass 类
-     * @param fieldName 属性名
-     * @throws IllegalArgumentException 当属性不存在，或者属性存在但是却找不到对应setter与getter方法时抛出
-     * @return cn.net.nova.crane.helper.PropertyUtils.PropertyCache
-     * @author huangchengxing
-     * @date 2022/4/1 13:50
-     */
-    public static Optional<BeanProperty> findProperty(Class<?> targetClass, String fieldName) {
-        return REFLEX_PROPERTY_FACTORY.getProperty(targetClass, fieldName);
     }
 
     /**
@@ -363,29 +335,4 @@ public class ReflexUtils {
         return CharSequenceUtil.upperFirstAndAddPre(name, prefix);
     }
 
-    /**
-     * @author huangchengxing
-     * @date 2022/05/11 11:43
-     */
-    @Accessors(fluent = true)
-    @RequiredArgsConstructor
-    public static class ReflexBeanProperty implements BeanProperty {
-        @Getter
-        private final Class<?> targetClass;
-        @Getter
-        private final Field field;
-        private final Method getter;
-        private final Method setter;
-
-        @Override
-        public Object getValue(Object target) {
-            return ObjectUtils.computeIfNotNull(target, t -> ReflectionUtils.invokeMethod(getter, t));
-        }
-
-        @Override
-        public void setValue(Object target, Object value) {
-            ReflectionUtils.invokeMethod(setter, target, value);
-        }
-
-    }
 }

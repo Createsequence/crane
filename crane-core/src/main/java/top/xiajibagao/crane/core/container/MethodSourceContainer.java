@@ -112,7 +112,7 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
      */
     private void registerMethod(Object methodSourceBean, Class<?> targetClass, MethodSourceBean.Method annotation, Method method) {
         checkMethod(method, annotation.namespace());
-        AsmReflexUtils.findProperty(annotation.sourceType(), annotation.sourceKey())
+        beanPropertyFactory.getProperty(annotation.sourceType(), annotation.sourceKey())
             .ifPresent(property -> {
                 MethodSource cache = new MethodSource(
                     annotation.mappingType(), methodSourceBean, targetClass, annotation.namespace(),
