@@ -270,7 +270,7 @@ public class CraneAutoConfiguration {
             CraneAutoConfigurationProperties.CacheConfigProperties cacheConfigProperties = properties.getCache();
             Map<String, Set<String>> parserAndPreParsedClassPackages = cacheConfigProperties.getParserAndPreParsedClassPackages();
             parserAndPreParsedClassPackages.forEach((parserName, packages) -> {
-                OperateConfigurationParser parser = beanFactory.getBean(OperateConfigurationParser.class, parserName);
+                OperateConfigurationParser parser = beanFactory.getBean(parserName, OperateConfigurationParser.class);
                 cacheClassOperationConfiguration(parser, packages);
             });
             Set<String> preParsedClassPackages = cacheConfigProperties.getPreParsedClassPackages();
