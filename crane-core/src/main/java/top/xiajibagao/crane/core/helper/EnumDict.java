@@ -314,12 +314,12 @@ public class EnumDict {
         /**
          * 类型名，指定从枚举中哪个属性获得，默认为{@link Enum#name()}
          */
-        String itemNameProperty() default "";
+        String itemNameProperty();
 
         /**
          * 枚举类在字典中的名称，默认为类名
          */
-        String typeName() default "";
+        String typeName();
 
     }
 
