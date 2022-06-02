@@ -10,4 +10,4 @@ crane:
         - top.xiajiabagao.crane.starter.starter.entity
       DefaultCraneClassAnnotationConfigurationParser:
         - top.xiajiabagao.crane.starter.starter.entity
-  enable-asm-reflect: false
+  enable-asm-reflect: true

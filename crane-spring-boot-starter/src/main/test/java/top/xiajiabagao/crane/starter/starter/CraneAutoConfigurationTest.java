@@ -43,7 +43,7 @@ public class CraneAutoConfigurationTest {
 
     @Test
     public void testCraneAutoConfiguration() {
-        Assertions.assertFalse(craneAutoConfigurationProperties.isEnableAsmReflect());
+        Assertions.assertTrue(craneAutoConfigurationProperties.isEnableAsmReflect());
 
         // 测试枚举配置
         CraneAutoConfigurationProperties.EnumConfigProperties enumConfig = craneAutoConfigurationProperties.getEnums();
