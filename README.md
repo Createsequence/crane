@@ -2,7 +2,7 @@
 
 基于 SpringBoot 的注解式字典项、关联表与枚举值处理框架。
 
-![CRANE](https://img.shields.io/github/license/Createsequence/crane) ![maven--central](https://img.shields.io/badge/maven--central-0.5.3-green)
+![CRANE](https://img.shields.io/github/license/Createsequence/crane) ![maven--central](https://img.shields.io/badge/maven--central-0.5.4-green)
 
 ## 项目介绍
 
@@ -224,8 +224,9 @@ before: Person(sex=0, sexName=女) // 处理后
   - [ ] 是否需要输出填充过程中的一些日志；
   - [x] 预加载类操作配置到配置缓存；
   - [x] 枚举容器根据指定包路径批量扫描并注册枚举；
+  - [x] 自定义使用反射还是字节码调用实现对象读写；
 
-- [ ] 提供粒度更细的，更完善的测试用例；
+- [x] 提供粒度更细的，更完善的测试用例；
 
 - [x] 提供支持缓存的类注解配置解析器；
 
