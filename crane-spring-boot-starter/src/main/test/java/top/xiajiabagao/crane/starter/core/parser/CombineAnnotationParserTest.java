@@ -69,11 +69,11 @@ public class CombineAnnotationParserTest {
         Assertions.assertEquals(configuration, assembleOperation.getOwner());
         Assertions.assertEquals(1, assembleOperation.getProperties().size());
 
-        AssembleProperty assembleProperty = assembleOperation.getProperties().get(0);
-        Assertions.assertEquals("sourceRef", assembleProperty.getSource());
-        Assertions.assertEquals("targetRef", assembleProperty.getReference());
-        Assertions.assertEquals("exp", assembleProperty.getExp());
-        Assertions.assertEquals(Integer.class, assembleProperty.getExpType());
+        PropertyMapping propertyMapping = assembleOperation.getProperties().get(0);
+        Assertions.assertEquals("sourceRef", propertyMapping.getSource());
+        Assertions.assertEquals("targetRef", propertyMapping.getReference());
+        Assertions.assertEquals("exp", propertyMapping.getExp());
+        Assertions.assertEquals(Integer.class, propertyMapping.getExpType());
 
         // 装卸操作
         Assertions.assertEquals(1, configuration.getDisassembleOperations().size());

@@ -12,9 +12,9 @@ import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.parser.BeanAssembleOperation;
-import top.xiajibagao.crane.core.parser.BeanAssembleProperty;
+import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 import java.util.Collections;
 
@@ -36,7 +36,7 @@ public class BeanOperateHandlerTest {
         OperateHandler handler = new BeanOperateHandler(new AsmReflexBeanPropertyFactory());
         Example target = new Example(1, "小明", null);
         Example source = new Example(2, "小红", null);
-        AssembleProperty targetPropertyAndSourceProperty = new BeanAssembleProperty("name", "name", "", Void.class);
+        PropertyMapping targetPropertyAndSourceProperty = new BeanPropertyMapping("name", "name", "", Void.class);
         Assertions.assertTrue(handler.sourceCanRead(source, targetPropertyAndSourceProperty, assembleOperation));
         Assertions.assertEquals("小红", handler.readFromSource(source, targetPropertyAndSourceProperty, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite("小红", target, targetPropertyAndSourceProperty, assembleOperation));
@@ -45,7 +45,7 @@ public class BeanOperateHandlerTest {
 
         // source -> target.xxx
         target = new Example(1, "小明", null);
-        AssembleProperty targetPropertyAndSource = new BeanAssembleProperty("example", "", "", Void.class);
+        PropertyMapping targetPropertyAndSource = new BeanPropertyMapping("example", "", "", Void.class);
         Assertions.assertTrue(handler.sourceCanRead(source, targetPropertyAndSource, assembleOperation));
         Assertions.assertEquals(source, handler.readFromSource(source, targetPropertyAndSource, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite(source, target, targetPropertyAndSource, assembleOperation));
@@ -59,7 +59,7 @@ public class BeanOperateHandlerTest {
             Collections.emptyList(), Collections.singleton(DefaultGroup.class)
         );
         target = new Example(1, "小明", null);
-        AssembleProperty targetAndSourceProperty = new BeanAssembleProperty("", "name", "", Void.class);
+        PropertyMapping targetAndSourceProperty = new BeanPropertyMapping("", "name", "", Void.class);
         Assertions.assertTrue(handler.sourceCanRead(source, targetAndSourceProperty, assembleOperation));
         Assertions.assertEquals("小红", handler.readFromSource(source, targetAndSourceProperty, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite("小红", target, targetAndSourceProperty, assembleOperation));
@@ -73,7 +73,7 @@ public class BeanOperateHandlerTest {
             Collections.emptyList(), Collections.singleton(DefaultGroup.class)
         );
         target = new Example(1, "小明", null);
-        AssembleProperty targetAndSource = new BeanAssembleProperty("", "", "", Void.class);
+        PropertyMapping targetAndSource = new BeanPropertyMapping("", "", "", Void.class);
         Assertions.assertTrue(handler.sourceCanRead(source, targetAndSource, assembleOperation));
         Assertions.assertEquals(source, handler.readFromSource(source, targetAndSource, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite(source, target, targetAndSource, assembleOperation));

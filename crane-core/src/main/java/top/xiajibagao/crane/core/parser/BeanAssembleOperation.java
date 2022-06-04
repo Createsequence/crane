@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -27,7 +27,7 @@ public class BeanAssembleOperation implements AssembleOperation {
     private final String namespace;
     private final Container container;
     private final Assembler assembler;
-    private final List<AssembleProperty> properties;
+    private final List<PropertyMapping> properties;
     private final Set<Class<?>> groups;
 
 }

@@ -64,7 +64,7 @@ public abstract class AbstractAnnotationConfigurationParser implements OperateCo
      */
     protected AssembleOperation createAssembleOperation(Field key, Assemble annotation, OperationConfiguration configuration) {
         // 解析属性配置
-        List<AssembleProperty> properties = new ArrayList<>(CollStreamUtil.toList(
+        List<PropertyMapping> properties = new ArrayList<>(CollStreamUtil.toList(
             Arrays.asList(annotation.props()), this::parsePropAnnotation)
         );
         // 若存在属性模板，则解析模板，并将属性配置加入当前配置
@@ -93,11 +93,11 @@ public abstract class AbstractAnnotationConfigurationParser implements OperateCo
      * 解析{@link PropsTemplate}注解
      *
      * @param targetClass 目标类型
-     * @return java.util.List<AssembleProperty>
+     * @return java.util.List<PropertyMapping>
      * @author huangchengxing
      * @date 2022/3/3 15:05
      */
-    protected List<AssembleProperty> parsePropsTemplateAnnotation(Class<?> targetClass) {
+    protected List<PropertyMapping> parsePropsTemplateAnnotation(Class<?> targetClass) {
         PropsTemplate annotation = AnnotatedElementUtils.findMergedAnnotation(targetClass, PropsTemplate.class);
         if (Objects.isNull(annotation)) {
             return Collections.emptyList();
@@ -111,12 +111,12 @@ public abstract class AbstractAnnotationConfigurationParser implements OperateCo
      * 解析{@link Prop}注解
      *
      * @param annotation 注解
-     * @return top.xiajibagao.crane.core.parser.interfaces.AssembleProperty
+     * @return top.xiajibagao.crane.core.parser.interfaces.PropertyMapping
      * @author huangchengxing
      * @date 2022/5/21 18:00
      */
-    protected AssembleProperty parsePropAnnotation(Prop annotation) {
-        return new BeanAssembleProperty(annotation.value(), annotation.src(), annotation.exp(), annotation.expType());
+    protected PropertyMapping parsePropAnnotation(Prop annotation) {
+        return new BeanPropertyMapping(annotation.value(), annotation.src(), annotation.exp(), annotation.expType());
     }
 
     /**

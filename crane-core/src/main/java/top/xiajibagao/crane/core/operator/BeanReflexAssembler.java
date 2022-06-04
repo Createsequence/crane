@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.PairEntry;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
-import top.xiajibagao.crane.core.parser.BeanAssembleProperty;
-import top.xiajibagao.crane.core.parser.EmptyAssembleProperty;
+import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
+import top.xiajibagao.crane.core.parser.EmptyPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
 import java.util.Collections;
@@ -28,7 +28,7 @@ public class BeanReflexAssembler implements Assembler {
         if (Objects.isNull(target) || Objects.isNull(source)) {
             return;
         }
-        CollUtil.defaultIfEmpty(operation.getProperties(), Collections.singletonList(EmptyAssembleProperty.instance()))
+        CollUtil.defaultIfEmpty(operation.getProperties(), Collections.singletonList(EmptyPropertyMapping.instance()))
             .stream()
             .map(property -> PairEntry.of(property, handlerChain.readFromSource(source, property, operation)))
             .filter(PairEntry::hasValue)
@@ -38,7 +38,7 @@ public class BeanReflexAssembler implements Assembler {
     @Override
     public Object getKey(Object target, AssembleOperation operation) {
         return handlerChain.readFromSource(
-            target, BeanAssembleProperty.ofNameOnlyProperty(operation.getTargetProperty().getName()), operation
+            target, BeanPropertyMapping.ofNameOnlyProperty(operation.getTargetProperty().getName()), operation
         );
     }
     

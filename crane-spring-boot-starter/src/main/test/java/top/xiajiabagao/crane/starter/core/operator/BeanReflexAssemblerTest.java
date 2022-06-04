@@ -17,8 +17,8 @@ import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.BeanAssembleOperation;
-import top.xiajibagao.crane.core.parser.BeanAssembleProperty;
 import top.xiajibagao.crane.core.parser.BeanOperationConfiguration;
+import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
@@ -57,9 +57,9 @@ public class BeanReflexAssemblerTest {
             0, configuration, ReflexUtils.findField(Example.class, "id"),
             Collections.emptySet(), "source", keyValueContainer, assembler,
             Arrays.asList(
-                new BeanAssembleProperty("name", "name", "", Void.class),
-                new BeanAssembleProperty("age", "age", "", Void.class),
-                new BeanAssembleProperty("type", "age", "#source >= 18 ? '成年人' : '未成年人'", String.class)
+                new BeanPropertyMapping("name", "name", "", Void.class),
+                new BeanPropertyMapping("age", "age", "", Void.class),
+                new BeanPropertyMapping("type", "age", "#source >= 18 ? '成年人' : '未成年人'", String.class)
             ),
             Collections.singleton(DefaultGroup.class)
         );

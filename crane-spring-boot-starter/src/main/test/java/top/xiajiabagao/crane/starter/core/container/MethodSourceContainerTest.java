@@ -24,8 +24,8 @@ import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.BeanAssembleOperation;
-import top.xiajibagao.crane.core.parser.BeanAssembleProperty;
 import top.xiajibagao.crane.core.parser.BeanOperationConfiguration;
+import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
@@ -72,7 +72,7 @@ public class MethodSourceContainerTest {
         AssembleOperation oneToOneOperation = new BeanAssembleOperation(
             0, configuration, ReflexUtils.findField(Example.class, "id"),
             Collections.emptySet(), "example", methodSourceContainer, assembler,
-            Collections.singletonList(new BeanAssembleProperty("name", "name", "", Void.class)),
+            Collections.singletonList(new BeanPropertyMapping("name", "name", "", Void.class)),
             Collections.singleton(DefaultGroup.class)
         );
         configuration.getAssembleOperations().add(oneToOneOperation);
@@ -90,7 +90,7 @@ public class MethodSourceContainerTest {
         AssembleOperation oneToMoreOperation = new BeanAssembleOperation(
             0, configuration, ReflexUtils.findField(Example.class, "groupId"),
             Collections.emptySet(), "exampleGroup", methodSourceContainer, assembler,
-            Collections.singletonList(new BeanAssembleProperty("exampleList", "", "", Void.class)),
+            Collections.singletonList(new BeanPropertyMapping("exampleList", "", "", Void.class)),
             Collections.singleton(DefaultGroup.class)
         );
         configuration.getAssembleOperations().add(oneToMoreOperation);

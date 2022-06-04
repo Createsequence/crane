@@ -21,8 +21,8 @@ import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.BeanAssembleOperation;
-import top.xiajibagao.crane.core.parser.BeanAssembleProperty;
 import top.xiajibagao.crane.core.parser.BeanOperationConfiguration;
+import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
@@ -57,7 +57,7 @@ public class EnumDictContainerTest {
         AssembleOperation assembleOperation = new BeanAssembleOperation(
             0, configuration, ReflexUtils.findField(Example.class, "sex"),
             Collections.emptySet(), "sex", enumDictContainer, assembler,
-            Collections.singletonList(new BeanAssembleProperty("value", "desc", "", Void.class)),
+            Collections.singletonList(new BeanPropertyMapping("value", "desc", "", Void.class)),
             Collections.singleton(DefaultGroup.class)
         );
         configuration.getAssembleOperations().add(assembleOperation);

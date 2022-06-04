@@ -8,7 +8,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.ExpressionUtils;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 /**
  * SpEL表达式装配处理器链 <br />
@@ -27,7 +27,7 @@ public class ExpressibleBeanReflexOperateHandlerChain extends BeanReflexOperateH
     private final ContextFactory contextFactory;
 
     @Override
-    public void writeToTarget(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
+    public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         if (CharSequenceUtil.isBlank(property.getExp())) {
             super.writeToTarget(sourceData, target, property, operation);
             return;
@@ -42,7 +42,7 @@ public class ExpressibleBeanReflexOperateHandlerChain extends BeanReflexOperateH
     public static class ProcessContext {
         private final Object sourceData;
         private final Object target;
-        private final AssembleProperty property;
+        private final PropertyMapping property;
         private final AssembleOperation operation;
     }
 
@@ -67,7 +67,7 @@ public class ExpressibleBeanReflexOperateHandlerChain extends BeanReflexOperateH
         public StandardEvaluationContext get(ProcessContext processContext) {
             Object sourceData = processContext.getSourceData();
             Object target = processContext.getTarget();
-            AssembleProperty property = processContext.getProperty();
+            PropertyMapping property = processContext.getProperty();
             AssembleOperation operation = processContext.getOperation();
 
             StandardEvaluationContext context = new StandardEvaluationContext();

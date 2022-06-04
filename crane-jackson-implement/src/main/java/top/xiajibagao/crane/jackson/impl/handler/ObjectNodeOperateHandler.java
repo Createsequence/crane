@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.util.ClassUtils;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
 import java.util.Objects;
@@ -28,17 +28,17 @@ public class ObjectNodeOperateHandler extends AbstractJacksonNodeOperateHandler 
     }
 
     @Override
-    public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
+    public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
         return Objects.nonNull(source) && ClassUtils.isAssignable(ObjectNode.class, source.getClass());
     }
 
     @Override
-    public boolean targetCanWrite(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
+    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         return Objects.nonNull(target) && ClassUtils.isAssignable(ObjectNode.class, target.getClass());
     }
 
     @Override
-    public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
+    public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
         if (Objects.isNull(source) || !(source instanceof ObjectNode) || JacksonUtils.isNull((JsonNode)source)) {
             return NullNode.getInstance();
         }
@@ -47,7 +47,7 @@ public class ObjectNodeOperateHandler extends AbstractJacksonNodeOperateHandler 
     }
 
     @Override
-    public void writeToTarget(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
+    public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         if (Objects.isNull(sourceData) || !(sourceData instanceof JsonNode) || JacksonUtils.isNull((JsonNode)target)) {
             return;
         }

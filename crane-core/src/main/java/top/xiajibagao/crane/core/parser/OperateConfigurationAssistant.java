@@ -14,10 +14,10 @@ import top.xiajibagao.crane.core.helper.SFunc;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
@@ -164,7 +164,7 @@ public class OperateConfigurationAssistant<T> {
         private final Field targetField;
         private final Container container;
         private final Set<String> aliases = new HashSet<>();
-        private final List<AssembleProperty> properties = new ArrayList<>();
+        private final List<PropertyMapping> properties = new ArrayList<>();
         private final Assembler assembler;
         private String namespace = "";
         private int order = 0;
@@ -186,7 +186,7 @@ public class OperateConfigurationAssistant<T> {
             return this;
         }
 
-        public AssembleOperationBuilder<T> properties(Collection<AssembleProperty> properties) {
+        public AssembleOperationBuilder<T> properties(Collection<PropertyMapping> properties) {
             if (CollUtil.isNotEmpty(properties)) {
                 this.properties.addAll(properties);
             }
@@ -198,7 +198,7 @@ public class OperateConfigurationAssistant<T> {
         }
 
         public AssembleOperationBuilder<T> property(String resource, String reference, String exp, Class<?> expType) {
-            properties.add(new BeanAssembleProperty(
+            properties.add(new BeanPropertyMapping(
                 CharSequenceUtil.blankToDefault(reference, ""),
                 CharSequenceUtil.blankToDefault(resource, ""),
                 exp, expType

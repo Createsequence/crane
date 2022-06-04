@@ -1,6 +1,6 @@
 package top.xiajibagao.crane.core.parser;
 
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 /**
  * 一个空装配字段配置
@@ -8,15 +8,15 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
  * @author huangchengxing
  * @date 2022/04/17 22:20
  */
-public class EmptyAssembleProperty implements AssembleProperty {
+public class EmptyPropertyMapping implements PropertyMapping {
 
-    private static final EmptyAssembleProperty INSTANCE = new EmptyAssembleProperty();
+    private static final EmptyPropertyMapping INSTANCE = new EmptyPropertyMapping();
 
-    public static EmptyAssembleProperty instance() {
+    public static EmptyPropertyMapping instance() {
         return INSTANCE;
     }
 
-    EmptyAssembleProperty() {
+    EmptyPropertyMapping() {
     }
 
     @Override

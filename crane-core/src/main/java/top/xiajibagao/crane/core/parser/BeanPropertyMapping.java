@@ -2,7 +2,7 @@ package top.xiajibagao.crane.core.parser;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 /**
  * @author huangchengxing
@@ -10,15 +10,15 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
  */
 @Getter
 @RequiredArgsConstructor
-public class BeanAssembleProperty implements AssembleProperty {
+public class BeanPropertyMapping implements PropertyMapping {
 
     private final String reference;
     private final String source;
     private final String exp;
     private final Class<?> expType;
 
-    public static BeanAssembleProperty ofNameOnlyProperty(String propertyName) {
-        return new BeanAssembleProperty(null, propertyName, "", Void.class);
+    public static BeanPropertyMapping ofNameOnlyProperty(String propertyName) {
+        return new BeanPropertyMapping(null, propertyName, "", Void.class);
     }
 
 }

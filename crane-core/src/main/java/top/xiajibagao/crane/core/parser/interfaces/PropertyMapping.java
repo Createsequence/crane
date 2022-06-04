@@ -3,8 +3,8 @@ package top.xiajibagao.crane.core.parser.interfaces;
 import cn.hutool.core.text.CharSequenceUtil;
 
 /**
- * 装配字段
- * <p>表明在一次装配操作中，数据源的字段与待处理对象字段的映射关系。 <br />
+ * 字段映射配置
+ * <p>表明在一次操作中，数据源的字段与待处理对象字段的映射关系。 <br />
  * 比如：在一次操作中，需要将数据源对象A的name字段赋值给待处理对象B的userName字段，
  * 则称name为数据源字段，对应的字段值称为数据源，而userName为引用字段。
  *
@@ -28,7 +28,7 @@ import cn.hutool.core.text.CharSequenceUtil;
  * @author huangchengxing
  * @date 2022/03/01 16:00
  */
-public interface AssembleProperty {
+public interface PropertyMapping {
 
     /**
      * 获取引用字段

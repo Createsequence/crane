@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.component.BeanPropertyFactory;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 /**
  * 处理对象类型数据源与待处理对象，也是用于兜底的处理器
@@ -20,17 +20,17 @@ public class BeanOperateHandler implements OperateHandler {
     private final BeanPropertyFactory beanPropertyFactory;
 
     @Override
-    public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
+    public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
         return true;
     }
 
     @Override
-    public boolean targetCanWrite(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
+    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         return true;
     }
 
     @Override
-    public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
+    public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
         // 若指定数据源字段，则尝试从数据源上获取数据
         if (property.hasResource()) {
             return beanPropertyFactory.getProperty(source.getClass(), property.getSource())
@@ -41,7 +41,7 @@ public class BeanOperateHandler implements OperateHandler {
     }
 
     @Override
-    public void writeToTarget(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
+    public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         String operateProperty = property.hasReference() ?
             property.getReference() : operation.getTargetProperty().getName();
         beanPropertyFactory.getProperty(target.getClass(), operateProperty)

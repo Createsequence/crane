@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.PairEntry;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
-import top.xiajibagao.crane.core.parser.EmptyAssembleProperty;
+import top.xiajibagao.crane.core.parser.EmptyPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
@@ -37,7 +37,7 @@ public class JacksonAssembler implements Assembler {
         ObjectNode targetNode = (ObjectNode) target;
         JsonNode sourceNode = (source instanceof JsonNode) ?
             (JsonNode)source : objectMapper.valueToTree(source);
-        CollUtil.defaultIfEmpty(operation.getProperties(), Collections.singletonList(EmptyAssembleProperty.instance()))
+        CollUtil.defaultIfEmpty(operation.getProperties(), Collections.singletonList(EmptyPropertyMapping.instance()))
             .stream()
             .map(property -> PairEntry.of(property, handlerChain.readFromSource(sourceNode, property, operation)))
             .filter(PairEntry::hasValue)

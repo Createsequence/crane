@@ -4,8 +4,8 @@ import cn.hutool.core.util.ArrayUtil;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -24,17 +24,17 @@ public class ArrayOperateHandler extends CollectionOperateHandler implements Ope
     }
 
     @Override
-    public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
+    public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
         return ArrayUtil.isArray(source);
     }
 
     @Override
-    public boolean targetCanWrite(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
+    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         return ArrayUtil.isArray(target);
     }
 
     @Override
-    public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
+    public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
         if (Objects.isNull(source) || ArrayUtil.isEmpty(source)) {
             return null;
         }
@@ -42,7 +42,7 @@ public class ArrayOperateHandler extends CollectionOperateHandler implements Ope
     }
 
     @Override
-    public void writeToTarget(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
+    public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         if (ArrayUtil.isNotEmpty(target)) {
             super.writeToTarget(sourceData, Arrays.asList((Object[])target), property, operation);
         }

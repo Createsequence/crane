@@ -20,7 +20,7 @@ import java.util.Set;
  * @see OperationConfiguration
  * @see Assembler
  * @see Container
- * @see AssembleProperty
+ * @see PropertyMapping
  * @author huangchengxing
  * @date 2022/03/01 14:55
  */
@@ -65,11 +65,11 @@ public interface AssembleOperation extends Operation {
     /**
      * 获取装配配置字段
      *
-     * @return java.util.List<top.xiajibagao.crane.parse.interfaces.AssembleProperty>
+     * @return java.util.List<top.xiajibagao.crane.parse.interfaces.PropertyMapping>
      * @author huangchengxing
      * @date 2022/3/1 16:02
      */
-    List<AssembleProperty> getProperties();
+    List<PropertyMapping> getProperties();
 
     /**
      * 获取分组

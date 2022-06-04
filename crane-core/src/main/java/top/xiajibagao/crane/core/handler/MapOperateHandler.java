@@ -3,8 +3,8 @@ package top.xiajibagao.crane.core.handler;
 import org.springframework.util.ClassUtils;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 import java.util.Map;
 import java.util.Objects;
@@ -19,17 +19,17 @@ import java.util.Objects;
 public class MapOperateHandler implements OperateHandler {
 
     @Override
-    public boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
+    public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
         return ClassUtils.isAssignable(Map.class, source.getClass());
     }
 
     @Override
-    public boolean targetCanWrite(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
+    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         return ClassUtils.isAssignable(Map.class, target.getClass());
     }
 
     @Override
-    public Object readFromSource(Object source, AssembleProperty property, Operation operation) {
+    public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
         if (Objects.isNull(source)) {
             return null;
         }
@@ -39,7 +39,7 @@ public class MapOperateHandler implements OperateHandler {
     }
 
     @Override
-    public void writeToTarget(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
+    public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         if (Objects.isNull(sourceData) || Objects.isNull(target)) {
             return;
         }

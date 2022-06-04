@@ -6,7 +6,7 @@ import top.xiajibagao.crane.core.exception.CraneException;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
-import top.xiajibagao.crane.core.parser.BeanAssembleProperty;
+import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 
 import java.util.*;
@@ -25,7 +25,7 @@ public class BeanReflexDisassembler implements Disassembler {
         List<Object> results = new ArrayList<>();
         // bfs遍历集合
         Object disassemblePropertyValue = handlerChain.readFromSource(
-            target, BeanAssembleProperty.ofNameOnlyProperty(operation.getTargetProperty().getName()), operation
+            target, BeanPropertyMapping.ofNameOnlyProperty(operation.getTargetProperty().getName()), operation
         );
         Deque<Object> deque = new LinkedList<>();
         deque.add(disassemblePropertyValue);

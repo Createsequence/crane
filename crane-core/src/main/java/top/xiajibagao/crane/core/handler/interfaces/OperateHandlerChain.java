@@ -2,8 +2,8 @@ package top.xiajibagao.crane.core.handler.interfaces;
 
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleProperty;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 import java.util.List;
 
@@ -48,7 +48,7 @@ public interface OperateHandlerChain extends OperateHandler {
      * @date 2022/4/8 21:04
      */
     @Override
-    default boolean sourceCanRead(Object source, AssembleProperty property, Operation operation) {
+    default boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
         return handlers().stream().anyMatch(h -> h.sourceCanRead(source, property, operation));
     }
 
@@ -64,7 +64,7 @@ public interface OperateHandlerChain extends OperateHandler {
      * @date 2022/4/8 9:40
      */
     @Override
-    default boolean targetCanWrite(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
+    default boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         return handlers().stream().anyMatch(h -> h.targetCanWrite(sourceData, target, property, operation));
     }
     
@@ -79,7 +79,7 @@ public interface OperateHandlerChain extends OperateHandler {
      * @date 2022/4/8 21:05
      */
     @Override
-    default Object readFromSource(Object source, AssembleProperty property, Operation operation) {
+    default Object readFromSource(Object source, PropertyMapping property, Operation operation) {
         return handlers()
             .stream()
             .filter(h -> h.sourceCanRead(source, property, operation))
@@ -99,7 +99,7 @@ public interface OperateHandlerChain extends OperateHandler {
      * @date 2022/4/8 21:05
      */
     @Override
-    default void writeToTarget(Object sourceData, Object target, AssembleProperty property, AssembleOperation operation) {
+    default void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         handlers()
             .stream()
             .filter(h -> h.targetCanWrite(sourceData, target, property, operation))

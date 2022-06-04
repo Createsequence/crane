@@ -62,11 +62,11 @@ public class FieldAnnotationParserTest {
         Assertions.assertEquals(configuration, assembleOperation.getOwner());
         Assertions.assertEquals(1, assembleOperation.getProperties().size());
 
-        AssembleProperty assembleProperty = assembleOperation.getProperties().get(0);
-        Assertions.assertEquals("sourceRef", assembleProperty.getSource());
-        Assertions.assertEquals("targetRef", assembleProperty.getReference());
-        Assertions.assertEquals("exp", assembleProperty.getExp());
-        Assertions.assertEquals(Integer.class, assembleProperty.getExpType());
+        PropertyMapping propertyMapping = assembleOperation.getProperties().get(0);
+        Assertions.assertEquals("sourceRef", propertyMapping.getSource());
+        Assertions.assertEquals("targetRef", propertyMapping.getReference());
+        Assertions.assertEquals("exp", propertyMapping.getExp());
+        Assertions.assertEquals(Integer.class, propertyMapping.getExpType());
 
         // 装卸操作
         Assertions.assertEquals(1, configuration.getDisassembleOperations().size());
@@ -87,11 +87,11 @@ public class FieldAnnotationParserTest {
         Assertions.assertEquals(disassembleConfiguration, disassembleConfigurationAssembleOperation.getOwner());
         Assertions.assertEquals(1, disassembleConfigurationAssembleOperation.getProperties().size());
 
-        AssembleProperty disassembleConfigurationAssembleProperty = assembleOperation.getProperties().get(0);
-        Assertions.assertEquals("sourceRef", disassembleConfigurationAssembleProperty.getSource());
-        Assertions.assertEquals("targetRef", disassembleConfigurationAssembleProperty.getReference());
-        Assertions.assertEquals("exp", disassembleConfigurationAssembleProperty.getExp());
-        Assertions.assertEquals(Integer.class, disassembleConfigurationAssembleProperty.getExpType());
+        PropertyMapping disassembleConfigurationPropertyMapping = assembleOperation.getProperties().get(0);
+        Assertions.assertEquals("sourceRef", disassembleConfigurationPropertyMapping.getSource());
+        Assertions.assertEquals("targetRef", disassembleConfigurationPropertyMapping.getReference());
+        Assertions.assertEquals("exp", disassembleConfigurationPropertyMapping.getExp());
+        Assertions.assertEquals(Integer.class, disassembleConfigurationPropertyMapping.getExpType());
 
         Assertions.assertEquals(1, disassembleConfiguration.getDisassembleOperations().size());
         Assertions.assertEquals(configuration, disassembleConfiguration.getDisassembleOperations().get(0).getTargetOperateConfiguration());

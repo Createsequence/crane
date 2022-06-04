@@ -19,8 +19,8 @@ import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.BeanAssembleOperation;
-import top.xiajibagao.crane.core.parser.BeanAssembleProperty;
 import top.xiajibagao.crane.core.parser.BeanOperationConfiguration;
+import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
@@ -51,14 +51,14 @@ public class SequentialOperationExecutorTest {
         AssembleOperation nameIntrospectOperation = new BeanAssembleOperation(
             0, configuration, ReflexUtils.findField(Example.class, "name"),
             Collections.emptySet(), "", beanIntrospectContainer, assembler,
-            Collections.singletonList(new BeanAssembleProperty("introspectName", "", "#source.name + '::' + #target.introspectId", String.class)),
+            Collections.singletonList(new BeanPropertyMapping("introspectName", "", "#source.name + '::' + #target.introspectId", String.class)),
             Collections.singleton(DefaultGroup.class)
         );
         configuration.getAssembleOperations().add(nameIntrospectOperation);
         AssembleOperation idIntrospectOperation = new BeanAssembleOperation(
             -1, configuration, ReflexUtils.findField(Example.class, "id"),
             Collections.emptySet(), "", keyIntrospectContainer, assembler,
-            Collections.singletonList(new BeanAssembleProperty("introspectId", "", "", Void.class)),
+            Collections.singletonList(new BeanPropertyMapping("introspectId", "", "", Void.class)),
             Collections.singleton(DefaultGroup.class)
         );
         configuration.getAssembleOperations().add(idIntrospectOperation);
