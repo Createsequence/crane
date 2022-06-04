@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.aop.MethodResultProcessAspect;
@@ -102,10 +101,18 @@ public class CraneAutoConfiguration {
 
     @Primary
     @Order
+    @ConditionalOnMissingBean(ExpressibleBeanReflexOperateHandlerChain.ContextFactory.class)
+    @Bean("DefaultCraneExpressibleBeanReflexOperateHandlerChainContextFactory")
+    public ExpressibleBeanReflexOperateHandlerChain.ContextFactory contextFactory() {
+        return new ExpressibleBeanReflexOperateHandlerChain.DefaultContextFactory();
+    }
+
+    @Primary
+    @Order
     @ConditionalOnMissingBean(BeanReflexOperateHandlerChain.class)
     @Bean("DefaultCraneBeanReflexOperateHandlerChain")
-    public BeanReflexOperateHandlerChain beanReflexOperateHandlerChain(BeanPropertyFactory beanPropertyFactory) {
-        BeanReflexOperateHandlerChain operateHandlerChain = new ExpressibleBeanReflexOperateHandlerChain(StandardEvaluationContext::new);
+    public BeanReflexOperateHandlerChain beanReflexOperateHandlerChain(BeanPropertyFactory beanPropertyFactory, ExpressibleBeanReflexOperateHandlerChain.ContextFactory contextFactory) {
+        BeanReflexOperateHandlerChain operateHandlerChain = new ExpressibleBeanReflexOperateHandlerChain(contextFactory);
         operateHandlerChain.addHandler(new MapOperateHandler())
             .addHandler(new CollectionOperateHandler(operateHandlerChain))
             .addHandler(new ArrayOperateHandler(operateHandlerChain))

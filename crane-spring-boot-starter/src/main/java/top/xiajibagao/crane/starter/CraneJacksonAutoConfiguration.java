@@ -2,6 +2,7 @@ package top.xiajibagao.crane.starter;
 
 import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
@@ -12,7 +13,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.expression.MapAccessor;
 import org.springframework.core.annotation.Order;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
+import top.xiajibagao.crane.core.helper.ExpressionUtils;
 import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.JacksonOperateHandlerChain;
 import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
@@ -20,6 +24,9 @@ import top.xiajibagao.crane.jackson.impl.handler.ValueNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.module.DynamicJsonNodeModule;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonAssembler;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonDisassembler;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author huangchengxing
