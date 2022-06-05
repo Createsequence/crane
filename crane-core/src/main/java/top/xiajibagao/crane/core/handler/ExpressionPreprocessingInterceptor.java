@@ -1,7 +1,9 @@
 package top.xiajibagao.crane.core.handler;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.EvaluationContext;
@@ -14,7 +16,9 @@ import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * 数据源表达式预处理拦截器
@@ -99,7 +103,11 @@ public class ExpressionPreprocessingInterceptor implements SourceOperateIntercep
      * @author huangchengxing 
      * @date 2022/6/4 23:54
      */
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class DefaultContextFactory implements ContextFactory {
+
+        private List<Consumer<StandardEvaluationContext>> appendAction;
 
         @Override
         public StandardEvaluationContext get(SourceWriteOperationContext sourceWriteOperationContext) {
@@ -116,6 +124,7 @@ public class ExpressionPreprocessingInterceptor implements SourceOperateIntercep
             context.setVariable("ref", property.getReference());
 
             context.addPropertyAccessor(new MapAccessor());
+            appendAction.forEach(action -> action.accept(context));
 
             return context;
         }

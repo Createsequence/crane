@@ -10,6 +10,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -102,6 +103,7 @@ public class CraneAutoConfiguration {
     // ==================== 操作者 ====================
 
     @Order
+    @ConditionalOnMissingClass("top.xiajibagao.crane.jackson.impl.helper.JsonNodeAccessor")
     @ConditionalOnMissingBean(ExpressionPreprocessingInterceptor.ContextFactory.class)
     @Bean("DefaultCraneExpressionPreprocessingInterceptorContextFactory")
     public ExpressionPreprocessingInterceptor.ContextFactory expressionContextFactory() {

@@ -13,13 +13,19 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import top.xiajibagao.crane.core.handler.ExpressionPreprocessingInterceptor;
+import top.xiajibagao.crane.core.handler.interfaces.SourceOperateInterceptor;
 import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.JacksonOperateHandlerChain;
 import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.ValueNodeOperateHandler;
+import top.xiajibagao.crane.jackson.impl.helper.JsonNodeAccessor;
 import top.xiajibagao.crane.jackson.impl.module.DynamicJsonNodeModule;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonAssembler;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonDisassembler;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author huangchengxing
@@ -52,11 +58,21 @@ public class CraneJacksonAutoConfiguration {
     }
 
     @Order
+    @ConditionalOnMissingBean(ExpressionPreprocessingInterceptor.ContextFactory.class)
+    @Bean("DefaultCraneExpressionPreprocessingInterceptorContextFactory")
+    public ExpressionPreprocessingInterceptor.ContextFactory expressionContextFactory(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
+        return new ExpressionPreprocessingInterceptor.DefaultContextFactory(Collections.singletonList(
+            context -> context.addPropertyAccessor(new JsonNodeAccessor(objectMapper))
+        ));
+    }
+
+    @Order
     @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
     @ConditionalOnMissingBean(JacksonOperateHandlerChain.class)
     @Bean("DefaultCraneJacksonOperateHandlerChain")
-    public JacksonOperateHandlerChain jacksonOperateHandlerChain(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
+    public JacksonOperateHandlerChain jacksonOperateHandlerChain(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, List<SourceOperateInterceptor> interceptors) {
         JacksonOperateHandlerChain operateHandlerChain = new JacksonOperateHandlerChain();
+        interceptors.forEach(operateHandlerChain::addInterceptor);
         operateHandlerChain.addHandler(new ArrayNodeOperateHandler(objectMapper, operateHandlerChain))
             .addHandler(new ObjectNodeOperateHandler(objectMapper))
             .addHandler(new ValueNodeOperateHandler(objectMapper));
