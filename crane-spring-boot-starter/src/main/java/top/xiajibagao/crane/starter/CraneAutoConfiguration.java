@@ -29,6 +29,7 @@ import top.xiajibagao.crane.core.executor.SequentialOperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
 import top.xiajibagao.crane.core.handler.*;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
+import top.xiajibagao.crane.core.handler.interfaces.SourceOperateInterceptor;
 import top.xiajibagao.crane.core.helper.EnumDict;
 import top.xiajibagao.crane.core.helper.OperateTemplate;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
@@ -41,6 +42,7 @@ import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -99,25 +101,32 @@ public class CraneAutoConfiguration {
 
     // ==================== 操作者 ====================
 
-    @Primary
     @Order
-    @ConditionalOnMissingBean(ExpressibleBeanReflexOperateHandlerChain.ContextFactory.class)
-    @Bean("DefaultCraneExpressibleBeanReflexOperateHandlerChainContextFactory")
-    public ExpressibleBeanReflexOperateHandlerChain.ContextFactory contextFactory() {
-        return new ExpressibleBeanReflexOperateHandlerChain.DefaultContextFactory();
+    @ConditionalOnMissingBean(ExpressionPreprocessingInterceptor.ContextFactory.class)
+    @Bean("DefaultCraneExpressionPreprocessingInterceptorContextFactory")
+    public ExpressionPreprocessingInterceptor.ContextFactory expressionContextFactory() {
+        return new ExpressionPreprocessingInterceptor.DefaultContextFactory();
+    }
+
+    @Order
+    @ConditionalOnMissingBean(ExpressionPreprocessingInterceptor.class)
+    @Bean("DefaultCraneExpressionPreprocessingInterceptor")
+    public ExpressionPreprocessingInterceptor expressionPreprocessingInterceptor(ExpressionPreprocessingInterceptor.ContextFactory contextFactory) {
+        return new ExpressionPreprocessingInterceptor(contextFactory);
     }
 
     @Primary
     @Order
     @ConditionalOnMissingBean(BeanReflexOperateHandlerChain.class)
     @Bean("DefaultCraneBeanReflexOperateHandlerChain")
-    public BeanReflexOperateHandlerChain beanReflexOperateHandlerChain(BeanPropertyFactory beanPropertyFactory, ExpressibleBeanReflexOperateHandlerChain.ContextFactory contextFactory) {
-        BeanReflexOperateHandlerChain operateHandlerChain = new ExpressibleBeanReflexOperateHandlerChain(contextFactory);
+    public BeanReflexOperateHandlerChain beanReflexOperateHandlerChain(BeanPropertyFactory beanPropertyFactory, List<SourceOperateInterceptor> interceptors) {
+        BeanReflexOperateHandlerChain operateHandlerChain = new BeanReflexOperateHandlerChain();
         operateHandlerChain.addHandler(new MapOperateHandler())
             .addHandler(new CollectionOperateHandler(operateHandlerChain))
             .addHandler(new ArrayOperateHandler(operateHandlerChain))
             .addHandler(new MapOperateHandler())
             .addHandler(new BeanOperateHandler(beanPropertyFactory));
+        interceptors.forEach(operateHandlerChain::addInterceptor);
         log.info(
             "注册处理器链 {}, 已配置节点: {}",
             "DefaultCraneBeanReflexOperateHandlerChain",
