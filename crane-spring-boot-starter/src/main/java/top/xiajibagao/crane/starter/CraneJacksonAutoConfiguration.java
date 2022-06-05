@@ -24,7 +24,6 @@ import top.xiajibagao.crane.jackson.impl.module.DynamicJsonNodeModule;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonAssembler;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonDisassembler;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -61,9 +60,8 @@ public class CraneJacksonAutoConfiguration {
     @ConditionalOnMissingBean(ExpressionPreprocessingInterceptor.ContextFactory.class)
     @Bean("DefaultCraneExpressionPreprocessingInterceptorContextFactory")
     public ExpressionPreprocessingInterceptor.ContextFactory expressionContextFactory(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
-        return new ExpressionPreprocessingInterceptor.DefaultContextFactory(Collections.singletonList(
-            context -> context.addPropertyAccessor(new JsonNodeAccessor(objectMapper))
-        ));
+        return new ExpressionPreprocessingInterceptor.DefaultContextFactory()
+            .addAction(context -> context.addPropertyAccessor(new JsonNodeAccessor(objectMapper)));
     }
 
     @Order
