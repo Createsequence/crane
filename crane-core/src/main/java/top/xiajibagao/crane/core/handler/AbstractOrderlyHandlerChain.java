@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
+import top.xiajibagao.crane.core.handler.interfaces.SourceOperateInterceptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,14 @@ import java.util.List;
 public class AbstractOrderlyHandlerChain implements OperateHandlerChain {
 
     protected final List<OperateHandler> handlers = new ArrayList<>();
+    protected final List<SourceOperateInterceptor> interceptors = new ArrayList<>();
+
+    @Override
+    public OperateHandlerChain addInterceptor(SourceOperateInterceptor interceptor) {
+        interceptors.add(interceptor);
+        interceptors.sort(SourceOperateInterceptor::compareTo);
+        return this;
+    }
 
     @Override
     public OperateHandlerChain addHandler(OperateHandler handler) {

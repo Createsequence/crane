@@ -19,7 +19,28 @@ import java.util.List;
 public interface OperateHandlerChain extends OperateHandler {
 
     /**
-     * 获取处理器链
+     * 获取操作拦截器链
+     *
+     * @return java.util.List<top.xiajibagao.crane.core.handler.interfaces.SourceOperateInterceptor>
+     * @author huangchengxing
+     * @date 2022/6/4 23:16
+     * @since 0.5.5
+     */
+    List<SourceOperateInterceptor> interceptors();
+
+    /**
+     * 注册操作拦截器
+     *
+     * @param interceptor 拦截器
+     * @return top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain
+     * @author huangchengxing
+     * @date 2022/6/4 23:18
+     * @since 0.5.5
+     */
+    OperateHandlerChain addInterceptor(SourceOperateInterceptor interceptor);
+    
+    /**
+     * 获取操作处理器链
      *
      * @return java.util.List<top.xiajibagao.crane.core.handlers.OperateHandler>
      * @author huangchengxing
@@ -69,27 +90,7 @@ public interface OperateHandlerChain extends OperateHandler {
     }
     
     /**
-     * 从数据源中获取数据。将使用处理器链中第一个支持处理该类的节点进行处理。
-     *
-     * @param source 数据源
-     * @param property 待处理字段
-     * @param operation 字段配置
-     * @return java.lang.Object
-     * @author huangchengxing
-     * @date 2022/4/8 21:05
-     */
-    @Override
-    default Object readFromSource(Object source, PropertyMapping property, Operation operation) {
-        return handlers()
-            .stream()
-            .filter(h -> h.sourceCanRead(source, property, operation))
-            .findFirst()
-            .map(h -> h.readFromSource(source, property, operation))
-            .orElse(null);
-    }
-
-    /**
-     * 将数据源中获取的数据写入待处理对象。将使用处理器链中第一个支持处理该类的节点进行处理。
+     * 将数据源数据使用操作拦截器处理后，再使用处理器链中第一个支持处理该待处理对象的操作处理器，将拦截后的数据源数据写入待处理对象
      *
      * @param sourceData 从数据源获取的数据
      * @param target 待处理对象
@@ -100,11 +101,43 @@ public interface OperateHandlerChain extends OperateHandler {
      */
     @Override
     default void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
+        for (SourceOperateInterceptor interceptor : interceptors()) {
+            if (interceptor.supportInterceptSourceWrite(sourceData, target, property, operation)) {
+                sourceData = interceptor.interceptSourceWrite(sourceData, target, property, operation);
+            }
+        }
+        final Object interceptedSourcesData = sourceData;
         handlers()
             .stream()
-            .filter(h -> h.targetCanWrite(sourceData, target, property, operation))
+            .filter(h -> h.targetCanWrite(interceptedSourcesData, target, property, operation))
             .findFirst()
-            .ifPresent(h -> h.writeToTarget(sourceData, target, property, operation));
+            .ifPresent(h -> h.writeToTarget(interceptedSourcesData, target, property, operation));
+    }
+
+    /**
+     * 将数据源对象使用操作拦截器处理后，再使用处理器链中第一个支持处理该拦截诡异的数据源对象的操作处理器，从中获取所需数据源
+     *
+     * @param source 数据源
+     * @param property 待处理字段
+     * @param operation 字段配置
+     * @return java.lang.Object
+     * @author huangchengxing
+     * @date 2022/4/8 21:05
+     */
+    @Override
+    default Object readFromSource(Object source, PropertyMapping property, Operation operation) {
+        for (SourceOperateInterceptor interceptor : interceptors()) {
+            if (interceptor.supportInterceptReadSource(source, property, operation)) {
+                source = interceptor.interceptReadSource(source, property, operation);
+            }
+        }
+        final Object interceptedSources = source;
+        return handlers()
+            .stream()
+            .filter(h -> h.sourceCanRead(interceptedSources, property, operation))
+            .findFirst()
+            .map(h -> h.readFromSource(interceptedSources, property, operation))
+            .orElse(null);
     }
 
 }
