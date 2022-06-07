@@ -5,11 +5,14 @@ import com.esotericsoftware.reflectasm.MethodAccess;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
+import top.xiajibagao.crane.core.helper.AsmReflexMethodInvoker;
+import top.xiajibagao.crane.core.helper.MethodInvoker;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils;
-import top.xiajibagao.crane.core.helper.reflex.IndexedMethod;
+import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * 用于生产基于字节码的反射调用实现的{@link BeanProperty}
@@ -22,13 +25,19 @@ public class AsmReflexBeanPropertyFactory extends AbstractBeanPropertyFactory im
 
     @Override
     protected BeanProperty createBeanProperty(Class<?> targetClass, Field field) {
-        int getterIndex = AsmReflexUtils.findGetterMethodIndex(targetClass, field.getName());
-        Assert.isTrue(getterIndex > -1, String.format("属性[%s]找不到对应的Getter方法", field));
-        int setterIndex = AsmReflexUtils.findSetterMethodIndex(targetClass, field.getName(), field.getType());
-        Assert.isTrue(setterIndex > -1, String.format("属性[%s]找不到对应的Setter方法", field));
         MethodAccess methodAccess = AsmReflexUtils.getMethodAccess(targetClass);
+
+        Method getter = ReflexUtils.findGetterMethod(targetClass, field);
+        Assert.notNull(getter, "属性[{}]找不到对应的Getter方法", field);
+        int getterIndex = methodAccess.getIndex(getter.getName(), getter.getParameterTypes());
+        MethodInvoker getterInvoker = new AsmReflexMethodInvoker(methodAccess, getterIndex);
+
+        Method setter = ReflexUtils.findSetterMethod(targetClass, field);
+        Assert.notNull(setter, "属性[{}]找不到对应的Setter方法", field);
+        int setterIndex = methodAccess.getIndex(setter.getName(), setter.getParameterTypes());
+        MethodInvoker setterInvoker = new AsmReflexMethodInvoker(methodAccess, setterIndex);
         return new AsmReflexBeanProperty(
-            targetClass, field, new IndexedMethod(methodAccess, getterIndex), new IndexedMethod(methodAccess, setterIndex)
+            targetClass, field, getterInvoker, setterInvoker
         );
     }
 
@@ -45,8 +54,8 @@ public class AsmReflexBeanPropertyFactory extends AbstractBeanPropertyFactory im
         private final Class<?> targetClass;
         @Getter
         private final Field field;
-        private final IndexedMethod getter;
-        private final IndexedMethod setter;
+        private final MethodInvoker getter;
+        private final MethodInvoker setter;
 
         @Override
         public Object getValue(Object target) {
@@ -55,7 +64,7 @@ public class AsmReflexBeanPropertyFactory extends AbstractBeanPropertyFactory im
 
         @Override
         public void setValue(Object target, Object value) {
-            setter.invoke(target, value);
+            ObjectUtils.computeIfNotNull(target, t -> setter.invoke(t, value));
         }
 
     }

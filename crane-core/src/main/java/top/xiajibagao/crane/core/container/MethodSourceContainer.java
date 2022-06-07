@@ -15,8 +15,8 @@ import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.component.BeanProperty;
 import top.xiajibagao.crane.core.component.BeanPropertyFactory;
+import top.xiajibagao.crane.core.helper.MethodInvoker;
 import top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils;
-import top.xiajibagao.crane.core.helper.reflex.IndexedMethod;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 
 import javax.annotation.Nonnull;
@@ -169,7 +169,7 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         @Getter
         private final String containerName;
         private final Method sourceGetter;
-        private final IndexedMethod indexedMethod;
+        private final MethodInvoker indexedMethod;
         private final BeanProperty sourceKeyProperty;
 
         @SuppressWarnings("unchecked")

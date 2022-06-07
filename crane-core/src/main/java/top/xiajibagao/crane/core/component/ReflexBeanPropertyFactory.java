@@ -4,8 +4,9 @@ import cn.hutool.core.lang.Assert;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
-import org.springframework.util.ReflectionUtils;
+import top.xiajibagao.crane.core.helper.MethodInvoker;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
+import top.xiajibagao.crane.core.helper.ReflexMethodInvoker;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 
 import java.lang.reflect.Field;
@@ -26,7 +27,7 @@ public class ReflexBeanPropertyFactory extends AbstractBeanPropertyFactory imple
         Assert.notNull(getter, "属性{}找不到对应的Getter方法", field);
         Method setter = ReflexUtils.findSetterMethod(targetClass, field);
         Assert.notNull(setter, "属性{}找不到对应的Setter方法", field);
-        return new ReflexBeanPropertyFactory.ReflexBeanProperty(targetClass, field, getter, setter);
+        return new ReflexBeanPropertyFactory.ReflexBeanProperty(targetClass, field, new ReflexMethodInvoker(getter), new ReflexMethodInvoker(setter));
     }
 
     /**
@@ -42,17 +43,17 @@ public class ReflexBeanPropertyFactory extends AbstractBeanPropertyFactory imple
         private final Class<?> targetClass;
         @Getter
         private final Field field;
-        private final Method getter;
-        private final Method setter;
+        private final MethodInvoker getter;
+        private final MethodInvoker setter;
 
         @Override
         public Object getValue(Object target) {
-            return ObjectUtils.computeIfNotNull(target, t -> ReflectionUtils.invokeMethod(getter, t));
+            return ObjectUtils.computeIfNotNull(target, getter::invoke);
         }
 
         @Override
         public void setValue(Object target, Object value) {
-            ReflectionUtils.invokeMethod(setter, target, value);
+            ObjectUtils.computeIfNotNull(target, t -> setter.invoke(t, value));
         }
 
     }

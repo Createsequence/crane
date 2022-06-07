@@ -1,6 +1,8 @@
 package top.xiajibagao.crane.core.helper.reflex;
 
 import com.esotericsoftware.reflectasm.MethodAccess;
+import top.xiajibagao.crane.core.helper.AsmReflexMethodInvoker;
+import top.xiajibagao.crane.core.helper.MethodInvoker;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -75,29 +77,14 @@ public class AsmReflexUtils {
      * 获取指定方法
      *
      * @param targetClass 目标类型
-     * @param methodName 方法名称
-     * @param paramTypes 方法参数类型
-     * @return top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils.IndexedMethod
-     * @author huangchengxing
-     * @date 2022/5/9 17:44
-     */
-    public static IndexedMethod findMethod(Class<?> targetClass, String methodName, Class<?>... paramTypes) {
-        MethodAccess methodAccess = MethodAccess.get(targetClass);
-        return new IndexedMethod(methodAccess, methodAccess.getIndex(methodName, paramTypes));
-    }
-
-    /**
-     * 获取指定方法
-     *
-     * @param targetClass 目标类型
      * @param method 目标方法
      * @return top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils.IndexedMethod
      * @author huangchengxing
      * @date 2022/5/9 17:44
      */
-    public static IndexedMethod findMethod(Class<?> targetClass, Method method) {
+    public static MethodInvoker findMethod(Class<?> targetClass, Method method) {
         MethodAccess methodAccess = MethodAccess.get(targetClass);
-        return new IndexedMethod(methodAccess, methodAccess.getIndex(method.getName(), method.getParameterTypes()));
+        return new AsmReflexMethodInvoker(methodAccess, methodAccess.getIndex(method.getName(), method.getParameterTypes()));
     }
 
 }

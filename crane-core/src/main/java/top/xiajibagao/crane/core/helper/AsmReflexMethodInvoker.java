@@ -1,23 +1,23 @@
-package top.xiajibagao.crane.core.helper.reflex;
+package top.xiajibagao.crane.core.helper;
 
 import com.esotericsoftware.reflectasm.MethodAccess;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author huangchengxing
- * @date 2022/05/11 11:42
+ * @date 2022/06/07 18:55
  */
-@Deprecated
-@Getter
-@Accessors(fluent = true)
 @RequiredArgsConstructor
-public class IndexedMethod {
+public class AsmReflexMethodInvoker implements MethodInvoker {
+
     private final MethodAccess methodAccess;
     private final int methodIndex;
 
-    public Object invoke(Object target, Object... args) {
+    @Override
+    public Object invoke(@Nonnull Object target, Object... args) {
         return methodAccess.invoke(target, methodIndex, args);
     }
+
 }
