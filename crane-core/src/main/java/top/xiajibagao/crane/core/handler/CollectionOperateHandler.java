@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.core.handler;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
@@ -30,7 +31,8 @@ public class CollectionOperateHandler implements OperateHandler {
 
     @Override
     public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
-        if (Objects.isNull(source)) {
+        Collection<?> sourceColl = parseCollection(source);
+        if (CollUtil.isEmpty(sourceColl)) {
             return null;
         }
         // 若不指定引用字段，则直接返回集合
@@ -38,7 +40,7 @@ public class CollectionOperateHandler implements OperateHandler {
             return source;
         }
         // 若指定引用字段，则尝试从集合中的对象里获取字段
-        return parseCollection(source).stream()
+        return sourceColl.stream()
             .map(t -> handlerChain.readFromSource(t, property, operation))
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
@@ -51,10 +53,10 @@ public class CollectionOperateHandler implements OperateHandler {
 
     @Override
     public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        if (Objects.isNull(sourceData) || Objects.isNull(target)) {
+        Collection<Object> targetColl = parseCollection(target);
+        if (CollUtil.isEmpty(targetColl)) {
             return;
         }
-        Collection<Object> targetColl = parseCollection(target);
         targetColl.forEach(t -> handlerChain.writeToTarget(sourceData, t, property, operation));
     }
 

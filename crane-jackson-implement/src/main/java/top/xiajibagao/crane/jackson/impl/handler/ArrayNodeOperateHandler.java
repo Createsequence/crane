@@ -5,6 +5,7 @@ import cn.hutool.core.stream.StreamUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -39,6 +40,9 @@ public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler i
     @Override
     public JsonNode readFromSource(Object source, PropertyMapping property, Operation operation) {
         JsonNode sourceNode = JacksonUtils.valueToTree(source);
+        if (sourceNode.isEmpty()) {
+            return NullNode.getInstance();
+        }
         Assert.isTrue(sourceNode.isArray(), "值[{}]不是或无法解析为Json数组", source);
 
         // 没有数据源字段，直接返回json数组
@@ -63,6 +67,9 @@ public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler i
     @Override
     public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         ArrayNode targetNode = (ArrayNode) target;
+        if (targetNode.isEmpty()) {
+            return;
+        }
         targetNode.forEach(node -> handlerChain.tryWriteToTarget(sourceData, node, property, operation));
     }
 

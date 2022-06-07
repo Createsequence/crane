@@ -30,7 +30,7 @@ public class ArrayOperateHandler extends CollectionOperateHandler implements Ope
 
     @Override
     public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
-        if (Objects.isNull(source) || ArrayUtil.isEmpty(source)) {
+        if (ArrayUtil.isEmpty(source)) {
             return null;
         }
         return super.readFromSource(Arrays.asList((Object[])source), property, operation);

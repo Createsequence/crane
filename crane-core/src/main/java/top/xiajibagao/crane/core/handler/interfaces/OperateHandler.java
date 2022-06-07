@@ -53,6 +53,7 @@ public interface OperateHandler extends Orderly {
      * @author huangchengxing
      * @date 2022/4/8 9:48
      */
+    @Nullable
     Object readFromSource(@Nullable Object source, PropertyMapping property, Operation operation);
 
     /**

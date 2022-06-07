@@ -33,9 +33,6 @@ public class ObjectNodeOperateHandler extends AbstractJacksonNodeOperateHandler 
 
     @Override
     public JsonNode readFromSource(Object source, PropertyMapping property, Operation operation) {
-        if (Objects.isNull(source)) {
-            return NullNode.getInstance();
-        }
         JsonNode sourceNode = JacksonUtils.valueToTree(objectMapper, source);
         if (sourceNode.isObject()) {
             return property.hasResource() ?

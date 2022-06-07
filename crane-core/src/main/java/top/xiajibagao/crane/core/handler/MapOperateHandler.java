@@ -1,12 +1,12 @@
 package top.xiajibagao.crane.core.handler;
 
+import cn.hutool.core.collection.CollUtil;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 处理Map类型的数据源与待处理对象
@@ -24,10 +24,10 @@ public class MapOperateHandler implements OperateHandler {
 
     @Override
     public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
-        if (Objects.isNull(source)) {
+        Map<String, Object> sourceMap = parseMap(source);
+        if (CollUtil.isEmpty(sourceMap)) {
             return null;
         }
-        Map<String, Object> sourceMap = parseMap(source);
         return property.hasResource() ?
             sourceMap.get(property.getSource()) : sourceMap;
     }
@@ -39,10 +39,11 @@ public class MapOperateHandler implements OperateHandler {
 
     @Override
     public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        if (Objects.isNull(sourceData) || Objects.isNull(target)) {
+        Map<String, Object> targetMap = parseMap(target);
+        if (CollUtil.isEmpty(targetMap)) {
             return;
         }
-        Map<String, Object> targetMap = parseMap(target);
+
         // 不存在引用字段时，尝试将数据添加到key字段对应的位置
         if (!property.hasReference()) {
             targetMap.put(operation.getTargetProperty().getName(), sourceData);
