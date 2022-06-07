@@ -32,7 +32,7 @@ public class JacksonUtils {
     }
 
     public static <T> T getBeanByPath(ObjectMapper objectMapper, T target, String jsonPath) {
-        JsonNode targetNode = beanToTree(objectMapper, target).at(jsonPath);
+        JsonNode targetNode = valueToTree(objectMapper, target).at(jsonPath);
         try {
             return targetNode.isNull() ? null : objectMapper.readValue(targetNode.textValue(), new TypeReference<T>() {
             });
@@ -49,8 +49,8 @@ public class JacksonUtils {
      * @author huangchengxing
      * @date 2022/1/11 11:44
      */
-    public static JsonNode beanToTree(Object target) {
-        return beanToTree(DEFAULT_MAPPER, target);
+    public static JsonNode valueToTree(Object target) {
+        return valueToTree(DEFAULT_MAPPER, target);
     }
 
     /**
@@ -62,8 +62,9 @@ public class JacksonUtils {
      * @author huangchengxing
      * @date 2022/1/11 11:44
      */
-    public static JsonNode beanToTree(ObjectMapper objectMapper, Object target) {
-        return objectMapper.valueToTree(target);
+    public static JsonNode valueToTree(ObjectMapper objectMapper, Object target) {
+        return target instanceof JsonNode ?
+            (JsonNode)target : objectMapper.valueToTree(target);
     }
 
     /**

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.util.ClassUtils;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
@@ -29,44 +28,45 @@ public class ObjectNodeOperateHandler extends AbstractJacksonNodeOperateHandler 
 
     @Override
     public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
-        return Objects.nonNull(source) && ClassUtils.isAssignable(ObjectNode.class, source.getClass());
+        return Objects.nonNull(source);
     }
 
     @Override
     public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        return Objects.nonNull(target) && ClassUtils.isAssignable(ObjectNode.class, target.getClass());
+        return Objects.nonNull(target);
     }
 
     @Override
     public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
-        if (Objects.isNull(source) || !(source instanceof ObjectNode) || JacksonUtils.isNull((JsonNode)source)) {
+        if (Objects.isNull(source)) {
             return NullNode.getInstance();
         }
-        return property.hasResource() ?
-            parse(source).get(translatePropertyName(property.getSource())) : source;
+        JsonNode jsonNode = JacksonUtils.valueToTree(objectMapper, source);
+        if (jsonNode instanceof ObjectNode) {
+            return property.hasResource() ?
+                jsonNode.get(translatePropertyName(property.getSource())) : source;
+        }
+        return property.hasResource() ? NullNode.getInstance() : source;
     }
 
     @Override
     public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        if (Objects.isNull(sourceData) || !(sourceData instanceof JsonNode) || JacksonUtils.isNull((JsonNode)target)) {
+        if (Objects.isNull(sourceData) || JacksonUtils.isNull((JsonNode)target)) {
             return;
         }
+        JsonNode sourceNode = JacksonUtils.valueToTree(objectMapper, sourceData);
         // 指定了引用字段
-        ObjectNode targetNode = parse(target);
+        ObjectNode targetNode = (ObjectNode) target;
         if (property.hasReference()) {
             String translatedReferenceName = translatePropertyName(property.getReference());
-            parse(target).set(translatedReferenceName, (JsonNode)sourceData);
+            targetNode.set(translatedReferenceName, sourceNode);
             return;
         }
         // 未指定引用字段
         String nodeName = findNodeName(targetNode, operation.getTargetProperty().getName(), operation.getTargetPropertyAliases());
         if (CharSequenceUtil.isNotBlank(nodeName)) {
-            targetNode.set(nodeName, (JsonNode)sourceData);
+            targetNode.set(nodeName, sourceNode);
         }
-    }
-
-    private ObjectNode parse(Object target) {
-        return (ObjectNode) target;
     }
 
 }
