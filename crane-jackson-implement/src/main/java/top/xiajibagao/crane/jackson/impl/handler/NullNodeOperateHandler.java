@@ -1,5 +1,6 @@
-package top.xiajibagao.crane.core.handler;
+package top.xiajibagao.crane.jackson.impl.handler;
 
+import com.fasterxml.jackson.databind.node.NullNode;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -14,10 +15,9 @@ import java.util.Objects;
  * 优先使用该节点处理，避免后续节点被无意义的反复调用
  *
  * @author huangchengxing
- * @date 2022/06/07 16:49
- * @since 0.5.5
+ * @date 2022/06/07 17:08
  */
-public class NullOperateHandler implements OperateHandler {
+public class NullNodeOperateHandler implements OperateHandler {
 
     @Override
     public int getOrder() {
@@ -26,23 +26,22 @@ public class NullOperateHandler implements OperateHandler {
 
     @Override
     public boolean sourceCanRead(@Nullable Object source, PropertyMapping property, Operation operation) {
-        return Objects.isNull(source);
+        return Objects.isNull(source) || source instanceof NullNode;
     }
 
     @Override
-    public Object readFromSource(@Nullable Object source, PropertyMapping property, Operation operation) {
+    public NullNode readFromSource(@Nullable Object source, PropertyMapping property, Operation operation) {
         // 直接返回null
-        return null;
+        return NullNode.getInstance();
     }
 
     @Override
     public boolean targetCanWrite(@Nullable Object sourceData, @Nullable Object target, PropertyMapping property, AssembleOperation operation) {
-        return Objects.isNull(target);
+        return Objects.isNull(target) || target instanceof NullNode;
     }
 
     @Override
     public void writeToTarget(@Nullable Object sourceData, @Nullable Object target, PropertyMapping property, AssembleOperation operation) {
         // 不做任何处理
     }
-
 }
