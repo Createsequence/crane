@@ -30,19 +30,6 @@ public interface OperateHandler extends Orderly {
     boolean sourceCanRead(@Nullable Object source, PropertyMapping property, Operation operation);
 
     /**
-     * 是否支持将数据源数据写入待处理对象
-     *
-     * @param sourceData 从数据源获取的数据
-     * @param target 待处理对象
-     * @param property 待处理字段
-     * @param operation 字段配置
-     * @return boolean
-     * @author huangchengxing
-     * @date 2022/4/8 9:40
-     */
-    boolean targetCanWrite(@Nullable Object sourceData, @Nullable Object target, PropertyMapping property, AssembleOperation operation);
-
-    /**
      * 从数据源中读取数据 <br />
      * source必须是{@link #sourceCanRead(Object, PropertyMapping, Operation)}所支持的类型
      *
@@ -55,6 +42,19 @@ public interface OperateHandler extends Orderly {
      */
     @Nullable
     Object readFromSource(@Nullable Object source, PropertyMapping property, Operation operation);
+
+    /**
+     * 是否支持将数据源数据写入待处理对象
+     *
+     * @param sourceData 从数据源获取的数据
+     * @param target 待处理对象
+     * @param property 待处理字段
+     * @param operation 字段配置
+     * @return boolean
+     * @author huangchengxing
+     * @date 2022/4/8 9:40
+     */
+    boolean targetCanWrite(@Nullable Object sourceData, @Nullable Object target, PropertyMapping property, AssembleOperation operation);
 
     /**
      * 将数据源数据写入待处理对象 <br />
