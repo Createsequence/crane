@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.core.ExampleConfig;
+import top.xiajiabagao.crane.starter.core.CoreTestConfig;
 import top.xiajibagao.crane.core.container.BeanIntrospectContainer;
 import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.container.KeyIntrospectContainer;
@@ -33,7 +33,7 @@ import java.util.concurrent.Executors;
  * @date 2022/06/01 17:12
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ExampleConfig.class)
+@SpringBootTest(classes = CoreTestConfig.class)
 public class AsyncUnorderedOperationExecutorTest {
 
     @Autowired

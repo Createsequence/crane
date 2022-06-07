@@ -9,7 +9,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.core.ExampleConfig;
+import top.xiajiabagao.crane.starter.core.CoreTestConfig;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
 import top.xiajibagao.crane.core.handler.BeanReflexOperateHandlerChain;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
@@ -31,7 +31,7 @@ import java.util.List;
  * @date 2022/05/31 17:56
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ExampleConfig.class)
+@SpringBootTest(classes = CoreTestConfig.class)
 public class BeanReflexDisassemblerTest {
 
     @Autowired

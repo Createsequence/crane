@@ -13,7 +13,7 @@ import top.xiajibagao.crane.starter.EnableCrane;
  */
 @EnableCrane
 @Configuration
-public class ExampleConfig {
+public class CoreTestConfig {
 
     @Primary
     @Bean

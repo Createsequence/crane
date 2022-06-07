@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.core.ExampleConfig;
+import top.xiajiabagao.crane.starter.core.CoreTestConfig;
 import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.ProcessResult;
 import top.xiajibagao.crane.core.annotation.Prop;
@@ -29,7 +29,7 @@ import java.util.function.Function;
  * @date 2022/06/01 20:16
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {ExampleConfig.class, MethodResultProcessAspectTest.ExampleService.class})
+@SpringBootTest(classes = {CoreTestConfig.class, MethodResultProcessAspectTest.ExampleService.class})
 public class MethodResultProcessAspectTest {
 
     @Autowired

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.core.ExampleConfig;
+import top.xiajiabagao.crane.starter.core.CoreTestConfig;
 import top.xiajibagao.crane.core.cache.CacheConfigurationParserWrapper;
 import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.cache.OperationConfigurationCache;
@@ -22,7 +22,7 @@ import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
  * @date 2022/06/01 11:11
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ExampleConfig.class)
+@SpringBootTest(classes = CoreTestConfig.class)
 public class CacheConfigurationParserWrapperTest {
 
     @Autowired

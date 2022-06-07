@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.core.ExampleConfig;
+import top.xiajiabagao.crane.starter.core.CoreTestConfig;
 import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.container.MethodSourceContainer;
@@ -37,7 +37,7 @@ import java.util.*;
  * @date 2022/06/01 16:13
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {ExampleConfig.class, MethodSourceContainerTest.MethodSourceService.class})
+@SpringBootTest(classes = {CoreTestConfig.class, MethodSourceContainerTest.MethodSourceService.class})
 public class MethodSourceContainerTest {
 
     @Autowired
