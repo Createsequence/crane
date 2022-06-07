@@ -11,7 +11,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import top.xiajiabagao.crane.starter.core.ExampleConfig;
+import top.xiajiabagao.crane.starter.jackson.JacksonTestConfig;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
@@ -30,7 +30,7 @@ import java.util.*;
  * @date 2022/06/07 13:13
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ExampleConfig.class)
+@SpringBootTest(classes = JacksonTestConfig.class)
 public class JacksonDisassemblerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();

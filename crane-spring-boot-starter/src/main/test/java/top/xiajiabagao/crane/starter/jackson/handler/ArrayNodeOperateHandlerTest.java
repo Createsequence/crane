@@ -55,7 +55,7 @@ public class ArrayNodeOperateHandlerTest {
         Assertions.assertEquals(objectMapper.valueToTree(Arrays.asList("小红", "小刚")), handler.readFromSource(source, targetPropertyAndSourceProperty, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite("小红", target, targetPropertyAndSourceProperty, assembleOperation));
         handler.writeToTarget( "小红", target, targetPropertyAndSourceProperty, assembleOperation);
-        Assertions.assertEquals(Arrays.asList("小红", "小红"), CollStreamUtil.toList(IterUtil.toList(target), node -> node.get("name")));
+        Assertions.assertEquals(Arrays.asList("小红", "小红"), CollStreamUtil.toList(IterUtil.toList(target), node -> node.get("name").textValue()));
 
         // source -> target.xxx
         target = objectMapper.valueToTree(Arrays.asList(new Example(1, "小明", null, null), new Example(2, "小李", null, null)));
@@ -75,15 +75,18 @@ public class ArrayNodeOperateHandlerTest {
         target = objectMapper.valueToTree(Arrays.asList(new Example(1, "小明", null, null), new Example(2, "小李", null, null)));
         PropertyMapping targetAndSourceProperty = new BeanPropertyMapping("", "name", "", Void.class);
         Assertions.assertTrue(handler.sourceCanRead(source, targetAndSourceProperty, assembleOperation));
-        Assertions.assertEquals(Arrays.asList("小红", "小刚"), handler.readFromSource(source, targetAndSourceProperty, assembleOperation));
+        Assertions.assertEquals(objectMapper.valueToTree(Arrays.asList("小红", "小刚")), handler.readFromSource(source, targetAndSourceProperty, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite(Arrays.asList("小红", "小刚"), target, targetAndSourceProperty, assembleOperation));
         handler.writeToTarget(Arrays.asList("小红", "小刚"), target, targetAndSourceProperty, assembleOperation);
         Assertions.assertEquals(
-            Arrays.asList(objectMapper.valueToTree(Arrays.asList("小红", "小刚")), objectMapper.valueToTree(Arrays.asList("小红", "小刚"))),
+            Arrays.asList(
+                objectMapper.valueToTree(Arrays.asList("小红", "小刚")),
+                objectMapper.valueToTree(Arrays.asList("小红", "小刚"))
+            ),
             CollStreamUtil.toList(IterUtil.toList(target), node -> node.get("names"))
         );
 
-        //// source -> target
+        // source -> target
         assembleOperation = new BeanAssembleOperation(
             0, null, ReflexUtils.findField(Example.class, "example"),
             Collections.emptySet(), "", null, null,
@@ -100,7 +103,7 @@ public class ArrayNodeOperateHandlerTest {
 
     @NoArgsConstructor
     @AllArgsConstructor
-    @Accessors(chain = true, fluent = true)
+    @Accessors(chain = true)
     @Data
     private static class Example {
         private Integer id;

@@ -16,6 +16,7 @@ import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
+import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
 import java.util.Collections;
 
@@ -41,10 +42,10 @@ public class ObjectNodeOperateHandlerTest {
         JsonNode source = objectMapper.valueToTree(new Example(2, "小红", null));
         PropertyMapping targetPropertyAndSourceProperty = new BeanPropertyMapping("name", "name", "", Void.class);
         Assertions.assertTrue(handler.sourceCanRead(source, targetPropertyAndSourceProperty, assembleOperation));
-        Assertions.assertEquals("小红", handler.readFromSource(source, targetPropertyAndSourceProperty, assembleOperation));
+        Assertions.assertEquals(objectMapper.valueToTree("小红"), handler.readFromSource(source, targetPropertyAndSourceProperty, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite("小红", target, targetPropertyAndSourceProperty, assembleOperation));
         handler.writeToTarget( "小红", target, targetPropertyAndSourceProperty, assembleOperation);
-        Assertions.assertEquals("小红", target.get("name"));
+        Assertions.assertEquals(objectMapper.valueToTree("小红"), target.get("name"));
 
         // source -> target.xxx
         target = objectMapper.valueToTree(new Example(1, "小明", null));
@@ -64,10 +65,10 @@ public class ObjectNodeOperateHandlerTest {
         target = objectMapper.valueToTree(new Example(1, "小明", null));
         PropertyMapping targetAndSourceProperty = new BeanPropertyMapping("", "name", "", Void.class);
         Assertions.assertTrue(handler.sourceCanRead(source, targetAndSourceProperty, assembleOperation));
-        Assertions.assertEquals("小红", handler.readFromSource(source, targetAndSourceProperty, assembleOperation));
+        Assertions.assertEquals(objectMapper.valueToTree("小红"), handler.readFromSource(source, targetAndSourceProperty, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite("小红", target, targetAndSourceProperty, assembleOperation));
         handler.writeToTarget("小红", target, targetAndSourceProperty, assembleOperation);
-        Assertions.assertEquals("小红", target.get("name"));
+        Assertions.assertEquals(JacksonUtils.valueToTree(objectMapper, "小红"), target.get("name"));
 
         // source -> target
         assembleOperation = new BeanAssembleOperation(
