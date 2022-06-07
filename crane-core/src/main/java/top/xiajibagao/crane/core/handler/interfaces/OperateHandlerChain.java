@@ -74,6 +74,48 @@ public interface OperateHandlerChain extends OperateHandler {
     }
 
     /**
+     * 将数据源对象使用操作拦截器处理后，再使用处理器链中第一个支持处理该拦截诡异的数据源对象的操作处理器，从中获取所需数据源
+     *
+     * @param source 数据源
+     * @param property 待处理字段
+     * @param operation 字段配置
+     * @return java.lang.Object
+     * @author huangchengxing
+     * @date 2022/4/8 21:05
+     */
+    @Override
+    default Object readFromSource(Object source, PropertyMapping property, Operation operation) {
+        for (SourceOperateInterceptor interceptor : interceptors()) {
+            if (interceptor.supportInterceptReadSource(source, property, operation)) {
+                source = interceptor.interceptReadSource(source, property, operation);
+            }
+        }
+        final Object interceptedSources = source;
+        return handlers()
+            .stream()
+            .filter(h -> h.sourceCanRead(interceptedSources, property, operation))
+            .findFirst()
+            .map(h -> h.readFromSource(interceptedSources, property, operation))
+            .orElse(null);
+    }
+
+    /**
+     * 若{@link #sourceCanRead(Object, PropertyMapping, Operation)}方法返回ture，
+     * 则返回{@link #readFromSource(Object, PropertyMapping, Operation)}的返回值，否则直接返回null
+     *
+     * @param source 数据源
+     * @param property 待处理字段
+     * @param operation 字段配置
+     * @return java.lang.Object
+     * @author huangchengxing
+     * @date 2022/6/7 15:47
+     * @since 0.5.5
+     */
+    default Object tryReadFromSource(Object source, PropertyMapping property, Operation operation) {
+        return sourceCanRead(source, property, operation) ? readFromSource(source, property, operation) : null;
+    }
+
+    /**
      * 处理器链中是否存在可以将数据源数据写入待处理对象的节点
      *
      * @param sourceData 从数据源获取的数据
@@ -115,29 +157,21 @@ public interface OperateHandlerChain extends OperateHandler {
     }
 
     /**
-     * 将数据源对象使用操作拦截器处理后，再使用处理器链中第一个支持处理该拦截诡异的数据源对象的操作处理器，从中获取所需数据源
+     * 若{@link #targetCanWrite(Object, Object, PropertyMapping, AssembleOperation)}返回ture，
+     * 则调用{@link #writeToTarget(Object, Object, PropertyMapping, AssembleOperation)}
      *
-     * @param source 数据源
-     * @param property 待处理字段
-     * @param operation 字段配置
-     * @return java.lang.Object
+     * @param sourceData 从数据源获取的数据
+     * @param target     待处理对象
+     * @param property   待处理字段
+     * @param operation  字段配置
      * @author huangchengxing
-     * @date 2022/4/8 21:05
+     * @date 2022/4/8 9:40
+     * @since 0.5.5
      */
-    @Override
-    default Object readFromSource(Object source, PropertyMapping property, Operation operation) {
-        for (SourceOperateInterceptor interceptor : interceptors()) {
-            if (interceptor.supportInterceptReadSource(source, property, operation)) {
-                source = interceptor.interceptReadSource(source, property, operation);
-            }
+    default void tryWriteToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
+        if (targetCanWrite(sourceData, target, property, operation)) {
+            writeToTarget(sourceData, target, property, operation);
         }
-        final Object interceptedSources = source;
-        return handlers()
-            .stream()
-            .filter(h -> h.sourceCanRead(interceptedSources, property, operation))
-            .findFirst()
-            .map(h -> h.readFromSource(interceptedSources, property, operation))
-            .orElse(null);
     }
 
 }
