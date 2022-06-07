@@ -25,12 +25,7 @@ public class ArrayOperateHandler extends CollectionOperateHandler implements Ope
 
     @Override
     public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
-        return ArrayUtil.isArray(source);
-    }
-
-    @Override
-    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        return ArrayUtil.isArray(target);
+        return Objects.nonNull(source) && source.getClass().isArray();
     }
 
     @Override
@@ -39,6 +34,11 @@ public class ArrayOperateHandler extends CollectionOperateHandler implements Ope
             return null;
         }
         return super.readFromSource(Arrays.asList((Object[])source), property, operation);
+    }
+
+    @Override
+    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
+        return Objects.nonNull(target) && target.getClass().isArray();
     }
 
     @Override

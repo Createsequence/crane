@@ -7,6 +7,8 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
+import java.util.Objects;
+
 /**
  * 处理对象类型数据源与待处理对象，也是用于兜底的处理器
  *
@@ -21,12 +23,7 @@ public class BeanOperateHandler implements OperateHandler {
 
     @Override
     public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
-        return true;
-    }
-
-    @Override
-    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        return true;
+        return Objects.nonNull(source);
     }
 
     @Override
@@ -38,6 +35,11 @@ public class BeanOperateHandler implements OperateHandler {
                 .orElse(null);
         }
         return source;
+    }
+
+    @Override
+    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
+        return Objects.nonNull(target);
     }
 
     @Override
