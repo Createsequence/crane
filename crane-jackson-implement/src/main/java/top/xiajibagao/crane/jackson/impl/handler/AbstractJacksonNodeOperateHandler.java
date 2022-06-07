@@ -51,15 +51,14 @@ public abstract class AbstractJacksonNodeOperateHandler implements OperateHandle
      */
     protected String findNodeName(JsonNode target, String targetName, Collection<String> aliases) {
         String keyPropertyName = translatePropertyName(targetName);
-        JsonNode keyNode = target.get(keyPropertyName);
-        if (JacksonUtils.isNotNull(keyNode)) {
+        if (target.has(keyPropertyName)) {
             return targetName;
         }
         if (CollUtil.isEmpty(aliases)) {
             return null;
         }
         return aliases.stream()
-            .filter(alias -> JacksonUtils.isNotNull(target.get(alias)))
+            .filter(target::has)
             .findFirst()
             .orElse(null);
     }
