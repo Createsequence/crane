@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import top.xiajibagao.crane.core.handler.ExpressionPreprocessingInterceptor;
+import top.xiajibagao.crane.core.handler.NullOperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.SourceOperateInterceptor;
 import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.JacksonOperateHandlerChain;
@@ -72,6 +73,7 @@ public class CraneJacksonAutoConfiguration {
         JacksonOperateHandlerChain operateHandlerChain = new JacksonOperateHandlerChain();
         interceptors.forEach(operateHandlerChain::addInterceptor);
         operateHandlerChain.addHandler(new ArrayNodeOperateHandler(objectMapper, operateHandlerChain))
+            .addHandler(new NullOperateHandler())
             .addHandler(new ObjectNodeOperateHandler(objectMapper))
             .addHandler(new ValueNodeOperateHandler(objectMapper));
         log.info("注册处理器链 {}, 已配置节点: {}", "DefaultCraneJacksonOrderlyOperateHandlerChain", CollUtil.join(operateHandlerChain.handlers(), ", ", h -> h.getClass()

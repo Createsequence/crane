@@ -124,6 +124,7 @@ public class CraneAutoConfiguration {
     public BeanReflexOperateHandlerChain beanReflexOperateHandlerChain(BeanPropertyFactory beanPropertyFactory, List<SourceOperateInterceptor> interceptors) {
         BeanReflexOperateHandlerChain operateHandlerChain = new BeanReflexOperateHandlerChain();
         operateHandlerChain.addHandler(new MapOperateHandler())
+            .addHandler(new NullOperateHandler())
             .addHandler(new CollectionOperateHandler(operateHandlerChain))
             .addHandler(new ArrayOperateHandler(operateHandlerChain))
             .addHandler(new MapOperateHandler())
