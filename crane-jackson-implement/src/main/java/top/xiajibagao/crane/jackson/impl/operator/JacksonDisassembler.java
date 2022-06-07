@@ -4,15 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import top.xiajibagao.crane.core.exception.CraneException;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * {@link JsonNode}数据装卸器
@@ -30,23 +26,24 @@ public class JacksonDisassembler implements Disassembler {
         if (JacksonUtils.isNotNodeOrNull(target)) {
             return Collections.emptyList();
         }
-        JsonNode targetNode = (JsonNode)target;
+        JsonNode targetNode = JacksonUtils.valueToTree(target);
         JsonNode targetPropertyNode = findTargetPropertyNode(targetNode, operation);
         if (JacksonUtils.isNull(targetPropertyNode)) {
             return Collections.emptyList();
         }
 
-        // 处理数据
+        // bfs遍历
         List<JsonNode> results = new ArrayList<>();
-        if (targetPropertyNode.isArray()) {
-            targetPropertyNode.forEach(results::add);
-        } else if(targetPropertyNode.isObject()) {
-            results.add(targetPropertyNode);
-        } else {
-            CraneException.throwOf(
-                "对象[{}]的节点[{}]，无法拆卸为json数组或json对象",
-                targetNode, targetPropertyNode
-            );
+        Deque<JsonNode> deque = new LinkedList<>();
+        deque.add(targetPropertyNode);
+        while (!deque.isEmpty()) {
+            JsonNode node = deque.removeFirst();
+            // 仍然还是json数组
+            if (node.isArray()) {
+                node.forEach(deque::addLast);
+                continue;
+            }
+            results.add(node);
         }
         return results;
     }
