@@ -32,39 +32,37 @@ public class ObjectNodeOperateHandler extends AbstractJacksonNodeOperateHandler 
     }
 
     @Override
-    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        return Objects.nonNull(target);
-    }
-
-    @Override
-    public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
+    public JsonNode readFromSource(Object source, PropertyMapping property, Operation operation) {
         if (Objects.isNull(source)) {
             return NullNode.getInstance();
         }
-        JsonNode jsonNode = JacksonUtils.valueToTree(objectMapper, source);
-        if (jsonNode instanceof ObjectNode) {
+        JsonNode sourceNode = JacksonUtils.valueToTree(objectMapper, source);
+        if (sourceNode.isObject()) {
             return property.hasResource() ?
-                jsonNode.get(translatePropertyName(property.getSource())) : source;
+                sourceNode.get(translatePropertyName(property.getSource())) : sourceNode;
         }
-        return property.hasResource() ? NullNode.getInstance() : source;
+        return property.hasResource() ? NullNode.getInstance() : sourceNode;
+    }
+
+    @Override
+    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
+        return target instanceof ObjectNode;
     }
 
     @Override
     public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        if (Objects.isNull(sourceData) || JacksonUtils.isNull((JsonNode)target)) {
-            return;
-        }
-        JsonNode sourceNode = JacksonUtils.valueToTree(objectMapper, sourceData);
         // 指定了引用字段
         ObjectNode targetNode = (ObjectNode) target;
         if (property.hasReference()) {
             String translatedReferenceName = translatePropertyName(property.getReference());
+            JsonNode sourceNode = JacksonUtils.valueToTree(objectMapper, sourceData);
             targetNode.set(translatedReferenceName, sourceNode);
             return;
         }
         // 未指定引用字段
         String nodeName = findNodeName(targetNode, operation.getTargetProperty().getName(), operation.getTargetPropertyAliases());
         if (CharSequenceUtil.isNotBlank(nodeName)) {
+            JsonNode sourceNode = JacksonUtils.valueToTree(objectMapper, sourceData);
             targetNode.set(nodeName, sourceNode);
         }
     }

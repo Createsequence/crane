@@ -1,14 +1,13 @@
 package top.xiajibagao.crane.jackson.impl.handler;
 
+import cn.hutool.core.util.ClassUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
-import org.springframework.util.ClassUtils;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
-import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
 import java.util.Objects;
 
@@ -27,24 +26,26 @@ public class ValueNodeOperateHandler extends AbstractJacksonNodeOperateHandler i
 
     @Override
     public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
-        return Objects.nonNull(source) && ClassUtils.isAssignable(ValueNode.class, source.getClass());
+        if (Objects.isNull(source)) {
+            return false;
+        }
+        return source instanceof ValueNode || ClassUtil.isBasicType(source.getClass()) || source instanceof String;
+    }
+
+    @Override
+    public JsonNode readFromSource(Object source, PropertyMapping property, Operation operation) {
+        // 值节点总是返回他本身
+        return objectMapper.valueToTree(source);
     }
 
     @Override
     public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        return Objects.nonNull(target) && ClassUtils.isAssignable(ValueNode.class, target.getClass());
-    }
-
-    @Override
-    public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
-        if (Objects.isNull(source) || !(source instanceof ValueNode) || JacksonUtils.isNull((ValueNode)source)) {
-            return NullNode.getInstance();
-        }
-        return source;
+        return target instanceof ValueNode;
     }
 
     @Override
     public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
         // 值节点无法做任何处理
     }
+
 }
