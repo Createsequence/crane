@@ -1,11 +1,10 @@
 package top.xiajibagao.crane.jackson.impl.handler;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.stream.StreamUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import org.springframework.util.ClassUtils;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -13,6 +12,7 @@ import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -33,26 +33,22 @@ public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler i
 
     @Override
     public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
-        return Objects.nonNull(source) && ClassUtils.isAssignable(ArrayNode.class, source.getClass());
+        return source instanceof ArrayNode || source instanceof Collection || (Objects.nonNull(source) && source.getClass().isArray());
     }
 
     @Override
-    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        return Objects.nonNull(target) && ClassUtils.isAssignable(ArrayNode.class, target.getClass());
-    }
+    public JsonNode readFromSource(Object source, PropertyMapping property, Operation operation) {
+        JsonNode sourceNode = JacksonUtils.valueToTree(source);
+        Assert.isTrue(sourceNode.isArray(), "值[{}]不是或无法解析为Json数组", source);
 
-    @Override
-    public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
-        if (Objects.isNull(source) || !(source instanceof ArrayNode) || JacksonUtils.isNull((JsonNode)source)) {
-            return NullNode.getInstance();
-        }
-        ArrayNode sourceNode = parse(source);
+        // 没有数据源字段，直接返回json数组
         if (!property.hasResource()) {
             return sourceNode;
         }
+        // 有数据源字段，获取json数组中的元素，并进一步处理
         ArrayNode arrayNode = objectMapper.getNodeFactory().arrayNode();
         StreamUtil.of(sourceNode)
-            .map(t -> handlerChain.readFromSource(t, property, operation))
+            .map(node -> handlerChain.tryReadFromSource(node, property, operation))
             .map(JsonNode.class::cast)
             .filter(JacksonUtils::isNotNull)
             .forEach(arrayNode::add);
@@ -60,17 +56,14 @@ public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler i
     }
 
     @Override
-    public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        if (Objects.isNull(target) || !(target instanceof ArrayNode) || JacksonUtils.isNull((JsonNode)target)) {
-            return;
-        }
-        for (JsonNode jsonNode : parse(target)) {
-            handlerChain.writeToTarget(sourceData, jsonNode, property, operation);
-        }
+    public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
+        return target instanceof ArrayNode;
     }
 
-    public ArrayNode parse(Object target) {
-        return (ArrayNode) target;
+    @Override
+    public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
+        ArrayNode targetNode = (ArrayNode) target;
+        targetNode.forEach(node -> handlerChain.tryWriteToTarget(sourceData, node, property, operation));
     }
 
 }
