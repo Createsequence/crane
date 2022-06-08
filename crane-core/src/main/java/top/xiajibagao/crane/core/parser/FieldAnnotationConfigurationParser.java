@@ -10,14 +10,18 @@ import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.Disassemble;
 import top.xiajibagao.crane.core.exception.CraneException;
 import top.xiajibagao.crane.core.helper.BeanFactoryUtils;
-import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.parser.interfaces.*;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 解析类属性中的{@link Assemble}与{@link Disassemble}注解，生成配置类
@@ -77,23 +81,19 @@ public class FieldAnnotationConfigurationParser
      * @date 2022/3/1 16:55
      */
     protected List<AssembleOperation> parseAssembleAnnotationOnField(Field key, BeanOperationConfiguration configuration) {
-        Assemble assemble = AnnotatedElementUtils.getMergedAnnotation(key, Assemble.class);
-        List<AssembleOperation> operations = ObjectUtils.computeIfNotNull(
-            AnnotatedElementUtils.getMergedAnnotation(key, Assemble.List.class),
-            list -> CollStreamUtil.toList(
-                Arrays.asList(list.value()), a -> createAssembleOperation(key, a, configuration)
-            ), new ArrayList<>()
-        );
-        if (Objects.nonNull(assemble)) {
-            operations.add(createAssembleOperation(key, assemble, configuration));
-        }
-
+        // 获取全部Assemble注解，包括正常注解，重复注解与元注解
+        List<Assemble> annotations = AnnotatedElementUtils.getAllMergedAnnotations(key, Assemble.List.class).stream()
+            .map(Assemble.List::value)
+            .flatMap(Stream::of)
+            .collect(Collectors.toList());
+        annotations.addAll(AnnotatedElementUtils.getAllMergedAnnotations(key, Assemble.class));
+        // 校验字段是否同时是装配和装卸字段
         CraneException.throwIfFalse(
-            CollectionUtils.isEmpty(operations) || !AnnotatedElementUtils.hasAnnotation(key, Disassemble.class),
-            "属性[%s]无法同时被%s和%s注解标记",
+            CollectionUtils.isEmpty(annotations) || !AnnotatedElementUtils.hasAnnotation(key, Disassemble.class),
+            "属性[{}]无法同时被{}和{}注解标记",
             configuration.getTargetClass(), key, Assemble.class, Disassemble.class
         );
-        return operations;
+        return CollStreamUtil.toList(annotations, a -> createAssembleOperation(key, a, configuration));
     }
     
     // =========================== 解析属性上的装卸注解 ===========================
@@ -109,13 +109,15 @@ public class FieldAnnotationConfigurationParser
      * @date 2022/3/1 17:49
      */
     protected List<DisassembleOperation> parseDisassembleAnnotationOnField(Field key, BeanOperationConfiguration configuration, ParseContext parseContext) {
-        Disassemble annotation = AnnotatedElementUtils.findMergedAnnotation(key, Disassemble.class);
-        if (Objects.isNull(annotation)) {
+        Set<Disassemble> disassembles = AnnotatedElementUtils.findAllMergedAnnotations(key, Disassemble.class);
+        if (CollUtil.isEmpty(disassembles)) {
             return Collections.emptyList();
         }
+        CraneException.throwIfTrue(disassembles.size() > 1, "属性[{}]不允许被多个{}注解！", key, Disassemble.class);
+        Disassemble annotation = CollUtil.getFirst(disassembles);
         CraneException.throwIfTrue(
             AnnotatedElementUtils.hasAnnotation(key, Assemble.class),
-            "属性[%s]无法同时被%s和%s注解标记", configuration.getTargetClass(), key, Assemble.class, Disassemble.class
+            "属性[{}]无法同时被{}和{}注解标记", configuration.getTargetClass(), key, Assemble.class, Disassemble.class
         );
 
         // 递归解析拆卸字段类型

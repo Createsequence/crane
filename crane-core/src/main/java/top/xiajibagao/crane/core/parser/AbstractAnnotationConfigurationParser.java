@@ -2,6 +2,7 @@ package top.xiajibagao.crane.core.parser;
 
 import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
@@ -98,11 +99,11 @@ public abstract class AbstractAnnotationConfigurationParser implements OperateCo
      * @date 2022/3/3 15:05
      */
     protected List<PropertyMapping> parsePropsTemplateAnnotation(Class<?> targetClass) {
-        PropsTemplate annotation = AnnotatedElementUtils.findMergedAnnotation(targetClass, PropsTemplate.class);
-        if (Objects.isNull(annotation)) {
-            return Collections.emptyList();
-        }
-        return Stream.of(annotation.value())
+        return AnnotatedElementUtils.findAllMergedAnnotations(targetClass, PropsTemplate.class).stream()
+            .filter(Objects::nonNull)
+            .map(PropsTemplate::value)
+            .filter(ArrayUtil::isNotEmpty)
+            .flatMap(Stream::of)
             .map(this::parsePropAnnotation)
             .collect(Collectors.toList());
     }
