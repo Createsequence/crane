@@ -31,7 +31,7 @@ public class AsmReflexUtils {
      * </ul>
      *
      * @param targetClass 属性
-     * @param fieldName 属性名
+     * @param fieldName   属性名
      * @return int setter方法的访问下标，若不存在则返回-1
      * @author huangchengxing
      * @date 2022/4/1 12:58
@@ -51,7 +51,7 @@ public class AsmReflexUtils {
      * </ul>
      *
      * @param targetClass 类
-     * @param fieldName 属性名
+     * @param fieldName   属性名
      * @return int getter方法的访问下标，若不存在则返回-1
      * @author huangchengxing
      * @date 2022/5/9 17:12
@@ -73,19 +73,34 @@ public class AsmReflexUtils {
     public static MethodAccess getMethodAccess(Class<?> targetClass) {
         return METHOD_ACCESS_CACHE.computeIfAbsent(targetClass, MethodAccess::get);
     }
-    
+
     /**
      * 获取指定方法
      *
      * @param targetClass 目标类型
      * @param method 目标方法
-     * @return top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils.IndexedMethod
+     * @param enableParamTypeConvert 是否允许自动转换入参类型
+     * @return top.xiajibagao.crane.core.helper.invoker.MethodInvoker
+     * @author huangchengxing
+     * @date 2022/5/9 17:44
+     * @since 0.5.5
+     */
+    public static MethodInvoker findMethod(Class<?> targetClass, Method method, boolean enableParamTypeConvert) {
+        MethodAccess methodAccess = MethodAccess.get(targetClass);
+        MethodInvoker methodInvoker = new AsmReflexMethodInvoker(methodAccess, methodAccess.getIndex(method.getName(), method.getParameterTypes()));
+        return enableParamTypeConvert ? new ParamTypeAutoConvertInvoker(method.getParameterTypes(), methodInvoker) : methodInvoker;
+    }
+
+    /**
+     * 获取指定方法
+     *
+     * @param targetClass 目标类型
+     * @param method 目标方法
+     * @return top.xiajibagao.crane.core.helper.invoker.MethodInvoker
      * @author huangchengxing
      * @date 2022/5/9 17:44
      */
     public static MethodInvoker findMethod(Class<?> targetClass, Method method) {
-        MethodAccess methodAccess = MethodAccess.get(targetClass);
-        return new AsmReflexMethodInvoker(methodAccess, methodAccess.getIndex(method.getName(), method.getParameterTypes()));
+        return findMethod(targetClass, method, false);
     }
-
 }

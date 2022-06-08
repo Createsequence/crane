@@ -28,7 +28,11 @@ public class ReflexBeanPropertyFactory extends AbstractBeanPropertyFactory imple
         Assert.notNull(getter, "属性{}找不到对应的Getter方法", field);
         Method setter = ReflexUtils.findSetterMethod(targetClass, field);
         Assert.notNull(setter, "属性{}找不到对应的Setter方法", field);
-        return new ReflexBeanPropertyFactory.ReflexBeanProperty(targetClass, field, new ReflexMethodInvoker(getter), new ReflexMethodInvoker(setter));
+        return new ReflexBeanPropertyFactory.ReflexBeanProperty(
+            targetClass, field,
+            new ParamTypeAutoConvertInvoker(getter.getParameterTypes(), new ReflexMethodInvoker(getter)),
+            new ParamTypeAutoConvertInvoker(setter.getParameterTypes(), new ReflexMethodInvoker(setter))
+        );
     }
 
     /**

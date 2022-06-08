@@ -31,12 +31,16 @@ public class AsmReflexBeanPropertyFactory extends AbstractBeanPropertyFactory im
         Method getter = ReflexUtils.findGetterMethod(targetClass, field);
         Assert.notNull(getter, "属性[{}]找不到对应的Getter方法", field);
         int getterIndex = methodAccess.getIndex(getter.getName(), getter.getParameterTypes());
-        MethodInvoker getterInvoker = new AsmReflexMethodInvoker(methodAccess, getterIndex);
+        MethodInvoker getterInvoker = new ParamTypeAutoConvertInvoker(
+            getter.getParameterTypes(), new AsmReflexMethodInvoker(methodAccess, getterIndex)
+        );
 
         Method setter = ReflexUtils.findSetterMethod(targetClass, field);
         Assert.notNull(setter, "属性[{}]找不到对应的Setter方法", field);
         int setterIndex = methodAccess.getIndex(setter.getName(), setter.getParameterTypes());
-        MethodInvoker setterInvoker = new AsmReflexMethodInvoker(methodAccess, setterIndex);
+        MethodInvoker setterInvoker = new ParamTypeAutoConvertInvoker(
+            setter.getParameterTypes(), new AsmReflexMethodInvoker(methodAccess, setterIndex)
+        );
         return new AsmReflexBeanProperty(
             targetClass, field, getterInvoker, setterInvoker
         );

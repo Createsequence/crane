@@ -1,7 +1,6 @@
 package top.xiajibagao.crane.core.container;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
@@ -116,7 +115,7 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
             .ifPresent(property -> {
                 MethodSource cache = new MethodSource(
                     annotation.mappingType(), methodSourceBean, targetClass, annotation.namespace(),
-                    method, AsmReflexUtils.findMethod(targetClass, method), property
+                    method, AsmReflexUtils.findMethod(targetClass, method, true), property
                 );
                 methodCache.put(annotation.namespace(), cache);
                 log.info("注册方法数据源：[{}], 映射类型：[{}]", annotation.namespace(), annotation.mappingType().name());
@@ -169,12 +168,12 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         @Getter
         private final String containerName;
         private final Method sourceGetter;
-        private final MethodInvoker indexedMethod;
+        private final MethodInvoker methodInvoker;
         private final BeanProperty sourceKeyProperty;
 
         @SuppressWarnings("unchecked")
         public Collection<Object> getSources(Collection<Object> keys) {
-            return (Collection<Object>)indexedMethod.invoke(target, Convert.convert(sourceGetter.getParameterTypes()[0], keys));
+            return (Collection<Object>)methodInvoker.invoke(target, keys);
         }
 
         public Object getSourceKeyPropertyValue(Object source) {
