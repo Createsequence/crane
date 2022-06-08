@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 按{@link OperateHandler#getOrder()}排序的装配器链
+ * {@link #handlers()}与{@link #interceptors()}皆按{@link Orderly#comparator()}排序的处理器链，提供一些方法的基本实现
  *
  * @since 0.2.0
  * @author huangchengxing

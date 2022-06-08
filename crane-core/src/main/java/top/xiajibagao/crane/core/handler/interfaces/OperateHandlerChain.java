@@ -8,11 +8,26 @@ import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 import java.util.List;
 
 /**
- * 装配处理器链 <br />
- * 用于组织多个装配处理节点，根据一定的顺序筛选类型支持装的配处理器，
- * 并调用其用以在{@link Assembler}中用于从不同类型的数据源中根据配置获取所需要的数据，
- * 并将数据填充到不同类型的对象中。
+ * 处理器链，用于组织多个操作处理器与数据源拦截器，从而完成针对某一些类型的数据读与写操作。
  *
+ * <p>处理器链中同时拥有数据源拦截器链{@link #interceptors()}与操作处理器链{@link #handlers()}两条"链"。
+ * 执行时，应当先执行拦截器链，再执行处理器链。
+ *
+ * <p>数据源拦截器链可以视为由多个拦截器组成，可按一定规则排序的纯粹责任链，约定：<br />
+ * 当调用{@link #readFromSource(Object, PropertyMapping, Operation)}时，
+ * 链上所有{@link SourceOperateInterceptor#supportInterceptReadSource(Object, PropertyMapping, Operation)}返回为ture的节点都应当被执行；<br />
+ * 当调用{@link #writeToTarget(Object, Object, PropertyMapping, AssembleOperation)}时，
+ * 链上所有{@link SourceOperateInterceptor#supportInterceptSourceWrite(Object, Object, PropertyMapping, AssembleOperation)}返回为ture的节点都应当被执行。
+ *
+ * <p>操作处理器可以视为由多个处理器组成，看按一定规则排序的不纯责任链，约定：<br />
+ * 当调用{@link #readFromSource(Object, PropertyMapping, Operation)}时，
+ * 排序最靠前，且{@link OperateHandler#sourceCanRead(Object, PropertyMapping, Operation)}返回为ture的节点才会被执行；
+ * 当调用{@link #writeToTarget(Object, Object, PropertyMapping, AssembleOperation)}时，
+ * 排序最靠前，且{@link OperateHandler#targetCanWrite(Object, Object, PropertyMapping, AssembleOperation)}返回为ture的节点才会被执行；
+ *
+ * @see OperateHandler
+ * @see SourceOperateInterceptor
+ * @see AbstractOrderlyHandlerChain
  * @author huangchengxing
  * @date 2022/04/08 20:35
  */
