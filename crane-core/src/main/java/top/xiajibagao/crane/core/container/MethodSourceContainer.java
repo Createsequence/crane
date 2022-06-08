@@ -112,7 +112,7 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
             .ifPresent(property -> {
                 MethodSource cache = new MethodSource(
                     annotation.mappingType(), methodSourceBean, targetClass, annotation.namespace(),
-                    method, AsmReflexUtils.findMethod(targetClass, method, true), property
+                    AsmReflexUtils.findMethod(targetClass, method, true), property
                 );
                 methodCache.put(annotation.namespace(), cache);
                 log.info("注册方法数据源：[{}], 映射类型：[{}]", annotation.namespace(), annotation.mappingType().name());
@@ -164,7 +164,6 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         private final Class<?> targetClass;
         @Getter
         private final String containerName;
-        private final Method sourceGetter;
         private final MethodInvoker methodInvoker;
         private final BeanProperty sourceKeyProperty;
 
