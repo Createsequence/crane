@@ -14,8 +14,13 @@ import java.lang.annotation.*;
  * @author huangchengxing
  * @date 2022/05/13 17:48
  */
+@MateAnnotation(
+    repeatable = true,
+    used = Assemble.class,
+    root = Assemble.class,
+    level = 1
+)
 @Assemble(container = EnumDictContainer.class)
-@MateAnnotation
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

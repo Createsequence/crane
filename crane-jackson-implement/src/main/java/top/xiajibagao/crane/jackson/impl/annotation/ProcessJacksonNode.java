@@ -15,7 +15,10 @@ import java.lang.annotation.*;
  * @author huangchengxing
  * @date 2022/04/12 17:52
  */
-@MateAnnotation
+@MateAnnotation(
+    used = ProcessJacksonNode.class,
+    root = ProcessJacksonNode.class
+)
 @Target(ElementType.TYPE_USE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
