@@ -53,6 +53,12 @@ public @interface AssembleKeyIntrospect {
     Class<? extends Assembler> assembler() default BeanReflexAssembler.class;
 
     /**
+     * 装配器Bean名称
+     */
+    @AliasFor(annotation = Assemble.class, attribute = "assemblerName")
+    String assemblerName() default "";
+
+    /**
      * 字段映射配置
      */
     @AliasFor(annotation = Assemble.class, attribute = "props")
