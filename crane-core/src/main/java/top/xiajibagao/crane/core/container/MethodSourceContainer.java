@@ -60,33 +60,30 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         }
 
         Class<?> targetClass = methodSourceBean.getClass();
-        if (parseClassAnnotation(methodSourceBean, targetClass)) {
+        Set<MethodSourceBean> annotations = AnnotatedElementUtils.findAllMergedAnnotations(targetClass, MethodSourceBean.class);
+        if (CollUtil.isEmpty(annotations)) {
             return;
         }
+        parseClassAnnotation(methodSourceBean, targetClass, annotations);
         parseMethodAnnotations(methodSourceBean, targetClass);
     }
 
     /**
      * 解析{@link MethodSourceBean}注解中声明的方法
      */
-    private boolean parseClassAnnotation(Object methodSourceBean, Class<?> targetClass) {
-        MethodSourceBean bean = AnnotatedElementUtils.findMergedAnnotation(targetClass, MethodSourceBean.class);
-        if (Objects.isNull(bean)) {
-            return true;
-        }
-        MethodSourceBean.Method[] annotations = bean.methods();
-        for (MethodSourceBean.Method annotation : annotations) {
-            if (CharSequenceUtil.isBlank(annotation.name())) {
-                continue;
-            }
-            Method method = ReflexUtils.findMethod(targetClass, annotation.name(),
-                true, annotation.returnType(), annotation.paramTypes()
-            );
-            if (Objects.nonNull(method)) {
-                registerMethod(methodSourceBean, targetClass, annotation, method);
-            }
-        }
-        return false;
+    private void parseClassAnnotation(Object methodSourceBean, Class<?> targetClass, Set<MethodSourceBean> annotations) {
+        annotations.stream()
+            .map(MethodSourceBean::value)
+            .flatMap(Stream::of)
+            .filter(annotation -> CharSequenceUtil.isNotBlank(annotation.name()))
+            .forEach(annotation -> {
+                Method method = ReflexUtils.findMethod(targetClass, annotation.name(),
+                    true, annotation.returnType(), annotation.paramTypes()
+                );
+                if (Objects.nonNull(method)) {
+                    registerMethod(methodSourceBean, targetClass, annotation, method);
+                }
+            });
     }
 
     /**

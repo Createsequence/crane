@@ -14,6 +14,7 @@ import java.util.Collection;
  * @date 2022/04/01 10:49
  */
 @MateAnnotation(
+    repeatable = true,
     used = MethodSourceBean.class,
     root = MethodSourceBean.class
 )
