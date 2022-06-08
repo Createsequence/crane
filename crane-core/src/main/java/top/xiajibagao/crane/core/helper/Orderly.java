@@ -2,6 +2,7 @@ package top.xiajibagao.crane.core.helper;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.annotation.OrderUtils;
 
 import javax.annotation.Nonnull;
 import java.util.Comparator;
@@ -36,6 +37,20 @@ public interface Orderly extends Ordered, Comparable<Orderly> {
     }
 
     /**
+     * 获取真实排序值。<br />
+     * 当实现类上存在{@link Order}注解时，返回{@link Order#value()}，否则返回{@link #getOrder()};
+     *
+     * @see OrderUtils#getOrder(Class, int)
+     * @return int
+     * @author huangchengxing
+     * @date 2022/6/8 11:37
+     * @see 0.5.6
+     */
+    default int getActualOrder() {
+        return OrderUtils.getOrder(this.getClass(), getOrder());
+    }
+
+    /**
      * 获取根据{@link #getOrder()}的返回值比较两个实例的大小
      *
      * @param o 比较对象
@@ -49,14 +64,16 @@ public interface Orderly extends Ordered, Comparable<Orderly> {
     }
 
     /**
-     * 获取根据{@link #getOrder()}返回值比较的比较器，默认返回值越小优先级越大
+     * 获取按排序值比较器。<br />
+     * 当比较时，若存在类存在{@link Order}注解，则优先从注解获取排序值，否则通过{@link #getOrder()}获取排序值。
      *
+     * @see OrderUtils#getOrder(Class, int)
      * @return java.util.Comparator<top.xiajibagao.crane.core.helper.Orderly>
      * @author huangchengxing
      * @date 2022/4/15 13:08
      */
     static Comparator<Orderly> comparator() {
-        return Comparator.comparingInt(Orderly::getOrder);
+        return Comparator.comparingInt(Orderly::getActualOrder);
     }
 
 }
