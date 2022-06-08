@@ -12,9 +12,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
-import top.xiajibagao.crane.core.component.BeanProperty;
-import top.xiajibagao.crane.core.component.BeanPropertyFactory;
 import top.xiajibagao.crane.core.helper.invoker.MethodInvoker;
+import top.xiajibagao.crane.core.helper.property.BeanProperty;
+import top.xiajibagao.crane.core.helper.property.BeanPropertyFactory;
 import top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 

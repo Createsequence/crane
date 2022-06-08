@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.core.component;
+package top.xiajibagao.crane.core.helper.property;
 
 import java.lang.reflect.Field;
 

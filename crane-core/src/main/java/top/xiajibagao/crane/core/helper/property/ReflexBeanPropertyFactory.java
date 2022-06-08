@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.core.component;
+package top.xiajibagao.crane.core.helper.property;
 
 import cn.hutool.core.lang.Assert;
 import lombok.Getter;

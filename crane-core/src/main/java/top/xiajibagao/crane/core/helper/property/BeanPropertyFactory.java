@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.core.component;
+package top.xiajibagao.crane.core.helper.property;
 
 
 import java.util.Optional;
@@ -19,7 +19,7 @@ public interface BeanPropertyFactory {
      *
      * @param targetClass 类
      * @param fieldName 属性名称
-     * @return java.util.Optional<top.xiajibagao.crane.core.component.BeanProperty>
+     * @return java.util.Optional<top.xiajibagao.crane.core.helper.property.BeanProperty>
      * @author huangchengxing
      * @date 2022/6/2 8:23
      * @since 0.5.4

@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.core.component;
+package top.xiajibagao.crane.core.helper.property;
 
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 
@@ -24,7 +24,7 @@ public abstract class AbstractBeanPropertyFactory implements BeanPropertyFactory
      *
      * @param targetClass 类型
      * @param field 属性
-     * @return top.xiajibagao.crane.core.component.BeanProperty
+     * @return top.xiajibagao.crane.core.helper.property.BeanProperty
      * @author huangchengxing
      * @date 2022/6/2 8:16
      */
@@ -35,7 +35,7 @@ public abstract class AbstractBeanPropertyFactory implements BeanPropertyFactory
      *
      * @param targetClass 目标类型
      * @param fieldName 字段名
-     * @return java.util.Optional<top.xiajibagao.crane.core.component.BeanProperty>
+     * @return java.util.Optional<top.xiajibagao.crane.core.helper.property.BeanProperty>
      * @author huangchengxing
      * @date 2022/5/10 16:05
      */

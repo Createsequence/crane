@@ -1,8 +1,8 @@
 package top.xiajibagao.crane.core.handler;
 
 import lombok.RequiredArgsConstructor;
-import top.xiajibagao.crane.core.component.BeanPropertyFactory;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
+import top.xiajibagao.crane.core.helper.property.BeanPropertyFactory;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
