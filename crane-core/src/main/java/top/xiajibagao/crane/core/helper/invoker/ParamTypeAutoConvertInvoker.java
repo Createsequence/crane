@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.core.helper;
+package top.xiajibagao.crane.core.helper.invoker;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ArrayUtil;
@@ -17,7 +17,7 @@ import java.util.Objects;
  * @since 0.5.5
  */
 @RequiredArgsConstructor
-public class ParamConvertMethodInvoker implements MethodInvoker {
+public class ParamTypeAutoConvertInvoker implements MethodInvoker {
 
     private final Class<?>[] paramTypes;
     private final MethodInvoker method;
@@ -32,7 +32,7 @@ public class ParamConvertMethodInvoker implements MethodInvoker {
                 args[i] = Convert.convert(methodArgType, arg);
             }
         }
-        return method.invoke(method, target, args);
+        return method.invoke(target, args);
     }
 
 }

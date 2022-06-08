@@ -1,11 +1,11 @@
-package top.xiajibagao.crane.core.helper;
+package top.xiajibagao.crane.core.helper.invoker;
 
 import javax.annotation.Nonnull;
 
 /**
  * 描述一个可以被调用的方法
  *
- * @see ParamConvertMethodInvoker
+ * @see ParamTypeAutoConvertInvoker
  * @author huangchengxing
  * @date 2022/06/07 17:48
  * @since 0.5.5

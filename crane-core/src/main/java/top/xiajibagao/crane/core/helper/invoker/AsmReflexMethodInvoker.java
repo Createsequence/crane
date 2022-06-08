@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.core.helper;
+package top.xiajibagao.crane.core.helper.invoker;
 
 import com.esotericsoftware.reflectasm.MethodAccess;
 import lombok.RequiredArgsConstructor;

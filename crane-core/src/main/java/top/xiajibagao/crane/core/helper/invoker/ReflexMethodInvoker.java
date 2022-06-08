@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.core.helper;
+package top.xiajibagao.crane.core.helper.invoker;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.ReflectionUtils;
