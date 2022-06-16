@@ -46,7 +46,7 @@ public class ValueNodeOperateHandlerTest {
         Assertions.assertEquals(source, handler.readFromSource(source, targetPropertyAndSourceProperty, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite("小红", target, targetPropertyAndSourceProperty, assembleOperation));
         handler.writeToTarget( "小红", target, targetPropertyAndSourceProperty, assembleOperation);
-        Assertions.assertEquals(target, target);
+        Assertions.assertEquals(objectMapper.valueToTree("小明"), target);
 
         // source -> target.xxx
         target = objectMapper.valueToTree("小明");
@@ -55,7 +55,7 @@ public class ValueNodeOperateHandlerTest {
         Assertions.assertEquals(source, handler.readFromSource(source, targetPropertyAndSource, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite("小红", target, targetPropertyAndSource, assembleOperation));
         handler.writeToTarget( "小红", target, targetPropertyAndSource, assembleOperation);
-        Assertions.assertEquals(target, target);
+        Assertions.assertEquals(objectMapper.valueToTree("小明"), target);
 
         // source.xxx -> target
         assembleOperation = new BeanAssembleOperation(
@@ -69,7 +69,7 @@ public class ValueNodeOperateHandlerTest {
         Assertions.assertEquals(source, handler.readFromSource(source, targetAndSourceProperty, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite("小红", target, targetAndSourceProperty, assembleOperation));
         handler.writeToTarget( "小红", target, targetAndSourceProperty, assembleOperation);
-        Assertions.assertEquals(target, target);
+        Assertions.assertEquals(objectMapper.valueToTree("小明"), target);
 
 
         // source -> target
@@ -84,7 +84,7 @@ public class ValueNodeOperateHandlerTest {
         Assertions.assertEquals(source, handler.readFromSource(source, targetAndSource, assembleOperation));
         Assertions.assertTrue(handler.targetCanWrite("小红", target, targetAndSource, assembleOperation));
         handler.writeToTarget("小红", target, targetAndSource, assembleOperation);
-        Assertions.assertEquals(target, target);
+        Assertions.assertEquals(objectMapper.valueToTree("小明"), target);
     }
 
     @NoArgsConstructor
