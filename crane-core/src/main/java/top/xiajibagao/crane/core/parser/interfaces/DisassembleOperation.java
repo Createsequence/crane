@@ -1,6 +1,13 @@
 package top.xiajibagao.crane.core.parser.interfaces;
 
+import cn.hutool.core.collection.CollStreamUtil;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 字段装卸配置
@@ -45,5 +52,40 @@ public interface DisassembleOperation extends Operation {
      * @date 2022/3/1 15:35
      */
     OperationConfiguration getTargetOperateConfiguration();
+    
+    /**
+     * 当前操作是否是动态装卸操作
+     *
+     * @param operation 操作
+     * @return boolean
+     * @author huangchengxing
+     * @date 2022/6/24 13:15
+     */
+    static boolean isDynamic(DisassembleOperation operation) {
+        return operation instanceof DynamicDisassembleOperation;
+    }
+
+    /**
+     * 根据装卸操作配置，从一组待处理的嵌套对象获取对应的操作配置
+     *
+     * @param disassembleOperation 装卸操作
+     * @param targets 待处理对象
+     * @return com.google.common.collect.Multimap<top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration,java.lang.Object>
+     * @author huangchengxing
+     * @date 2022/6/24 13:51
+     */
+    static Multimap<OperationConfiguration, Object> collect(DisassembleOperation disassembleOperation, Collection<Object> targets) {
+        Multimap<OperationConfiguration, Object> operationConfigurations = ArrayListMultimap.create();
+        if (DisassembleOperation.isDynamic(disassembleOperation)) {
+            DynamicDisassembleOperation dynamicDisassembleOperation = (DynamicDisassembleOperation)disassembleOperation;
+            Map<Class<?>, List<Object>> nestedValueGroup = CollStreamUtil.groupByKey(targets, Object::getClass);
+            nestedValueGroup.forEach((type, values) -> operationConfigurations.put(
+                dynamicDisassembleOperation.getTargetOperateConfiguration(type), values
+            ));
+        } else {
+            operationConfigurations.putAll(disassembleOperation.getTargetOperateConfiguration(), targets);
+        }
+        return operationConfigurations;
+    }
 
 }

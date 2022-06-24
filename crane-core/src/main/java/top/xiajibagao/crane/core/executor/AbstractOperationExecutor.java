@@ -46,7 +46,6 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
         OperationConfiguration configuration,
         Set<Class<?>> targetGroups,
         MultiValueTableMap<Container, AssembleOperation, Object> pendingOperations) {
-
         if (CollectionUtils.isEmpty(targets)) {
             return;
         }
@@ -114,9 +113,14 @@ public abstract class AbstractOperationExecutor implements OperationExecutor {
                 .map(t -> operation.getDisassembler().execute(t, operation))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-            OperationConfiguration operationConfiguration = operation.getTargetOperateConfiguration();
+            if (CollUtil.isEmpty(nestedPropertyValues)) {
+                continue;
+            }
+
             // 递归解析嵌套对象
-            collectOperations(nestedPropertyValues, operationConfiguration, targetGroups, pendingOperations);
+            DisassembleOperation.collect(operation, nestedPropertyValues)
+                .asMap()
+                .forEach((config, values) -> collectOperations(values, config, targetGroups, pendingOperations));
         }
     }
 

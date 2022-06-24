@@ -72,6 +72,7 @@ public class ClassAnnotationParserTest {
         // 装卸操作
         Assertions.assertEquals(1, configuration.getDisassembleOperations().size());
         DisassembleOperation disassembleOperation = configuration.getDisassembleOperations().get(0);
+        Assertions.assertFalse(DisassembleOperation.isDynamic(disassembleOperation));
         Assertions.assertEquals(configuration, disassembleOperation.getOwner());
         Assertions.assertEquals(beanReflexDisassembler, disassembleOperation.getDisassembler());
 

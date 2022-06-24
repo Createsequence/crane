@@ -99,7 +99,7 @@ public class SequentialOperationExecutor implements OperationExecutor {
      */
     @Nonnull
     protected Multimap<OperationConfiguration, Object> collectOperationConfigurations(
-        @Nonnull List<Object> targets,
+        @Nonnull Collection<Object> targets,
         @Nonnull OperationConfiguration configuration,
         @Nonnull Multimap<OperationConfiguration, Object> collectedConfigurations) {
         // 若无待操作数据则结束解析
@@ -120,8 +120,13 @@ public class SequentialOperationExecutor implements OperationExecutor {
                 .map(t -> operation.getDisassembler().execute(t, operation))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-            OperationConfiguration operationConfiguration = operation.getTargetOperateConfiguration();
-            collectOperationConfigurations(nestedPropertyValues, operationConfiguration, collectedConfigurations);
+            if (CollUtil.isEmpty(nestedPropertyValues)) {
+                continue;
+            }
+            // 递归解析嵌套对象
+            DisassembleOperation.collect(operation, nestedPropertyValues)
+                .asMap()
+                .forEach((config, values) -> collectOperationConfigurations(values, config, collectedConfigurations));
         }
         return collectedConfigurations;
     }

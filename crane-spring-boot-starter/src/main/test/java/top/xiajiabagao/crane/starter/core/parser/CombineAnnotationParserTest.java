@@ -83,6 +83,7 @@ public class CombineAnnotationParserTest {
         Assertions.assertEquals(beanReflexDisassembler, disassembleOperation.getDisassembler());
 
         OperationConfiguration disassembleConfiguration = disassembleOperation.getTargetOperateConfiguration();
+        Assertions.assertFalse(DisassembleOperation.isDynamic(disassembleOperation));
         Assertions.assertEquals(globalConfiguration, disassembleConfiguration.getGlobalConfiguration());
         Assertions.assertEquals(NestExample.class, disassembleConfiguration.getTargetClass());
         Assertions.assertEquals(1, disassembleConfiguration.getAssembleOperations().size());

@@ -16,10 +16,7 @@ import top.xiajibagao.crane.core.parser.interfaces.*;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -122,7 +119,17 @@ public class FieldAnnotationConfigurationParser
 
         // 递归解析拆卸字段类型
         parseContext.looking(configuration.getTargetClass(), configuration);
+
+        // 若不指定类型，则认为其为动态类型
         Class<?> disassembleType = annotation.value();
+        DisassembleOperation operation;
+        if (Objects.equals(Void.TYPE, disassembleType)) {
+            OperateConfigurationParser parser = getDisassembleOperationParser(annotation);
+            operation = createDynamicDisassembleOperation(parser, key, annotation, configuration);
+            return Collections.singletonList(operation);
+        }
+
+        // 若指定类型，则认为其为固定类型
         OperationConfiguration disassembleConfiguration;
         if (parseContext.isInLooking(disassembleType)) {
             // 存在循环依赖，则先通过缓存获取引用
@@ -130,12 +137,11 @@ public class FieldAnnotationConfigurationParser
             disassembleConfiguration = parseContext.get(disassembleType);
         } else {
             disassembleConfiguration = annotation.useCurrParser() ?
-                parse(disassembleType, parseContext) :
-                BeanFactoryUtils.getBean(beanFactory, annotation.parser(), annotation.parserName())
+                parse(disassembleType, parseContext) : BeanFactoryUtils
+                    .getBean(beanFactory, annotation.parser(), annotation.parserName())
                     .parse(disassembleType);
         }
-        DisassembleOperation operation = createDisassembleOperation(key, annotation, configuration, disassembleConfiguration);
-
+        operation = createDisassembleOperation(key, annotation, configuration, disassembleConfiguration);
         return Collections.singletonList(operation);
     }
 

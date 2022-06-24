@@ -160,24 +160,36 @@ public class ClassAnnotationConfigurationParser
             .collect(Collectors.toMap(Disassemble::key, Function.identity(), (k1, k2) -> k1));
         List<DisassembleOperation> results = new ArrayList<>();
         disassembleKeys.forEach((keyName, annotation) -> {
-            Field key = ReflexUtils.findAnyMatchField(configuration.getTargetClass(), true, ArrayUtil.insert(annotation.aliases(), 0, annotation.key()));
-            Class<?> disassembleType = annotation.targetClass();
-            // 若存在循环依赖，则直接从上下文获取配置的引用，否则递归解析待装卸的字段类型
-            OperationConfiguration disassembleConfiguration;
-            if (parseContext.isInLooking(disassembleType)) {
-                disassembleConfiguration = parseContext.get(disassembleType);
-            } else {
-                disassembleConfiguration = annotation.useCurrParser() ?
-                    parse(disassembleType, parseContext) :
-                    BeanFactoryUtils.getBean(beanFactory, annotation.parser(), annotation.parserName())
-                        .parse(disassembleType);
-            }
-            DisassembleOperation disassembleOperation = createDisassembleOperation(
-                key, annotation, configuration, disassembleConfiguration
-            );
+            DisassembleOperation disassembleOperation = getDisassembleOperation(configuration, parseContext, annotation);
             results.add(disassembleOperation);
         });
         return results;
+    }
+
+    private DisassembleOperation getDisassembleOperation(OperationConfiguration configuration, ParseContext parseContext, Disassemble annotation) {
+        Field key = ReflexUtils.findAnyMatchField(configuration.getTargetClass(), true, ArrayUtil.insert(annotation.aliases(), 0, annotation.key()));
+        Class<?> disassembleType = annotation.targetClass();
+
+        // 若不指定类型，则认为其为动态类型
+        if (Objects.equals(Void.TYPE, disassembleType)) {
+            OperateConfigurationParser parser = getDisassembleOperationParser(annotation);
+            return createDynamicDisassembleOperation(parser, key, annotation, configuration);
+        }
+
+        // 若指定类型，则认为其为固定类型
+        OperationConfiguration disassembleConfiguration;
+        // 若存在循环依赖，则直接从上下文获取配置的引用，否则递归解析待装卸的字段类型
+        if (parseContext.isInLooking(disassembleType)) {
+            disassembleConfiguration = parseContext.get(disassembleType);
+        } else {
+            disassembleConfiguration = annotation.useCurrParser() ?
+                parse(disassembleType, parseContext) :
+                BeanFactoryUtils.getBean(beanFactory, annotation.parser(), annotation.parserName())
+                    .parse(disassembleType);
+        }
+        return createDisassembleOperation(
+            key, annotation, configuration, disassembleConfiguration
+        );
     }
 
 }

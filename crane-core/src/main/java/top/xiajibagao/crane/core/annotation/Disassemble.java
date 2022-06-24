@@ -7,10 +7,17 @@ import top.xiajibagao.crane.core.parser.CombineOperationConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
 import java.lang.annotation.*;
+import java.util.Collection;
 
 /**
  * 数据装卸注解
- * <p>注解在嵌套字段上，将会在处理数据时将注解字段递归并展开为复数需要进行装配操作的对象
+ *
+ * <p>注解在嵌套字段上，将会在处理数据时将注解字段递归并展开为复数需要进行装配操作的对象。
+ *
+ * <p>可以通过{@link #value()}或{@link #targetClass()}指定嵌套字段的类型，
+ * 当两者都为{@link Void#TYPE}时，则认为该字段为动态类型，将在处理的时候动态获取字段的第一个非{@link Collection}集合或数组的对象作为目标，
+ * 然后解析配置并处理。 <br />
+ * 注意，json填充暂不支持该动态类型的功能。
  *
  * @author huangchengxing
  * @date 2022/02/28 18:00

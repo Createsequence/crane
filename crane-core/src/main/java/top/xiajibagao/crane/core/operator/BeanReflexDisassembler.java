@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.core.operator;
 
+import cn.hutool.core.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.ClassUtils;
 import top.xiajibagao.crane.core.exception.CraneException;
@@ -22,6 +23,7 @@ public class BeanReflexDisassembler implements Disassembler {
 
     @Override
     public Collection<?> execute(Object target, DisassembleOperation operation) {
+        Assert.isFalse(DisassembleOperation.isDynamic(operation));
         List<Object> results = new ArrayList<>();
         // bfs遍历集合
         Object disassemblePropertyValue = handlerChain.readFromSource(

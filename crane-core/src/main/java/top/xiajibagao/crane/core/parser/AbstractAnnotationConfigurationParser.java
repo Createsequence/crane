@@ -13,6 +13,7 @@ import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.Disassemble;
 import top.xiajibagao.crane.core.annotation.Prop;
 import top.xiajibagao.crane.core.annotation.PropsTemplate;
+import top.xiajibagao.crane.core.cache.OperationConfigurationCache;
 import top.xiajibagao.crane.core.helper.BeanFactoryUtils;
 import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
@@ -134,15 +135,41 @@ public abstract class AbstractAnnotationConfigurationParser implements OperateCo
     protected DisassembleOperation createDisassembleOperation(
         Field key, Disassemble annotation, OperationConfiguration configuration, OperationConfiguration disassembleConfiguration) {
         return new BeanDisassembleOperation(
-            ObjectUtils.computeIfNotNull(
-                AnnotatedElementUtils.getMergedAnnotation(key, Order.class), Order::value, Ordered.LOWEST_PRECEDENCE
-            ),
+            getActualOrder(),
             configuration,
             BeanFactoryUtils.getBean(beanFactory, annotation.disassembler(), annotation.disassemblerName()),
             disassembleConfiguration,
             key,
             CollUtils.toSet(annotation.aliases())
         );
+    }
+
+    /**
+     * 根据{@link Disassemble}注解创建{@link DynamicDisassembleOperation}
+     *
+     * @param parser 解析器
+     * @param key 属性
+     * @param annotation {@link Disassemble}注解
+     * @param configuration 当前正在构建的配置
+     * @return DisassembleOperation
+     * @author huangchengxing
+     * @date 2022/3/1 17:50
+     */
+    protected DynamicDisassembleOperation createDynamicDisassembleOperation(
+        OperateConfigurationParser parser, Field key, Disassemble annotation, OperationConfiguration configuration) {
+        return new BeanDynamicDisassembleOperation(
+            parser,
+            getActualOrder(),
+            configuration,
+            BeanFactoryUtils.getBean(beanFactory, annotation.disassembler(), annotation.disassemblerName()),
+            key, CollUtils.toSet(annotation.aliases()),
+            beanFactory.getBean(OperationConfigurationCache.class)
+        );
+    }
+
+    protected OperateConfigurationParser getDisassembleOperationParser(Disassemble annotation) {
+        return annotation.useCurrParser() ?
+            this : BeanFactoryUtils.getBean(beanFactory, annotation.parser(), annotation.parserName());
     }
 
     /**
