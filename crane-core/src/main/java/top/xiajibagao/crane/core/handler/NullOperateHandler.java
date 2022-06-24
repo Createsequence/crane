@@ -1,7 +1,7 @@
 package top.xiajibagao.crane.core.handler;
 
+import org.springframework.core.Ordered;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
-import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -21,7 +21,7 @@ public class NullOperateHandler implements OperateHandler {
 
     @Override
     public int getOrder() {
-        return Orderly.HIGHEST_PRECEDENCE;
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 
     @Override

@@ -22,8 +22,8 @@ import java.util.Set;
 public class DynamicJsonNodeBeanSerializer<T> extends StdSerializer<T> {
 
     private final ObjectMapper objectMapper;
-    private final OperationConfiguration operationConfiguration;
-    private final OperationExecutor operationExecutor;
+    private final transient OperationConfiguration operationConfiguration;
+    private final transient OperationExecutor operationExecutor;
     private final Set<Class<?>> groups;
 
     public DynamicJsonNodeBeanSerializer(
