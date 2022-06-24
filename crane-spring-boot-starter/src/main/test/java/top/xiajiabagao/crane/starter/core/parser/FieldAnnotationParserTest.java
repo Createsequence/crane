@@ -94,8 +94,9 @@ public class FieldAnnotationParserTest {
         Assertions.assertEquals("exp", disassembleConfigurationPropertyMapping.getExp());
         Assertions.assertEquals(Integer.class, disassembleConfigurationPropertyMapping.getExpType());
 
-        Assertions.assertEquals(1, disassembleConfiguration.getDisassembleOperations().size());
+        Assertions.assertEquals(2, disassembleConfiguration.getDisassembleOperations().size());
         Assertions.assertEquals(configuration, disassembleConfiguration.getDisassembleOperations().get(0).getTargetOperateConfiguration());
+        Assertions.assertTrue(DisassembleOperation.isDynamic(disassembleConfiguration.getDisassembleOperations().get(1)));
 
     }
 
@@ -138,6 +139,9 @@ public class FieldAnnotationParserTest {
             disassembler = BeanReflexDisassembler.class
         )
         private List<Example> exampleList;
+
+        @Disassemble(disassembler = BeanReflexDisassembler.class)
+        private List<?> dynamicList;
 
     }
 

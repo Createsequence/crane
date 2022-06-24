@@ -95,8 +95,9 @@ public class ClassAnnotationParserTest {
         Assertions.assertEquals("exp", disassembleConfigurationPropertyMapping.getExp());
         Assertions.assertEquals(Integer.class, disassembleConfigurationPropertyMapping.getExpType());
 
-        Assertions.assertEquals(1, disassembleConfiguration.getDisassembleOperations().size());
-        Assertions.assertEquals(configuration, disassembleConfiguration.getDisassembleOperations().get(0).getTargetOperateConfiguration());
+        Assertions.assertEquals(2, disassembleConfiguration.getDisassembleOperations().size());
+        Assertions.assertEquals(configuration, disassembleConfiguration.getDisassembleOperations().get(1).getTargetOperateConfiguration());
+        Assertions.assertTrue(DisassembleOperation.isDynamic(disassembleConfiguration.getDisassembleOperations().get(0)));
 
     }
 
@@ -155,6 +156,7 @@ public class ClassAnnotationParserTest {
             namespace = "namespace",
             props = @Prop(src = "sourceRef", ref = "targetRef", exp = "exp", expType = Integer.class)
         ),
+        disassembles = @Disassemble(key = "dynamicList"),
         enableExtend = true
     )
     private static class NestExample implements NestExampleConfigInterface {
@@ -163,6 +165,7 @@ public class ClassAnnotationParserTest {
         private String targetRef;
 
         private List<Example> exampleList;
+        private List<?> dynamicList;
 
     }
 
