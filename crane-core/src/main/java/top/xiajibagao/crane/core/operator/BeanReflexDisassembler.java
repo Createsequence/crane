@@ -9,6 +9,7 @@ import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
+import top.xiajibagao.crane.core.parser.interfaces.DynamicDisassembleOperation;
 
 import java.util.*;
 
@@ -23,7 +24,7 @@ public class BeanReflexDisassembler implements Disassembler {
 
     @Override
     public Collection<?> execute(Object target, DisassembleOperation operation) {
-        Assert.isFalse(DisassembleOperation.isDynamic(operation));
+        Assert.isFalse(DisassembleOperation.isDynamic(operation), "无法处理{}", DynamicDisassembleOperation.class);
         List<Object> results = new ArrayList<>();
         // bfs遍历集合
         Object disassemblePropertyValue = handlerChain.readFromSource(

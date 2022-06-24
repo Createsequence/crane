@@ -116,16 +116,7 @@ public class SequentialOperationExecutor implements OperationExecutor {
 
         // 若存在嵌套字段递归解析
         for (DisassembleOperation operation : disassembleOperations) {
-            List<Object> nestedPropertyValues = targets.stream()
-                .map(t -> operation.getDisassembler().execute(t, operation))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-            if (CollUtil.isEmpty(nestedPropertyValues)) {
-                continue;
-            }
-            // 递归解析嵌套对象
-            DisassembleOperation.collect(operation, nestedPropertyValues)
-                .asMap()
+            DisassembleOperation.collect(operation, targets).asMap()
                 .forEach((config, values) -> collectOperationConfigurations(values, config, collectedConfigurations));
         }
         return collectedConfigurations;

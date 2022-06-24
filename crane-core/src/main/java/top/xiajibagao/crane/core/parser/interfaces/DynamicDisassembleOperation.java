@@ -1,6 +1,5 @@
 package top.xiajibagao.crane.core.parser.interfaces;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 
 /**
@@ -16,22 +15,7 @@ import java.util.Collection;
 public interface DynamicDisassembleOperation extends DisassembleOperation {
 
     /**
-     * 获取对象的实际类型的操作配置
-     *
-     * <p>若该对象类型为可能嵌套的数组或{@link Collection}集合，
-     * 则将递归遍历，直到获取到第一个非数组或{@link Collection}集合的元素，
-     * 作为实际待解析的对象。<br />
-     * 当对象为空时，或无法确定实际类型时，将返回一个null。
-     *
-     * @return java.lang.Class<?>
-     * @author huangchengxing
-     * @date 2022/6/24 11:30
-     */
-    @Nullable
-    OperationConfiguration getTargetOperateConfiguration(Object target);
-
-    /**
-     * 默认调用时应直接抛出异常，实现类需要调用{@link #getTargetOperateConfiguration(Object)}以实现相同的效果
+     * 默认调用时应直接抛出异常，实现类需要调用{@link #resolve(Object)}将其转为正常的{@link DisassembleOperation}使用
      *
      * @return top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration
      * @author huangchengxing
@@ -42,5 +26,31 @@ public interface DynamicDisassembleOperation extends DisassembleOperation {
     default OperationConfiguration getTargetOperateConfiguration() {
         throw new UnsupportedOperationException();
     }
+
+    /**
+     * 获取实际对象类型对应的操作配置
+     *
+     * <p>若该对象类型为可能嵌套的数组或{@link Collection}集合，
+     * 则将递归遍历，直到获取到第一个非数组或{@link Collection}集合的元素，
+     * 作为实际待解析的对象。<br />
+     * 当对象为空时，或无法确定实际类型时，将返回null。
+     *
+     * @param target 待处理器对象
+     * @return top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration
+     * @author huangchengxing
+     * @date 2022/6/24 17:06
+     */
+    OperationConfiguration getTargetOperateConfiguration(Object target);
+
+    /**
+     * 获取当确定类型的装卸操作，{@link DisassembleOperation#getTargetOperateConfiguration()}获取的实例
+     * 应当与{@link #getTargetOperateConfiguration(Object)}相同
+     *
+     * @param target 待拆卸的字段值
+     * @return top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation
+     * @author huangchengxing
+     * @date 2022/6/24 16:30
+     */
+    DisassembleOperation resolve(Object target);
 
 }

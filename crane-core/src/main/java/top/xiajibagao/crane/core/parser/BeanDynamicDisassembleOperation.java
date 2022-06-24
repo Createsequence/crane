@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
+import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DynamicDisassembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
@@ -41,6 +42,14 @@ public class BeanDynamicDisassembleOperation implements DynamicDisassembleOperat
             targetClass,
             configurationParser::parse
         );
+    }
+
+    @Override
+    @Nullable
+    public DisassembleOperation resolve(Object target) {
+        OperationConfiguration operation = getTargetOperateConfiguration(target);
+        return Objects.isNull(operation) ?
+            null : new BeanDisassembleOperation(order, owner, disassembler, operation, targetProperty, targetPropertyAliases);
     }
 
     @Nullable

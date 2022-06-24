@@ -1,13 +1,12 @@
 package top.xiajibagao.crane.core.parser.interfaces;
 
-import cn.hutool.core.collection.CollStreamUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * 字段装卸配置
@@ -66,7 +65,7 @@ public interface DisassembleOperation extends Operation {
     }
 
     /**
-     * 根据装卸操作配置，从一组待处理的嵌套对象获取对应的操作配置
+     * 根据装卸操作配置，从一组待处理的嵌套对象获取装卸字段值，然后获取值对象与对应的操作配置
      *
      * @param disassembleOperation 装卸操作
      * @param targets 待处理对象
@@ -74,16 +73,19 @@ public interface DisassembleOperation extends Operation {
      * @author huangchengxing
      * @date 2022/6/24 13:51
      */
-    static Multimap<OperationConfiguration, Object> collect(DisassembleOperation disassembleOperation, Collection<Object> targets) {
+    static Multimap<OperationConfiguration, Object> collect(DisassembleOperation disassembleOperation, Collection<?> targets) {
+        boolean isDynamic = isDynamic(disassembleOperation);
         Multimap<OperationConfiguration, Object> operationConfigurations = ArrayListMultimap.create();
-        if (DisassembleOperation.isDynamic(disassembleOperation)) {
-            DynamicDisassembleOperation dynamicDisassembleOperation = (DynamicDisassembleOperation)disassembleOperation;
-            Map<Class<?>, List<Object>> nestedValueGroup = CollStreamUtil.groupByKey(targets, Object::getClass);
-            nestedValueGroup.forEach((type, values) -> operationConfigurations.put(
-                dynamicDisassembleOperation.getTargetOperateConfiguration(type), values
-            ));
-        } else {
-            operationConfigurations.putAll(disassembleOperation.getTargetOperateConfiguration(), targets);
+        for (Object target : targets) {
+            DisassembleOperation operation = isDynamic ?
+                ((DynamicDisassembleOperation) disassembleOperation).resolve(target) : disassembleOperation;
+            if (Objects.isNull(operation)) {
+                continue;
+            }
+            Collection<?> values = operation.getDisassembler().execute(target, operation);
+            if (CollUtil.isNotEmpty(values)) {
+                operationConfigurations.putAll(operation.getTargetOperateConfiguration(), values);
+            }
         }
         return operationConfigurations;
     }
