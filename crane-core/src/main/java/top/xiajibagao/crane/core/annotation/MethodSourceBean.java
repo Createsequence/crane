@@ -13,11 +13,7 @@ import java.util.Collection;
  * @author huangchengxing
  * @date 2022/04/01 10:49
  */
-@MateAnnotation(
-    repeatable = true,
-    used = MethodSourceBean.class,
-    root = MethodSourceBean.class
-)
+@MateAnnotation
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -50,11 +46,7 @@ public @interface MethodSourceBean {
      * @author huangchengxing 
      * @date 2022/4/12 11:19
      */
-    @MateAnnotation(
-        transitive = false,
-        used = MethodSourceBean.Method.class,
-        root = MethodSourceBean.Method.class
-    )
+    @MateAnnotation
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @Documented

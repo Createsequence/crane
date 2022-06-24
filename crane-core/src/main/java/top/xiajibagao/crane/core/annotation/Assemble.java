@@ -16,11 +16,7 @@ import java.lang.annotation.*;
  * @author huangchengxing
  * @date 2022/02/28 18:00
  */
-@MateAnnotation(
-    repeatable = true,
-    used = Assemble.class,
-    root = Assemble.class
-)
+@MateAnnotation
 @Repeatable(Assemble.List.class)
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)

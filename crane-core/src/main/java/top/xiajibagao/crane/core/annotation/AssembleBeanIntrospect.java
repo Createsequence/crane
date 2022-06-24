@@ -14,12 +14,7 @@ import java.lang.annotation.*;
  * @author huangchengxing
  * @date 2022/05/13 17:49
  */
-@MateAnnotation(
-    repeatable = true,
-    used = Assemble.class,
-    root = Assemble.class,
-    level = 1
-)
+@MateAnnotation
 @Assemble(container = BeanIntrospectContainer.class)
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)

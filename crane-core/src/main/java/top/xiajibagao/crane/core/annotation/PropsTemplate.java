@@ -13,10 +13,7 @@ import java.lang.annotation.*;
  * @author huangchengxing
  * @date 2022/03/03 14:51
  */
-@MateAnnotation(
-    used = PropsTemplate.class,
-    root = PropsTemplate.class
-)
+@MateAnnotation
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

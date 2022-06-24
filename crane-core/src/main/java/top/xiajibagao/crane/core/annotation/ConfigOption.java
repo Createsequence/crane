@@ -15,11 +15,7 @@ import java.lang.annotation.*;
  * @author huangchengxing
  * @date 2022/03/06 16:50
  */
-@MateAnnotation(
-    transitive = false,
-    used = ConfigOption.class,
-    root = ConfigOption.class
-)
+@MateAnnotation
 @Target(ElementType.TYPE_USE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
