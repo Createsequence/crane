@@ -39,7 +39,8 @@ public abstract class AbstractAnnotationConfigurationParser implements OperateCo
     @Nonnull
     @Override
     public OperationConfiguration parse(Class<?> targetClass) {
-        return parse(targetClass, new ParseContext());
+        return OperateConfigurationParser.isNotParseClass(targetClass) ?
+            createConfiguration(targetClass) : parse(targetClass, new ParseContext());
     }
     
     /**
@@ -53,6 +54,18 @@ public abstract class AbstractAnnotationConfigurationParser implements OperateCo
      */
     @Nonnull
     protected abstract OperationConfiguration parse(Class<?> targetClass, ParseContext parseContext);
+
+    /**
+     * 创建一个操作配置
+     *
+     * @param targetClass 目标类型
+     * @return top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration
+     * @author huangchengxing
+     * @date 2022/6/24 16:08
+     * @since 0.5.7
+     */
+    @Nonnull
+    protected abstract OperationConfiguration createConfiguration(Class<?> targetClass);
 
     /**
      * 根据{@link Assemble}注解创建{@link AssembleOperation}

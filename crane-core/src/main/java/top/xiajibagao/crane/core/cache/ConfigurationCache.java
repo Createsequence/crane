@@ -2,6 +2,7 @@ package top.xiajibagao.crane.core.cache;
 
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
+import javax.annotation.Nullable;
 import java.util.function.Function;
 
 /**
@@ -11,7 +12,7 @@ import java.util.function.Function;
  * @date 2022/4/5 21:34
  */
 public interface ConfigurationCache {
-	
+
 	/**
 	 * 若缓存不存在，则将配置添加至缓存
 	 *
@@ -32,6 +33,7 @@ public interface ConfigurationCache {
 	 * @author huangchengxing
 	 * @date 2022/4/5 21:24
 	 */
+	@Nullable
 	OperationConfiguration getCachedConfiguration(String cacheName, Class<?> targetType);
 	
 	/**

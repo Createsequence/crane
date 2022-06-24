@@ -45,8 +45,8 @@ public class ClassAnnotationConfigurationParser
 
     @Nonnull
     @Override
-    protected BeanOperationConfiguration parse(Class<?> targetClass, ParseContext parseContext) {
-        BeanOperationConfiguration configuration = createConfiguration(targetClass);
+    protected OperationConfiguration parse(Class<?> targetClass, ParseContext parseContext) {
+        OperationConfiguration configuration = createConfiguration(targetClass);
         parseContext.looking(targetClass, configuration);
         if (parseContext.isExcluded(targetClass)) {
             return configuration;
@@ -85,7 +85,7 @@ public class ClassAnnotationConfigurationParser
      * @author huangchengxing
      * @date 2022/5/22 16:44
      */
-    private void parseAnnotation(ParseContext parseContext, Class<?> targetClass, BeanOperationConfiguration configuration, List<AssembleOperation> assembleOperations, List<DisassembleOperation> disassembleOperations) {
+    private void parseAnnotation(ParseContext parseContext, Class<?> targetClass, OperationConfiguration configuration, List<AssembleOperation> assembleOperations, List<DisassembleOperation> disassembleOperations) {
         Operations annotation = AnnotatedElementUtils.findMergedAnnotation(targetClass, Operations.class);
         if (Objects.isNull(annotation)) {
             return;
@@ -103,8 +103,9 @@ public class ClassAnnotationConfigurationParser
      * @author huangchengxing
      * @date 2022/3/1 16:24
      */
+    @Override
     @Nonnull
-    protected BeanOperationConfiguration createConfiguration(Class<?> targetClass) {
+    protected OperationConfiguration createConfiguration(Class<?> targetClass) {
         return new BeanOperationConfiguration(globalConfiguration, targetClass, new ArrayList<>(), new ArrayList<>());
     }
 
@@ -171,7 +172,7 @@ public class ClassAnnotationConfigurationParser
         Class<?> disassembleType = annotation.targetClass();
 
         // 若不指定类型，则认为其为动态类型
-        if (Objects.equals(Void.TYPE, disassembleType)) {
+        if (Objects.equals(Void.class, disassembleType)) {
             OperateConfigurationParser parser = getDisassembleOperationParser(annotation);
             return createDynamicDisassembleOperation(parser, key, annotation, configuration);
         }

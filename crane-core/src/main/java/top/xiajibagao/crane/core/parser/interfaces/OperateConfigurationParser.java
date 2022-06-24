@@ -1,11 +1,16 @@
 package top.xiajibagao.crane.core.parser.interfaces;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import org.springframework.core.annotation.Order;
 import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 
 /**
  * 操作配置解析器
@@ -25,7 +30,26 @@ import javax.annotation.Nonnull;
  * @date 2022/03/01 15:52
  */
 public interface OperateConfigurationParser extends Orderly {
-    
+
+    /**
+     * 包下的类不需要解析
+     */
+    Collection<String> NOT_PARSE_PACKAGE = Collections.unmodifiableSet(CollUtil.newHashSet("java.", "javax.", "sum.", "org.springframework."));
+
+    /**
+     * 包括"java."、"javax."、"sum", "org.springframework."包下的类
+     *
+     * @param targetClass 目标类型
+     * @return boolean
+     * @author huangchengxing
+     * @date 2022/6/24 15:26
+     * @since 0.5.7
+     */
+    static boolean isNotParseClass(Class<?> targetClass) {
+        return Objects.isNull(targetClass)
+            || NOT_PARSE_PACKAGE.stream().anyMatch(path -> CharSequenceUtil.startWithAny(targetClass.getName(), path));
+    }
+
     /**
      * 解析目标类型，获取该类型对应的类操作配置实例
      *

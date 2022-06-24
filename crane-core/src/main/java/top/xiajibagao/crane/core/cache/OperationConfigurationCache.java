@@ -3,6 +3,7 @@ package top.xiajibagao.crane.core.cache;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -23,6 +24,7 @@ public class OperationConfigurationCache implements ConfigurationCache {
 		cacheMap.put(targetType, configuration);
 	}
 
+	@Nullable
 	@Override
 	public OperationConfiguration getCachedConfiguration(String cacheName, Class<?> targetType) {
 		return Optional.ofNullable(configurationCache.get(cacheName))

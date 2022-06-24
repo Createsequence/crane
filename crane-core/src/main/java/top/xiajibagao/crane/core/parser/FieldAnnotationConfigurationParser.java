@@ -38,8 +38,8 @@ public class FieldAnnotationConfigurationParser
 
     @Nonnull
     @Override
-    protected BeanOperationConfiguration parse(Class<?> targetClass, ParseContext parseContext) {
-        BeanOperationConfiguration operationConfiguration = createConfiguration(targetClass);
+    protected OperationConfiguration parse(Class<?> targetClass, ParseContext parseContext) {
+        OperationConfiguration operationConfiguration = createConfiguration(targetClass);
         List<AssembleOperation> assembleOperations = new ArrayList<>();
         List<DisassembleOperation> disassembleOperations = new ArrayList<>();
         // 解析属性注解获取操作配置
@@ -61,8 +61,9 @@ public class FieldAnnotationConfigurationParser
      * @author huangchengxing
      * @date 2022/3/1 16:24
      */
+    @Override
     @Nonnull
-    protected BeanOperationConfiguration createConfiguration(Class<?> targetClass) {
+    protected OperationConfiguration createConfiguration(Class<?> targetClass) {
         return new BeanOperationConfiguration(globalConfiguration, targetClass, new ArrayList<>(), new ArrayList<>());
     }
 
@@ -77,7 +78,7 @@ public class FieldAnnotationConfigurationParser
      * @author huangchengxing
      * @date 2022/3/1 16:55
      */
-    protected List<AssembleOperation> parseAssembleAnnotationOnField(Field key, BeanOperationConfiguration configuration) {
+    protected List<AssembleOperation> parseAssembleAnnotationOnField(Field key, OperationConfiguration configuration) {
         // 获取全部Assemble注解，包括正常注解，重复注解与元注解
         List<Assemble> annotations = AnnotatedElementUtils.getAllMergedAnnotations(key, Assemble.List.class).stream()
             .map(Assemble.List::value)
@@ -105,7 +106,7 @@ public class FieldAnnotationConfigurationParser
      * @author huangchengxing
      * @date 2022/3/1 17:49
      */
-    protected List<DisassembleOperation> parseDisassembleAnnotationOnField(Field key, BeanOperationConfiguration configuration, ParseContext parseContext) {
+    protected List<DisassembleOperation> parseDisassembleAnnotationOnField(Field key, OperationConfiguration configuration, ParseContext parseContext) {
         Set<Disassemble> disassembles = AnnotatedElementUtils.findAllMergedAnnotations(key, Disassemble.class);
         if (CollUtil.isEmpty(disassembles)) {
             return Collections.emptyList();
@@ -123,7 +124,7 @@ public class FieldAnnotationConfigurationParser
         // 若不指定类型，则认为其为动态类型
         Class<?> disassembleType = annotation.value();
         DisassembleOperation operation;
-        if (Objects.equals(Void.TYPE, disassembleType)) {
+        if (Objects.equals(Void.class, disassembleType)) {
             OperateConfigurationParser parser = getDisassembleOperationParser(annotation);
             operation = createDynamicDisassembleOperation(parser, key, annotation, configuration);
             return Collections.singletonList(operation);

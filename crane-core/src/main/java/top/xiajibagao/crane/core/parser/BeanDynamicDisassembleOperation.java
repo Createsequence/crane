@@ -3,7 +3,7 @@ package top.xiajibagao.crane.core.parser;
 import cn.hutool.core.collection.CollUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import top.xiajibagao.crane.core.cache.OperationConfigurationCache;
+import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 import top.xiajibagao.crane.core.parser.interfaces.DynamicDisassembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
@@ -30,13 +30,13 @@ public class BeanDynamicDisassembleOperation implements DynamicDisassembleOperat
     private final Disassembler disassembler;
     private final Field targetProperty;
     private final Set<String> targetPropertyAliases;
-    private final OperationConfigurationCache operationConfigurationCache;
+    private final ConfigurationCache configurationCache;
 
     @Nullable
     @Override
     public OperationConfiguration getTargetOperateConfiguration(Object target) {
         Class<?> targetClass = getTargetClass(target);
-        return operationConfigurationCache.getOrCached(
+        return configurationCache.getOrCached(
             configurationParser.getClass().getName(),
             targetClass,
             configurationParser::parse
