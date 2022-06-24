@@ -26,10 +26,12 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
     private final BeanFactory beanFactory;
     private final ConfigurationCache configurationCache;
     
-    @SuppressWarnings("unchecked")
-    public void process(T annotatedElement, Object target, Class<?>... targetGroups) {
+    public void process(T annotatedElement, Object target) {
+        if (Objects.isNull(target)) {
+            return;
+        }
         ConfigOption annotation = parseAnnotation(annotatedElement);
-        if (Objects.isNull(annotation) || ArrayUtil.isEmpty(targetGroups)) {
+        if (Objects.isNull(annotation) || ArrayUtil.isEmpty(annotation.groups())) {
             return;
         }
         Class<?> targetClass = getTargetClass(annotation, annotatedElement, target);
@@ -43,7 +45,7 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
             getNamespace(parser), targetClass, parser::parse
         );
         OperationExecutor executor = BeanFactoryUtils.getBean(beanFactory, annotation.executor(), annotation.executorName());
-        executor.execute(CollUtils.adaptToCollection(target), configuration, targetGroups);
+        executor.execute(CollUtils.adaptToCollection(target), configuration, annotation.groups());
     }
     
     /**

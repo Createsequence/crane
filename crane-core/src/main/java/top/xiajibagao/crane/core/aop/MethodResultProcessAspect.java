@@ -65,7 +65,7 @@ public class MethodResultProcessAspect extends ConfigOptionAnnotationProcessor<M
             log.warn("表达式[{}]执行失败，错误信息：[{}]", condition, e.getMessage());
         }
         if (Objects.nonNull(isProcess) && isProcess) {
-            process(method, result, annotation.groups());
+            process(method, result);
         }
     }
 
