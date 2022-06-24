@@ -1,5 +1,6 @@
 package top.xiajibagao.crane.core.aop;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 import top.xiajibagao.crane.core.annotation.ProcessResult;
 import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.helper.ConfigOptionAnnotationProcessor;
@@ -47,7 +47,7 @@ public class MethodResultProcessAspect extends ConfigOptionAnnotationProcessor<M
         }
         String condition = annotation.condition();
         // 无表达式需要执行
-        if (!StringUtils.hasText(condition)) {
+        if (CharSequenceUtil.isBlank(condition)) {
             process(method, result);
             return;
         }
