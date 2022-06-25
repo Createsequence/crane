@@ -57,7 +57,119 @@ public class UserVO {
 
 实际业务场景中，数据源可能是各式缓存或者数据库，甚至可能是配置文件，而需要处理的对象有不同的数据结构，要求填充的方式或字段也可能五花八门，而 crane 的核心功能就是对该流程的模拟和增强。
 
+## 核心功能
+
+crane 提供了非常丰富的功能，这里挑出几个核心功能做出简单示例。
+
+### 1、字段
+
+crane 支持基于注解在实体类上简单的完成一些功能的配置：
+
+~~~java
+// 1.将数据源对象中的name映射到当前对象的userName字段，此处填充支持一定程度的类型自动转换
+@Assemble(props = { @Prop(src = "name", ref = "userName") })
+private Integer userId;
+private String userName;
+
+// 2.将数据源对象直接映射到当前对象的user字段
+@Assemble(props = { @Prop(ref = "user") })
+private Integer userId;
+private User user;
+
+// 3.将数据源对象的actualId字段映射到当前对象的userId字段
+@Assemble(props = { @Prop(src = "actualId") })
+private Integer userId;
+
+// 4.若数据源对象是User集合，则依次将数据源对象中的name字段取出，并装到当前对象的userNames字段
+@Assemble(props = { @Prop(src = "name", ref = "userNames") })
+private Integer userId;
+private List<String> userNames;
+
+// 5.分组填充，userRole只有指定操作组为InnerGroup时才会被填充
+@Assemble(props = { @Prop(src = "name", ref = "userName") }, groups = DefaultGroup.class)
+@Assemble(props = { @Prop(src = "role", ref = "userRole") }, groups = InnerGroup.class)
+private Integer userId;
+private String userRole;
+private String userName;
+
+// 6.表达式预处理，获取数据源对象的name后，在前面拼接“亲爱的用户”，然后再填到当前对象的userName字段上
+@Assemble(props = { @Prop(src = "name", ref = "userName", exp = "'亲爱的用户' + #source") })
+private Integer userId;
+private String userName;
+
+// 6.嵌套填充，若Person也配置了字段映射，则将会把persons中的对象取出并进行处理
+@Disassemble(Person.class)
+private List<Person> persons;
+~~~
+
+### 2、数据源
+
+crane 支持通过各种容器兼容填充时所使用的各种各样的数据源，在容器注册到 spring 中后，可以通过 `@Assemble#container` 来引用它，容器将根据配置上的 namespace 和 key 值获取对应的数据源：
+
+~~~java
+// 使用KeyValueContainer容器，根据键值对缓存中namespace的命名空间里，根据sex获得对应的值，然后填到当前对象的sexName字段
+@Assemble(
+    namespace = "sex",
+    container = KeyValueContainer.class, 
+    props = { @Prop(ref = "sexName") }
+)
+private Integer sex;
+private String sexName;
+~~~
+
+下述是 crane 默认支持的数据源：
+
+- 键值对缓存：对应容器 `KeyValueContainer`，允许根据 namesapce 和 key 注册和获取任何数据；
+- 枚举：对应容器 `EnumDictContainer`，允许向容器中注册枚举类，然后通过指定的 namesapce 和 key 获得对应的枚举实例；
+- 实例方法：对应容器 `MethodContainer`，允许通过注解简单配置，将任意对象实例的方法作为数据源，通过 namespace 和 key 直接调用方法获取填充数据。适用于任何基于接口或本地方法的返回值进行填充的场景；
+- 内省容器：对应容器 `BeanIntrospectContainer` 和 `KeyIntrospectContainer`，允许直接将当前填充的对象作为数据源。适用于一些字段同步的场景；
+
+此外，也提供了 `BaseKeyContainer` 和 `BaseNamingContainer` 抽象类，用户可以基于此快速定制数据源容器，然后注册到 spring 中即可使用。
+
+### 3、执行
+
+crane 允许自由的在任何地方去触发填充行为的执行。
+
+**当方法返回值时调用**
+
+该功能基于 springAOP 实现。在方法上添加 `@ProcessResult` 注解，即可在调用方法时自动对返回值进行处理。
+
+该功能支持处理单个对象、对象的数组或 `Collection` 集合，并且支持根据 SpEL 表达式动态确定是否对结果进行填充。
+
+~~~java
+@ProcessResult(Classroom.class, condition = "!#result.isEmpty && !#isHandle")
+public List<Classroom> getClassroom(Boolean isHandler) {
+    // return something.......
+}
+~~~
+
+**在代码中调用**
+
+crane 也支持通过 `OperateTemplate` 直接在代码中触发操作：
+
+~~~java
+List<Foo> foos = Arrays.asList(new Foo(), new Foo(), new Foo(), new Foo());
+operateTemplate.process(foos); // 通过spring容器获取
+~~~
+
+**在JSON序列化时调用**
+
+crane 提供了 `DynamicJsonNodeModule` 模块，将其注册到 `ObjectMapper` 实例中后，crane 将在 `ObjectMapper` 序列化时根据配置动态填充 JsonNode，并且能够一定程度上的新增或者替换原有字段：
+
+~~~java
+List<Foo> foos = Arrays.asList(new Foo(), new Foo(), new Foo(), new Foo());
+JsonNode foosJsonNode = objectMapper.valueToTree(foos);
+~~~
+
+当该实例被用于在 `@RestController` 注解的 `Controller` 中使用时，则会自动对 Controller 的返回的 Json 数据进行处理。
+
+
+
+
+
 ## 快速开始
+
+下面将演示如何最快的搭建并启用一个 crane 项目。
 
 下面将演示如何最简单的启动一个示例项目。
 
@@ -172,6 +284,10 @@ before: Person(sex=0, sexName=女) // 处理后
 ~~~
 
 至此，即完成了 crane 的最基本功能的使用。
+
+##  参与贡献和技术支持
+
+如果在使用中遇到了问题、发现了 bug ，又或者是有什么好点子，欢迎在 issues 或者加入 QQ 群：540919540 反馈！
 
 ## 待办
 
