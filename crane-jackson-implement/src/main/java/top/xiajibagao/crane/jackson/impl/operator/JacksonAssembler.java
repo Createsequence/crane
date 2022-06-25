@@ -11,6 +11,7 @@ import top.xiajibagao.crane.core.helper.PairEntry;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.EmptyPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
+import top.xiajibagao.crane.jackson.impl.handler.JacksonOperateHandlerChain;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
 import java.util.Collections;
@@ -21,6 +22,7 @@ import java.util.Objects;
  *
  * @author huangchengxing
  * @date 2022/03/02 10:03
+ * @see JacksonOperateHandlerChain
  */
 @Getter
 @RequiredArgsConstructor

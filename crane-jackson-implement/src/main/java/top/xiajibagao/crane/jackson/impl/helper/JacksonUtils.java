@@ -20,6 +20,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
+ * Jackson工具类
+ *
  * @author huangchengxing
  * @date 2022/01/11 11:32
  */

@@ -14,7 +14,7 @@ import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 import java.util.Objects;
 
 /**
- * 处理{@link ObjectNode}类型的数据源节点对象与待处理目标节点对象
+ * {@link ObjectNode}节点处理器
  *
  * @since 0.2.0
  * @author huangchengxing

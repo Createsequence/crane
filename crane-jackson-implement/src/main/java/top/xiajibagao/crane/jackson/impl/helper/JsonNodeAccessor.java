@@ -8,12 +8,15 @@ import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
+import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
 
 /**
  * JsonNode对象属性访问器，注册到SpEL上下文中，用于通过类似“xxx.xxx”的表达式读写对象属性
  *
  * @author huangchengxing
  * @date 2022/06/04 22:11
+ * @see PropertyAccessor
+ * @see ReflectivePropertyAccessor
  */
 @RequiredArgsConstructor
 public class JsonNodeAccessor implements PropertyAccessor {

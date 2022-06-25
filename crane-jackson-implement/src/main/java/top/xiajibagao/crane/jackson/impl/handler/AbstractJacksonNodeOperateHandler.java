@@ -11,9 +11,11 @@ import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 import java.util.Collection;
 
 /**
- * @since 0.2.0
+ * {@link OperateHandler}的基础实现，提供了一些针对{@link JsonNode}类型对象的操作方法和必要的组件
+ *
  * @author huangchengxing
  * @date 2022/04/12 13:23
+ * @since 0.2.0
  */
 @RequiredArgsConstructor
 public abstract class AbstractJacksonNodeOperateHandler implements OperateHandler {

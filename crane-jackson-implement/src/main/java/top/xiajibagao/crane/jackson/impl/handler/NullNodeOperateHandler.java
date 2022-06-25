@@ -11,8 +11,9 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
- * 用于处理null值的节点，一般当具有最高的优先级，当待读取的数据源或待写入的待处理对象为null时，
- * 优先使用该节点处理，避免后续节点被无意义的反复调用
+ * 用于处理null值或{@link NullNode}节点，具有最高的优先级。
+ * 当待读取的数据源或待写入的待处理对象为null时，优先使用该节点处理，
+ * 避免后续节点被无意义的反复调用。
  *
  * @author huangchengxing
  * @date 2022/06/07 17:08
