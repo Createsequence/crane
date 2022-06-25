@@ -6,11 +6,11 @@ import java.util.Optional;
 /**
  * {@link BeanProperty}工厂
  *
+ * @author huangchengxing
+ * @date 2022/05/10 15:51
  * @see AbstractBeanPropertyFactory
  * @see AsmReflexBeanPropertyFactory
  * @see ReflexBeanPropertyFactory
- * @author huangchengxing
- * @date 2022/05/10 15:51
  */
 public interface BeanPropertyFactory {
 

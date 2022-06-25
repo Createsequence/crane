@@ -1,17 +1,18 @@
 package top.xiajibagao.crane.core.annotation;
 
 import org.springframework.core.annotation.AliasFor;
+import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 字段装配配置
- * <p>表示一次装配操作中，数据源对象的字段与待处理对象的字段的映射关系
+ * 字段映射配置。表示一次装配操作中，数据源对象的字段与待处理对象的字段的映射关系
  *
  * @author huangchengxing
  * @date 2022/02/28 18:01
+ * @see PropertyMapping
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

@@ -10,6 +10,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.helper.invoker.MethodInvoker;
@@ -25,8 +26,28 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * 方法数据源容器
+ *
+ * <p>表示以实例方法作为数据源的数据源容器。内部维护有方法实例与命名空间的映射表。
+ * 当spring启动时，将扫描容器中类上带有{@link MethodSourceBean}注解的实例，
+ * 并通过{@link #register(Object)}将其注册到方法数据源容器中。<br />
+ * 方法数据源会进一步解析该示例中被{@link MethodSourceBean.Method}注解的方法，
+ * 按照各自{@link MethodSourceBean.Method#namespace()}
+ * 缓存到不同的命名空间中。
+ *
+ * <p>容器中作为数据源的方法应当有且仅有一个{@link Collection}及其子类型的入参，
+ * 当调用时，会将一批对象中{@link Assemble}指定的key集合作为参数，传入命名空间对的方法。
+ * 方法的返回也应当为{@link Collection}集合或其子类。
+ *
+ * <p>容器根据{@link MethodSourceBean.Method#mappingType()}属性指定的{@link MappingType}枚举，
+ * 支持按照{@link MethodSourceBean.Method#sourceKey()}指定的key对数据源一对多或多对一。<br />
+ * 当指定为{@link MappingType#ONE_TO_ONE}时，容器根据key批量获取的数据源默认将会按一对一分组，
+ * 当出现复数数据源对一个key值时将会抛出异常。此时装配器根据key获得到的值为数据源对象本身。<br />
+ * 当指定为{@link MappingType#ONE_TO_MORE}时，容器将按key分组，此时装配器根据key获得到的值为数据源对象集合。
+ *
  * @author huangchengxing
  * @date 2022/03/31 21:40
+ * @see MethodSourceBean
  */
 @Slf4j
 @RequiredArgsConstructor

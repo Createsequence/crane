@@ -13,9 +13,9 @@ import java.util.Objects;
 /**
  * 处理数组类型的数据源与待处理对象
  *
- * @since 0.2.0
  * @author huangchengxing
  * @date 2022/04/08 16:39
+ * @since 0.2.0
  */
 public class ArrayOperateHandler extends CollectionOperateHandler implements OperateHandler {
 

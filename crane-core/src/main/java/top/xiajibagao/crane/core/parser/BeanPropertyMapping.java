@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 /**
+ * {@link PropertyMapping}的通用实现
+ *
  * @author huangchengxing
  * @date 2022/03/01 16:11
  */

@@ -4,6 +4,8 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
 
 /**
+ * Crane内部异常类
+ *
  * @author huangchengxing
  * @date 2022/02/28 19:29
  */

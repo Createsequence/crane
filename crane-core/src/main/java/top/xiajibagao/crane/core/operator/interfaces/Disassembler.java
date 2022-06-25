@@ -5,8 +5,7 @@ import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import java.util.Collection;
 
 /**
- * 装卸器
- * <p>用于将对象中带有嵌套结构的字段值取出，并平摊处理为复数需要进行装配操作的待处理对象
+ * 装卸器。用于将对象中带有嵌套结构的字段值取出，并平摊处理为复数需要进行装配操作的待处理对象
  *
  * @author huangchengxing
  * @date 2022/03/01 14:45

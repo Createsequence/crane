@@ -12,10 +12,10 @@ import javax.annotation.Nullable;
  * 数据源操作拦截器
  * <p>数据源拦截器，用于在数据源被操作处理器链链读取或写入待处理对象前，对数据源进行拦截或改写操作
  *
- * @see ExpressionPreprocessingInterceptor
  * @author huangchengxing
  * @date 2022/06/04 22:55
  * @since 0.5.5
+ * @see ExpressionPreprocessingInterceptor
  */
 public interface SourceOperateInterceptor extends Orderly {
 

@@ -3,8 +3,7 @@ package top.xiajibagao.crane.core.operator.interfaces;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 
 /**
- * 装配器
- * <p>用于根据指定的装配配置，获取对应的key字段值，或将数据源中的字段写入待操作对象
+ * 装配器。用于根据指定的装配配置，获取对应的key字段值，或将数据源中的字段写入待操作对象
  *
  * @see AssembleOperation
  * @author huangchengxing

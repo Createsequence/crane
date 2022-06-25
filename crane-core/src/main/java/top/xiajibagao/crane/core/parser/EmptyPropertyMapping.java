@@ -3,7 +3,7 @@ package top.xiajibagao.crane.core.parser;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 /**
- * 一个空装配字段配置
+ * 一个空装配字段配置，应直接通过{@link #instance()}方法使用它
  *
  * @author huangchengxing
  * @date 2022/04/17 22:20

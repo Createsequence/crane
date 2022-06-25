@@ -17,6 +17,8 @@ import java.util.function.Function;
  *
  * @author huangchengxing
  * @date 2022/03/02 13:20
+ * @see EnumDict
+ * @see EnumDict.Item
  */
 @RequiredArgsConstructor
 public class EnumDictContainer extends BaseNamespaceContainer<String, EnumDict.EnumDictItem<?>> implements Container {

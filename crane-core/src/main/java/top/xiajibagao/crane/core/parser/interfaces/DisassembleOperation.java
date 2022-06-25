@@ -10,18 +10,23 @@ import java.util.Objects;
 
 /**
  * 字段装卸配置
- * <p>表明一次需要从某个字段中获取数据装卸操作
- * 一个字段装卸配置应当能够描述：
+ *
+ * <p>表明一次需要从某个字段中获取数据装卸操作。一个字段装卸配置应当能够描述：
  * <ol>
  *     <li>装卸类中哪一个字段?</li>
  *     <li>使用哪个装卸器?</li>
  *     <li>将获取的字段值拆分为哪些待处理对象?</li>
  * </ol>
  *
- * @see OperationConfiguration
- * @see Disassembler
+ * <p>存在不确定类型的装卸操作实现{@link DynamicDisassembleOperation}，
+ * 可以使用{@link #isDynamic(DisassembleOperation)}确定是该操作否为一个
+ * 不确定类型的装卸操作。
+ *
  * @author huangchengxing
  * @date 2022/03/01 14:55
+ * @see DynamicDisassembleOperation
+ * @see OperationConfiguration
+ * @see Disassembler
  */
 public interface DisassembleOperation extends Operation {
     

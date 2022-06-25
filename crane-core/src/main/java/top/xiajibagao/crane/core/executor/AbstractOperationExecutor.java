@@ -19,6 +19,7 @@ import java.util.stream.StreamSupport;
 
 /**
  * 抽象操作执行器
+ *
  * <p>{@link OperationExecutor}初步实现，提供基本的装配与装卸操作的收集处理。
  * 实现类必须实现{@link #execute(GlobalConfiguration, MultiValueTableMap)}方法
  *

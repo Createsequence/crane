@@ -4,13 +4,19 @@ import java.util.Collection;
 
 /**
  * 动态字段装卸注解
+ *
  * <p>功能与{@link DynamicDisassembleOperation}一致，但是代表的类型不确定的装卸字段，
  * 用于处理类似字段类型是泛型、接口或父类的情况。
  *
+ * <p>使用时，应当通过{@link DisassembleOperation#isDynamic(DisassembleOperation)}确定要处理的
+ * {@link DisassembleOperation}是否属于{@link DynamicDisassembleOperation}，若是，则应根据当前
+ * 待处理的对象，调用{@link #resolve(Object)}获得确定类型的{@link DisassembleOperation}。<br />
+ * {@link DynamicDisassembleOperation#getTargetOperateConfiguration()}不允许被直接调用。
+ *
  * @author huangchengxing
  * @date 2022/06/24 11:21
- * @see DisassembleOperation
  * @since 0.5.7
+ * @see DisassembleOperation
  */
 public interface DynamicDisassembleOperation extends DisassembleOperation {
 

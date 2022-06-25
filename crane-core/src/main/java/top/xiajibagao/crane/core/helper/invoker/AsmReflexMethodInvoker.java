@@ -6,8 +6,11 @@ import lombok.RequiredArgsConstructor;
 import javax.annotation.Nonnull;
 
 /**
+ * 基于字节码调用的{@link MethodInvoker}实现
+ *
  * @author huangchengxing
  * @date 2022/06/07 18:55
+ * @since 0.5.5
  */
 @RequiredArgsConstructor
 public class AsmReflexMethodInvoker implements MethodInvoker {

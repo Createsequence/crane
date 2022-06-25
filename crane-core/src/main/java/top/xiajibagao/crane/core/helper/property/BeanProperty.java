@@ -5,11 +5,11 @@ import java.lang.reflect.Field;
 /**
  * 描述一个类属性，提供针对该类型实例的此属性的get/set能力
  *
+ * @author huangchengxing
+ * @date 2022/04/01 14:08
  * @see BeanPropertyFactory
  * @see AsmReflexBeanPropertyFactory.AsmReflexBeanProperty
  * @see ReflexBeanPropertyFactory.ReflexBeanProperty
- * @author huangchengxing
- * @date 2022/04/01 14:08
  */
 public interface BeanProperty {
 

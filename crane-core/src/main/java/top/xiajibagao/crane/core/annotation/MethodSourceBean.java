@@ -1,17 +1,20 @@
 package top.xiajibagao.crane.core.annotation;
 
 import org.springframework.core.annotation.AliasFor;
+import top.xiajibagao.crane.core.container.MethodSourceContainer;
 
 import java.lang.annotation.*;
 import java.util.Collection;
 
 /**
  * 方法数据源对象
+ *
  * <p>注解类表明该类中存在可直接作为容器的数据源的方法，
  * 允许直接在{@link #methods()}中声明或者通过在方法上添加{@link MethodSourceBean.Method}注解的方式声明作为数据源的方法。
  *
  * @author huangchengxing
  * @date 2022/04/01 10:49
+ * @see MethodSourceContainer
  */
 @MateAnnotation
 @Target(ElementType.TYPE)

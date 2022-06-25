@@ -14,6 +14,8 @@ import top.xiajibagao.crane.core.parser.interfaces.DynamicDisassembleOperation;
 import java.util.*;
 
 /**
+ * 针对普通JavaBean的{@link Disassembler}实现，允许基于反射完成对JavaBean的装卸操作
+ *
  * @author huangchengxing
  * @date 2022/03/02 13:29
  */

@@ -16,9 +16,9 @@ import java.util.List;
 /**
  * {@link #handlers()}与{@link #interceptors()}皆按{@link Orderly#comparator()}排序的处理器链，提供一些方法的基本实现
  *
- * @since 0.2.0
  * @author huangchengxing
  * @date 2022/04/08 21:02
+ * @since 0.2.0
  */
 @Getter
 @Accessors(fluent = true)

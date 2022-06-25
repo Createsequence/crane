@@ -3,6 +3,8 @@ package top.xiajibagao.crane.core.parser;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 
 /**
+ * {@link GlobalConfiguration}的通用实现
+ *
  * @author huangchengxing
  * @date 2022/4/5 20:29
  */

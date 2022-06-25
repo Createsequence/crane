@@ -25,11 +25,11 @@ import java.util.List;
  * 当调用{@link #writeToTarget(Object, Object, PropertyMapping, AssembleOperation)}时，
  * 排序最靠前，且{@link OperateHandler#targetCanWrite(Object, Object, PropertyMapping, AssembleOperation)}返回为ture的节点才会被执行；
  *
+ * @author huangchengxing
+ * @date 2022/04/08 20:35
  * @see OperateHandler
  * @see SourceOperateInterceptor
  * @see AbstractOrderlyHandlerChain
- * @author huangchengxing
- * @date 2022/04/08 20:35
  */
 public interface OperateHandlerChain extends OperateHandler {
 

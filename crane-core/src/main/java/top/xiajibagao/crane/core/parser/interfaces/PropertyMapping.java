@@ -4,7 +4,8 @@ import cn.hutool.core.text.CharSequenceUtil;
 
 /**
  * 字段映射配置
- * <p>表明在一次操作中，数据源的字段与待处理对象字段的映射关系。 <br />
+ *
+ * <p>表明在一次操作中，一个数据源的字段与一个待处理对象字段的映射关系。 <br />
  * 比如：在一次操作中，需要将数据源对象A的name字段赋值给待处理对象B的userName字段，
  * 则称name为数据源字段，对应的字段值称为数据源，而userName为引用字段。
  *
@@ -24,9 +25,9 @@ import cn.hutool.core.text.CharSequenceUtil;
  * <p>一般情况下，当获取到数据源字段的值后，若支持使用表达式处理，则该值应当先被表达式处理后，
  * 转为指定的表达式返回值类型，并重新以该值作为数据源，然后装配到待处理对象的指定字段。
  *
- * @see AssembleOperation
  * @author huangchengxing
  * @date 2022/03/01 16:00
+ * @see AssembleOperation
  */
 public interface PropertyMapping {
 

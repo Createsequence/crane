@@ -21,13 +21,13 @@ import java.util.Objects;
  * 若被 Spring 容器管理，则应当按照优先{@link Order}指定的顺序执行，否则应当按照{@link Orderly#compareTo(Orderly)}
  * 给定的自然顺序执行。
  *
+ * @author huangchengxing
+ * @date 2022/03/01 15:52
  * @see OperationConfiguration
  * @see AssembleOperation
  * @see DisassembleOperation
  * @see Assembler
  * @see Disassembler
- * @author huangchengxing
- * @date 2022/03/01 15:52
  */
 public interface OperateConfigurationParser extends Orderly {
 

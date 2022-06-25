@@ -6,13 +6,12 @@ import java.lang.reflect.Field;
 import java.util.Set;
 
 /**
- * 字段操作
- * <p>表明针对类中的某一字段进行的一项特定操作
+ * 字段操作，表明针对类中的某一字段进行的一项特定操作
  *
- * @see DisassembleOperation
- * @see AssembleOperation
  * @author huangchengxing
  * @date 2022/04/14 13:31
+ * @see DisassembleOperation
+ * @see AssembleOperation
  */
 public interface Operation extends Orderly {
 

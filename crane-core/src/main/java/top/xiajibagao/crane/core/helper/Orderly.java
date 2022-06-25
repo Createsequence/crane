@@ -15,10 +15,11 @@ import java.util.Objects;
  * 实现此接口暗示实现类是允许排序的，但是否真的可以排序则需要实现者提供相关支持。
  * 当实现类指定了顺序，但是与{@link Order}注解不一致时，应当以注解为准。
  *
- * @see Ordered
- * @see Comparable
  * @author huangchengxing
  * @date 2022/04/15 13:06
+ * @see Ordered
+ * @see Comparable
+ * @see OrderUtils
  */
 public interface Orderly extends Ordered, Comparable<Orderly> {
 

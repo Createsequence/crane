@@ -10,6 +10,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
 /**
+ * 基于双重Map集合的{@link ConfigurationCache}的通用实现
+ *
  * @author huangchengxing
  * @date 2022/4/5 21:03
  */

@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * {@link AssembleOperation}的通用实现
+ *
  * @author huangchengxing
  * @date 2022/03/01 16:07
  */

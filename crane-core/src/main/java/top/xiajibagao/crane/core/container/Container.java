@@ -22,11 +22,11 @@ import top.xiajibagao.crane.core.parser.interfaces.Operation;
  *
  * <p>容器之间支持根据排序调整其接受{@link Operation}的顺序，但是仍然应当以保证{@link Operation}的顺序优先。
  *
+ * @author huangchengxing
+ * @date 2022/02/28 17:52
  * @see AssembleOperation
  * @see BaseKeyContainer
  * @see BaseNamespaceContainer
- * @author huangchengxing
- * @date 2022/02/28 17:52
  */
 public interface Container extends Orderly {
 

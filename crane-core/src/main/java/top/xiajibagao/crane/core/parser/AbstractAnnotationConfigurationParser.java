@@ -26,8 +26,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * 注解解析器抽象类，为{@link OperateConfigurationParser}提供一些基本实现
+ *
  * @author huangchengxing
  * @date 2022/05/22 15:05
+ * @see ClassAnnotationConfigurationParser
+ * @see AbstractAnnotationConfigurationParser
  */
 @Slf4j
 @RequiredArgsConstructor

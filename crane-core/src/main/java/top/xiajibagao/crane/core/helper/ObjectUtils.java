@@ -7,6 +7,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
+ * 通用工具类，提供针对对象操作的一些函数式操作支持
+ *
  * @author huangchengxing
  * @date 2022/02/26 18:11
  */

@@ -19,7 +19,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 枚举字典，用于将枚举适配为字典项，并提供根据类型与名称的查询功能
+ * 枚举字典，用于将枚举适配为字典项，并提供根据类型与名称的获取并访问其中属性的功能
  *
  * @author huangchengxing
  * @date 2022/01/07 13:59

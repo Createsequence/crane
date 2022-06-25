@@ -8,6 +8,7 @@ import java.util.Set;
 
 /**
  * 字段装配配置
+ *
  * <p>表明一次需要根据指定字段获取关联数据，并填充到当前对象的装配操作
  * 一个字段装配配置应当能够描述：
  * <ol>
@@ -17,12 +18,12 @@ import java.util.Set;
  *     <li>将数据源中的哪些字段填到待处理对象中的哪些字段?</li>
  * </ol>
  *
+ * @author huangchengxing
+ * @date 2022/03/01 14:55
  * @see OperationConfiguration
  * @see Assembler
  * @see Container
  * @see PropertyMapping
- * @author huangchengxing
- * @date 2022/03/01 14:55
  */
 public interface AssembleOperation extends Operation {
 
