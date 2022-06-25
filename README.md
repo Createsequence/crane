@@ -102,16 +102,6 @@ public class UserVO {
 </dependency>
 ~~~
 
-若还需要使用 Jackson 相关的功能，则还需要引入 `crane-jackson-implement`
-
-~~~xml
-<dependency>
-    <groupId>top.xiajibagao</groupId>
-    <artifactId>crane-jackson-implement</artifactId>
-    <version>${last-version}</version>
-</dependency>
-~~~
-
 > - 若无法从 maven 仓库引入 crane 依赖，则可以把代码拉到本地，然后执行 `mvn clean install`命令安装到本地后即可引用；
 > - 由于 Crane 尚未有正式的发行版，因此最好每次引入的依赖都为最新的；
 
@@ -137,7 +127,7 @@ public class Application {
 @Data // 使用Lombok简化getter和setter方法
 @Accessors(chain = true)
 public class Person {
-    @Assemble(namespace = "sex", props = @Prop("sexName"))
+    @Assemble(namespace = "sex", props = @Prop(ref = "sexName"))
     Integer sex;
     String sexName;
 }
@@ -185,8 +175,6 @@ before: Person(sex=0, sexName=女) // 处理后
 
 ## 待办
 
-- [ ] 添加一个完整的示例项目；
-
 - [ ] 允许通过专门的配置类或配置文件配置字段映射模板；
 
 - [ ] 允许通过专门的配置类或配置文件配置操作；
@@ -219,6 +207,8 @@ before: Person(sex=0, sexName=女) // 处理后
   - [x] 预加载类操作配置到配置缓存；
   - [x] 枚举容器根据指定包路径批量扫描并注册枚举；
   - [x] 自定义使用反射还是字节码调用实现对象读写；
+
+- [x] 装卸配置允许处理动态类型的字段；
 
 - [x] 反射调用set方法时，若入参与参数类型不一致，尝试自动转换；
 
