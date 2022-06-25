@@ -163,10 +163,6 @@ JsonNode foosJsonNode = objectMapper.valueToTree(foos);
 
 当该实例被用于在 `@RestController` 注解的 `Controller` 中使用时，则会自动对 Controller 的返回的 Json 数据进行处理。
 
-
-
-
-
 ## 快速开始
 
 下面将演示如何最快的搭建并启用一个 crane 项目。
