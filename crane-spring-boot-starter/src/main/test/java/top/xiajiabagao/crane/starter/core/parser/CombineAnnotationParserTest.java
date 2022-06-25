@@ -67,9 +67,9 @@ public class CombineAnnotationParserTest {
         Assertions.assertEquals(Collections.singleton(DefaultGroup.class), assembleOperation.getGroups());
         Assertions.assertEquals("namespace", assembleOperation.getNamespace());
         Assertions.assertEquals(configuration, assembleOperation.getOwner());
-        Assertions.assertEquals(1, assembleOperation.getProperties().size());
+        Assertions.assertEquals(1, assembleOperation.getPropertyMappings().size());
 
-        PropertyMapping propertyMapping = assembleOperation.getProperties().get(0);
+        PropertyMapping propertyMapping = assembleOperation.getPropertyMappings().get(0);
         Assertions.assertEquals("sourceRef", propertyMapping.getSource());
         Assertions.assertEquals("targetRef", propertyMapping.getReference());
         Assertions.assertEquals("exp", propertyMapping.getExp());

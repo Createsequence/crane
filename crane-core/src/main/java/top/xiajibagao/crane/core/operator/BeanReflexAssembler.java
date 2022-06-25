@@ -28,7 +28,7 @@ public class BeanReflexAssembler implements Assembler {
         if (Objects.isNull(target) || Objects.isNull(source)) {
             return;
         }
-        CollUtil.defaultIfEmpty(operation.getProperties(), Collections.singletonList(EmptyPropertyMapping.instance()))
+        CollUtil.defaultIfEmpty(operation.getPropertyMappings(), Collections.singletonList(EmptyPropertyMapping.instance()))
             .stream()
             .map(property -> PairEntry.of(property, handlerChain.readFromSource(source, property, operation)))
             .filter(PairEntry::hasValue)

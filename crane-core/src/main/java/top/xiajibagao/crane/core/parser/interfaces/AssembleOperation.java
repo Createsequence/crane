@@ -69,7 +69,7 @@ public interface AssembleOperation extends Operation {
      * @author huangchengxing
      * @date 2022/3/1 16:02
      */
-    List<PropertyMapping> getProperties();
+    List<PropertyMapping> getPropertyMappings();
 
     /**
      * 获取分组

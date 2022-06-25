@@ -37,7 +37,7 @@ public class JacksonAssembler implements Assembler {
         ObjectNode targetNode = (ObjectNode) target;
         JsonNode sourceNode = (source instanceof JsonNode) ?
             (JsonNode)source : objectMapper.valueToTree(source);
-        CollUtil.defaultIfEmpty(operation.getProperties(), Collections.singletonList(EmptyPropertyMapping.instance()))
+        CollUtil.defaultIfEmpty(operation.getPropertyMappings(), Collections.singletonList(EmptyPropertyMapping.instance()))
             .stream()
             .map(property -> PairEntry.of(property, handlerChain.readFromSource(sourceNode, property, operation)))
             .filter(PairEntry::hasValue)

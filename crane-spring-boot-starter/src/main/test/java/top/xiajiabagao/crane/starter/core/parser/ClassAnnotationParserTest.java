@@ -61,9 +61,9 @@ public class ClassAnnotationParserTest {
         Assertions.assertEquals(Collections.singleton(DefaultGroup.class), assembleOperation.getGroups());
         Assertions.assertEquals("namespace", assembleOperation.getNamespace());
         Assertions.assertEquals(configuration, assembleOperation.getOwner());
-        Assertions.assertEquals(1, assembleOperation.getProperties().size());
+        Assertions.assertEquals(1, assembleOperation.getPropertyMappings().size());
 
-        PropertyMapping propertyMapping = assembleOperation.getProperties().get(0);
+        PropertyMapping propertyMapping = assembleOperation.getPropertyMappings().get(0);
         Assertions.assertEquals("sourceRef", propertyMapping.getSource());
         Assertions.assertEquals("targetRef", propertyMapping.getReference());
         Assertions.assertEquals("exp", propertyMapping.getExp());
@@ -87,9 +87,9 @@ public class ClassAnnotationParserTest {
         Assertions.assertEquals(Collections.singleton(DefaultGroup.class), disassembleConfigurationAssembleOperation.getGroups());
         Assertions.assertEquals("namespace", disassembleConfigurationAssembleOperation.getNamespace());
         Assertions.assertEquals(disassembleConfiguration, disassembleConfigurationAssembleOperation.getOwner());
-        Assertions.assertEquals(1, disassembleConfigurationAssembleOperation.getProperties().size());
+        Assertions.assertEquals(1, disassembleConfigurationAssembleOperation.getPropertyMappings().size());
 
-        PropertyMapping disassembleConfigurationPropertyMapping = assembleOperation.getProperties().get(0);
+        PropertyMapping disassembleConfigurationPropertyMapping = assembleOperation.getPropertyMappings().get(0);
         Assertions.assertEquals("sourceRef", disassembleConfigurationPropertyMapping.getSource());
         Assertions.assertEquals("targetRef", disassembleConfigurationPropertyMapping.getReference());
         Assertions.assertEquals("exp", disassembleConfigurationPropertyMapping.getExp());
