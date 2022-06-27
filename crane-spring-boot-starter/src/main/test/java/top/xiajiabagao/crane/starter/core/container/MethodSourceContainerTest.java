@@ -18,10 +18,10 @@ import top.xiajiabagao.crane.starter.core.CoreTestConfig;
 import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
 import top.xiajibagao.crane.core.container.MethodSourceContainer;
-import top.xiajibagao.crane.core.handler.BeanReflexOperateHandlerChain;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
+import top.xiajibagao.crane.core.operator.BeanReflexOperateProcessor;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.BeanAssembleOperation;
 import top.xiajibagao.crane.core.parser.BeanOperationConfiguration;
@@ -41,7 +41,7 @@ import java.util.*;
 public class MethodSourceContainerTest {
 
     @Autowired
-    private BeanReflexOperateHandlerChain beanReflexOperateHandlerChain;
+    private BeanReflexOperateProcessor beanReflexOperateProcessor;
     @Autowired
     private GlobalConfiguration globalConfiguration;
     @Autowired
@@ -61,7 +61,7 @@ public class MethodSourceContainerTest {
         Assertions.assertEquals(MappingType.ONE_TO_MORE, exampleGroupMethodSource.getMappingType());
 
         // 获取配置
-        Assembler assembler = new BeanReflexAssembler(beanReflexOperateHandlerChain);
+        Assembler assembler = new BeanReflexAssembler(beanReflexOperateProcessor);
         OperationConfiguration configuration = new BeanOperationConfiguration(globalConfiguration, Example.class, new ArrayList<>(), new ArrayList<>());
         List<Example> examples = Arrays.asList(
             new Example(1, 1), new Example(2, 1),

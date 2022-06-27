@@ -11,6 +11,7 @@ import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.helper.property.AsmReflexBeanPropertyFactory;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
+import top.xiajibagao.crane.core.operator.BeanReflexOperateProcessor;
 import top.xiajibagao.crane.core.parser.BeanAssembleOperation;
 import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -33,7 +34,7 @@ public class BeanOperateHandlerTest {
         );
 
         // source.xxx -> target.xxx
-        OperateHandler handler = new BeanOperateHandler(new AsmReflexBeanPropertyFactory());
+        OperateHandler handler = new BeanOperateHandler(new BeanReflexOperateProcessor(), new AsmReflexBeanPropertyFactory());
         Example target = new Example(1, "小明", null);
         Example source = new Example(2, "小红", null);
         PropertyMapping targetPropertyAndSourceProperty = new BeanPropertyMapping("name", "name", "", Void.class);

@@ -3,8 +3,10 @@ package top.xiajibagao.crane.jackson.impl.operator;
 import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
@@ -15,11 +17,14 @@ import java.util.*;
  *
  * @author huangchengxing
  * @date 2022/03/02 10:04
+ * @see JacksonOperateProcessor
  */
+@Getter
 @RequiredArgsConstructor
 public class JacksonDisassembler implements Disassembler {
 
     private final ObjectMapper objectMapper;
+    private final OperateProcessor operateProcessor;
 
     @Override
     public Collection<?> execute(Object target, DisassembleOperation operation) {

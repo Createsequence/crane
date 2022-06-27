@@ -22,8 +22,8 @@ import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.jackson.impl.handler.JacksonOperateHandlerChain;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonAssembler;
+import top.xiajibagao.crane.jackson.impl.operator.JacksonOperateProcessor;
 
 import java.util.*;
 
@@ -38,7 +38,7 @@ public class JacksonAssemblerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
-    private JacksonOperateHandlerChain jacksonOperateHandlerChain;
+    private JacksonOperateProcessor jacksonOperateProcessor;
     @Autowired
     private KeyValueContainer keyValueContainer;
     @Autowired
@@ -53,7 +53,7 @@ public class JacksonAssemblerTest {
         keyValueContainer.register("source", sourceBean);
 
         // 获取配置
-        Assembler assembler = new JacksonAssembler(objectMapper, jacksonOperateHandlerChain);
+        Assembler assembler = new JacksonAssembler(objectMapper, jacksonOperateProcessor);
         OperationConfiguration configuration = new BeanOperationConfiguration(globalConfiguration, Example.class, new ArrayList<>(), new ArrayList<>());
         AssembleOperation assembleOperation = new BeanAssembleOperation(
             0, configuration, ReflexUtils.findField(Example.class, "id"),

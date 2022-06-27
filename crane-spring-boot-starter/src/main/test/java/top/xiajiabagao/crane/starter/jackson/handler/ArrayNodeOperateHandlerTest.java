@@ -11,7 +11,6 @@ import lombok.experimental.Accessors;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.parser.BeanAssembleOperation;
@@ -19,9 +18,9 @@ import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
-import top.xiajibagao.crane.jackson.impl.handler.JacksonOperateHandlerChain;
 import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.ValueNodeOperateHandler;
+import top.xiajibagao.crane.jackson.impl.operator.JacksonOperateProcessor;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +33,7 @@ import java.util.List;
 public class ArrayNodeOperateHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JacksonOperateProcessor jacksonOperateProcessor = new JacksonOperateProcessor();
 
     @Test
     public void testArrayNodeOperateHandler() {
@@ -44,10 +44,12 @@ public class ArrayNodeOperateHandlerTest {
         );
 
         // source.xxx -> target.xxx
-        OperateHandlerChain operateHandlerChain = new JacksonOperateHandlerChain()
-            .addHandler(new ObjectNodeOperateHandler(objectMapper))
-            .addHandler(new ValueNodeOperateHandler(objectMapper));
-        OperateHandler handler = new ArrayNodeOperateHandler(objectMapper, operateHandlerChain);
+        jacksonOperateProcessor
+            .registerTargetWriters(new ValueNodeOperateHandler(objectMapper, jacksonOperateProcessor))
+            .registerSourceReaders(new ValueNodeOperateHandler(objectMapper, jacksonOperateProcessor))
+            .registerTargetWriters(new ObjectNodeOperateHandler(objectMapper, jacksonOperateProcessor))
+            .registerSourceReaders(new ObjectNodeOperateHandler(objectMapper, jacksonOperateProcessor));
+        OperateHandler handler = new ArrayNodeOperateHandler(objectMapper, jacksonOperateProcessor);
         JsonNode target = objectMapper.valueToTree(Arrays.asList(new Example(1, "小明", null, null), new Example(2, "小李", null, null)));
         JsonNode source = objectMapper.valueToTree(Arrays.asList(new Example(3, "小红", null, null), new Example(4, "小刚", null, null)));
         PropertyMapping targetPropertyAndSourceProperty = new BeanPropertyMapping("name", "name", "", Void.class);

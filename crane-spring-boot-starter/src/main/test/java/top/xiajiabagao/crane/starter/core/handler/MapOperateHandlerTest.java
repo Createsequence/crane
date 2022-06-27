@@ -10,6 +10,7 @@ import top.xiajibagao.crane.core.handler.MapOperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
+import top.xiajibagao.crane.core.operator.BeanReflexOperateProcessor;
 import top.xiajibagao.crane.core.parser.BeanAssembleOperation;
 import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -34,7 +35,7 @@ public class MapOperateHandlerTest {
         );
 
         // source.xxx -> target.xxx
-        OperateHandler handler = new MapOperateHandler();
+        OperateHandler handler = new MapOperateHandler(new BeanReflexOperateProcessor());
         Map<String, Object> target = new HashMap<>();
         target.put("id", 1);
         target.put("name", "小明");

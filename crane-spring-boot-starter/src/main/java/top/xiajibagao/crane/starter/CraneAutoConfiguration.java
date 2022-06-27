@@ -1,6 +1,7 @@
 package top.xiajibagao.crane.starter;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ClassUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,15 +26,16 @@ import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.SequentialOperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
 import top.xiajibagao.crane.core.handler.*;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
-import top.xiajibagao.crane.core.handler.interfaces.SourceOperateInterceptor;
 import top.xiajibagao.crane.core.helper.EnumDict;
 import top.xiajibagao.crane.core.helper.OperateTemplate;
 import top.xiajibagao.crane.core.helper.property.AsmReflexBeanPropertyFactory;
 import top.xiajibagao.crane.core.helper.property.BeanPropertyFactory;
 import top.xiajibagao.crane.core.helper.property.ReflexBeanPropertyFactory;
+import top.xiajibagao.crane.core.interceptor.ExpressionPreprocessingInterceptor;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
 import top.xiajibagao.crane.core.operator.BeanReflexDisassembler;
+import top.xiajibagao.crane.core.operator.BeanReflexOperateProcessor;
+import top.xiajibagao.crane.core.operator.interfaces.*;
 import top.xiajibagao.crane.core.parser.BeanGlobalConfiguration;
 import top.xiajibagao.crane.core.parser.ClassAnnotationConfigurationParser;
 import top.xiajibagao.crane.core.parser.CombineOperationConfigurationParser;
@@ -43,8 +44,8 @@ import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -103,7 +104,6 @@ public class CraneAutoConfiguration {
     // ==================== 操作者 ====================
 
     @Order
-    @ConditionalOnMissingClass("top.xiajibagao.crane.jackson.impl.helper.JsonNodeAccessor")
     @ConditionalOnMissingBean(ExpressionPreprocessingInterceptor.ContextFactory.class)
     @Bean("DefaultCraneExpressionPreprocessingInterceptorContextFactory")
     public ExpressionPreprocessingInterceptor.ContextFactory expressionContextFactory() {
@@ -117,39 +117,56 @@ public class CraneAutoConfiguration {
         return new ExpressionPreprocessingInterceptor(contextFactory);
     }
 
+    @ConditionalOnMissingBean(NullOperateHandler.class)
+    @Bean("DefaultCraneNullOperateHandler")
+    public NullOperateHandler nullOperateHandler(@Qualifier("DefaultCraneBeanReflexOperateHandlerChain") OperateProcessor operateProcessor) {
+        return new NullOperateHandler(operateProcessor);
+    }
+
+    @ConditionalOnMissingBean(MapOperateHandler.class)
+    @Bean("DefaultCraneMapOperateHandler")
+    public MapOperateHandler mapOperateHandler(@Qualifier("DefaultCraneBeanReflexOperateHandlerChain") OperateProcessor operateProcessor) {
+        return new MapOperateHandler(operateProcessor);
+    }
+
+    @ConditionalOnMissingBean(BeanOperateHandler.class)
+    @Bean("DefaultCraneBeanOperateHandler")
+    public BeanOperateHandler beanOperateHandler(@Qualifier("DefaultCraneBeanReflexOperateHandlerChain") OperateProcessor operateProcessor, BeanPropertyFactory beanPropertyFactory) {
+        return new BeanOperateHandler(operateProcessor, beanPropertyFactory);
+    }
+
+    @ConditionalOnMissingBean(CollectionOperateHandler.class)
+    @Bean("DefaultCraneCollectionOperateHandler")
+    public CollectionOperateHandler collectionOperateHandler(@Qualifier("DefaultCraneBeanReflexOperateHandlerChain") OperateProcessor operateProcessor) {
+        return new CollectionOperateHandler(operateProcessor);
+    }
+
+    @ConditionalOnMissingBean(ArrayOperateHandler.class)
+    @Bean("DefaultCraneArrayOperateHandler")
+    public ArrayOperateHandler arrayOperateHandler(@Qualifier("DefaultCraneBeanReflexOperateHandlerChain") OperateProcessor operateProcessor) {
+        return new ArrayOperateHandler(operateProcessor);
+    }
+
     @Primary
     @Order
-    @ConditionalOnMissingBean(BeanReflexOperateHandlerChain.class)
+    @ConditionalOnMissingBean(BeanReflexOperateProcessor.class)
     @Bean("DefaultCraneBeanReflexOperateHandlerChain")
-    public BeanReflexOperateHandlerChain beanReflexOperateHandlerChain(BeanPropertyFactory beanPropertyFactory, List<SourceOperateInterceptor> interceptors) {
-        BeanReflexOperateHandlerChain operateHandlerChain = new BeanReflexOperateHandlerChain();
-        operateHandlerChain.addHandler(new MapOperateHandler())
-            .addHandler(new NullOperateHandler())
-            .addHandler(new CollectionOperateHandler(operateHandlerChain))
-            .addHandler(new ArrayOperateHandler(operateHandlerChain))
-            .addHandler(new MapOperateHandler())
-            .addHandler(new BeanOperateHandler(beanPropertyFactory));
-        interceptors.forEach(operateHandlerChain::addInterceptor);
-        log.info(
-            "注册处理器链 {}, 已配置节点: {}",
-            "DefaultCraneBeanReflexOperateHandlerChain",
-            CollUtil.join(operateHandlerChain.handlers(), ", ", h -> h.getClass().getName())
-        );
-        return operateHandlerChain;
+    public BeanReflexOperateProcessor beanReflexOperateHandlerChain() {
+        return new BeanReflexOperateProcessor();
     }
 
     @Order
     @ConditionalOnMissingBean(BeanReflexAssembler.class)
     @Bean("DefaultCraneBeanReflexAssembler")
-    public BeanReflexAssembler beanReflexAssembler(@Qualifier("DefaultCraneBeanReflexOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
-        return new BeanReflexAssembler(assembleHandlerChain);
+    public BeanReflexAssembler beanReflexAssembler(@Qualifier("DefaultCraneBeanReflexOperateHandlerChain") OperateProcessor operateProcessor) {
+        return new BeanReflexAssembler(operateProcessor);
     }
 
     @Order
     @ConditionalOnMissingBean(BeanReflexDisassembler.class)
     @Bean("DefaultCraneBeanReflexDisassembler")
-    public BeanReflexDisassembler beanReflexDisassembler(@Qualifier("DefaultCraneBeanReflexOperateHandlerChain") OperateHandlerChain assembleHandlerChain) {
-        return new BeanReflexDisassembler(assembleHandlerChain);
+    public BeanReflexDisassembler beanReflexDisassembler(@Qualifier("DefaultCraneBeanReflexOperateHandlerChain") OperateProcessor operateProcessor) {
+        return new BeanReflexDisassembler(operateProcessor);
     }
 
     // ==================== 容器 ====================
@@ -257,17 +274,25 @@ public class CraneAutoConfiguration {
     @RequiredArgsConstructor
     public static class AfterConfigurationInitedRunner implements ApplicationRunner {
 
-        private final BeanFactory beanFactory;
+        private final BeanReflexOperateProcessor beanReflexOperateProcessor;
+        private final Collection<SourceReader> sourceReaders;
+        private final Collection<SourceReadInterceptor> sourceReadInterceptors;
+        private final Collection<TargetWriteInterceptor> targetWriteInterceptors;
+        private final Collection<TargetWriter> targetWriters;
+
+        private final ApplicationContext applicationContext;
         private final CraneAutoConfigurationProperties properties;
         private final ConfigurationCache configurationCache;
         private final EnumDict enumDict;
 
         @Override
         public void run(ApplicationArguments args) {
+            // 预加载枚举
             preRegisteredEnum();
-            if (properties.getCache().isEnablePreParseClass()) {
-                preParsedAndCacheClassOperationConfiguration();
-            }
+            // 预解析类操作配置
+            preParsedAndCacheClassOperationConfiguration();
+            // 将处理器与拦截器注册到OperateProcessor
+            initOperateProcessor();
         }
 
         /**
@@ -286,14 +311,17 @@ public class CraneAutoConfiguration {
          * 解析配置并加入缓存
          */
         private void preParsedAndCacheClassOperationConfiguration() {
+            if (!properties.getCache().isEnablePreParseClass()) {
+                return;
+            }
             CraneAutoConfigurationProperties.CacheConfigProperties cacheConfigProperties = properties.getCache();
             Map<String, Set<String>> parserAndPreParsedClassPackages = cacheConfigProperties.getParserAndPreParsedClassPackages();
             parserAndPreParsedClassPackages.forEach((parserName, packages) -> {
-                OperateConfigurationParser parser = beanFactory.getBean(parserName, OperateConfigurationParser.class);
+                OperateConfigurationParser parser = applicationContext.getBean(parserName, OperateConfigurationParser.class);
                 cacheClassOperationConfiguration(parser, packages);
             });
             Set<String> preParsedClassPackages = cacheConfigProperties.getPreParsedClassPackages();
-            OperateConfigurationParser parser = beanFactory.getBean(OperateConfigurationParser.class);
+            OperateConfigurationParser parser = applicationContext.getBean(OperateConfigurationParser.class);
             cacheClassOperationConfiguration(parser, preParsedClassPackages);
         }
 
@@ -306,6 +334,18 @@ public class CraneAutoConfiguration {
                 .map(parser::parse)
                 .peek(c -> log.info("缓存预解析配置[{}]", c.getTargetClass()))
                 .forEach(conf -> configurationCache.setConfigurationCache(cacheName, conf.getTargetClass(), conf));
+        }
+
+        /**
+         * 初始化{@link BeanReflexOperateProcessor}，为其注册必要的组件
+         */
+        private void initOperateProcessor() {
+            ConfigHelper.registerForOperateProcessor(
+                beanReflexOperateProcessor,
+                applicationContext,
+                annotation -> Objects.isNull(annotation)
+                    || CharSequenceUtil.containsAny(OperateProcessor.OPERATE_GROUP_JAVA_BEAN, annotation.value())
+            );
         }
     }
 

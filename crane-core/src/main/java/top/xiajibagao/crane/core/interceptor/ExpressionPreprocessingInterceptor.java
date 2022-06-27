@@ -1,4 +1,4 @@
-package top.xiajibagao.crane.core.handler;
+package top.xiajibagao.crane.core.interceptor;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.Getter;
@@ -6,10 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import top.xiajibagao.crane.core.handler.interfaces.SourceOperateInterceptor;
+import top.xiajibagao.crane.core.annotation.GroupRegister;
 import top.xiajibagao.crane.core.helper.ExpressionUtils;
+import top.xiajibagao.crane.core.operator.interfaces.GroupRegistrable;
+import top.xiajibagao.crane.core.operator.interfaces.TargetWriteInterceptor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
 import javax.annotation.Nonnull;
@@ -25,8 +26,10 @@ import java.util.function.Consumer;
  * @author huangchengxing
  * @date 2022/06/04 23:37
  */
-public class ExpressionPreprocessingInterceptor implements SourceOperateInterceptor {
+@GroupRegister
+public class ExpressionPreprocessingInterceptor implements TargetWriteInterceptor, GroupRegistrable {
 
+    @Getter
     private ContextFactory contextFactory;
 
     public ExpressionPreprocessingInterceptor(@Nonnull ContextFactory contextFactory) {
@@ -41,18 +44,13 @@ public class ExpressionPreprocessingInterceptor implements SourceOperateIntercep
     }
 
     @Override
-    public boolean supportInterceptReadSource(@Nullable Object source, PropertyMapping property, Operation operation) {
-        return false;
-    }
-
-    @Override
     public boolean supportInterceptSourceWrite(@Nullable Object sourceData, @Nullable Object target, PropertyMapping property, AssembleOperation operation) {
         return CharSequenceUtil.isNotBlank(property.getExp());
     }
 
     @Override
     public Object interceptSourceWrite(@Nullable Object sourceData, @Nullable Object target, PropertyMapping property, AssembleOperation operation) {
-        SourceWriteOperationContext context = new SourceWriteOperationContext(sourceData, target, property, operation);
+        Context context = new Context(sourceData, target, property, operation);
         EvaluationContext evaluationContext = contextFactory.get(context);
         return ExpressionUtils.execute(property.getExp(), evaluationContext, property.getExpType(), true);
     }
@@ -70,18 +68,18 @@ public class ExpressionPreprocessingInterceptor implements SourceOperateIntercep
         /**
          * 根据本次执行的待处理对象与数据源还有各项配置，生成带有所需方法及参数的上下文
          *
-         * @param sourceWriteOperationContext 上下文
+         * @param context 上下文
          * @return org.springframework.expression.spel.support.StandardEvaluationContext
          * @author huangchengxing
          * @date 2022/6/4 21:34
          */
-        EvaluationContext get(SourceWriteOperationContext sourceWriteOperationContext);
+        EvaluationContext get(Context context);
 
     }
 
     @Getter
     @RequiredArgsConstructor
-    public static class SourceWriteOperationContext {
+    public static class Context {
         private final Object sourceData;
         private final Object target;
         private final PropertyMapping property;
@@ -112,7 +110,7 @@ public class ExpressionPreprocessingInterceptor implements SourceOperateIntercep
         }
 
         @Override
-        public StandardEvaluationContext get(SourceWriteOperationContext sourceWriteOperationContext) {
+        public StandardEvaluationContext get(Context sourceWriteOperationContext) {
             Object sourceData = sourceWriteOperationContext.getSourceData();
             Object target = sourceWriteOperationContext.getTarget();
             PropertyMapping property = sourceWriteOperationContext.getProperty();

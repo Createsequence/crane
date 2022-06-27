@@ -1,8 +1,10 @@
 package top.xiajibagao.crane.jackson.impl.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import org.springframework.core.Ordered;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
+import top.xiajibagao.crane.core.annotation.GroupRegister;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -18,7 +20,12 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/06/07 17:08
  */
-public class NullNodeOperateHandler implements OperateHandler {
+@GroupRegister(OperateProcessor.OPERATE_GROUP_JSON_BEAN)
+public class NullNodeOperateHandler extends AbstractJacksonNodeOperateHandler {
+
+    public NullNodeOperateHandler(ObjectMapper objectMapper, OperateProcessor operateProcessor) {
+        super(objectMapper, operateProcessor);
+    }
 
     @Override
     public int getOrder() {

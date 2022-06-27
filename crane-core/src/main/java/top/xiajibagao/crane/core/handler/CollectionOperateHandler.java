@@ -1,9 +1,11 @@
 package top.xiajibagao.crane.core.handler;
 
 import cn.hutool.core.collection.CollUtil;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import top.xiajibagao.crane.core.annotation.GroupRegister;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -19,10 +21,12 @@ import java.util.stream.Collectors;
  * @date 2022/04/08 10:24
  * @since 0.2.0
  */
+@GroupRegister(OperateProcessor.OPERATE_GROUP_JAVA_BEAN)
+@Getter
 @RequiredArgsConstructor
 public class CollectionOperateHandler implements OperateHandler {
 
-    private final OperateHandlerChain handlerChain;
+    protected final OperateProcessor operateProcessor;
 
     @Override
     public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
@@ -41,7 +45,7 @@ public class CollectionOperateHandler implements OperateHandler {
         }
         // 若指定引用字段，则尝试从集合中的对象里获取字段
         return sourceColl.stream()
-            .map(t -> handlerChain.readFromSource(t, property, operation))
+            .map(t -> operateProcessor.readFromSource(t, property, operation))
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
@@ -57,7 +61,7 @@ public class CollectionOperateHandler implements OperateHandler {
         if (CollUtil.isEmpty(targetColl)) {
             return;
         }
-        targetColl.forEach(t -> handlerChain.writeToTarget(sourceData, t, property, operation));
+        targetColl.forEach(t -> operateProcessor.writeToTarget(sourceData, t, property, operation));
     }
 
     @SuppressWarnings("unchecked")

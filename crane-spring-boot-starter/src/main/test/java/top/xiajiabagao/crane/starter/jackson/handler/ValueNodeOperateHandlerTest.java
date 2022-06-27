@@ -17,6 +17,7 @@ import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 import top.xiajibagao.crane.jackson.impl.handler.ValueNodeOperateHandler;
+import top.xiajibagao.crane.jackson.impl.operator.JacksonOperateProcessor;
 
 import java.util.Collections;
 
@@ -37,7 +38,7 @@ public class ValueNodeOperateHandlerTest {
         );
 
         // source.xxx -> target.xxx
-        OperateHandler handler = new ValueNodeOperateHandler(objectMapper);
+        OperateHandler handler = new ValueNodeOperateHandler(objectMapper, new JacksonOperateProcessor());
         JsonNode target = objectMapper.valueToTree("小明");
         JsonNode source = objectMapper.valueToTree("小红");
         Assertions.assertTrue(source instanceof ValueNode);

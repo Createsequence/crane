@@ -1,7 +1,11 @@
 package top.xiajibagao.crane.core.handler;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.Ordered;
+import top.xiajibagao.crane.core.annotation.GroupRegister;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -17,7 +21,12 @@ import java.util.Objects;
  * @date 2022/06/07 16:49
  * @since 0.5.5
  */
+@GroupRegister(OperateProcessor.OPERATE_GROUP_JAVA_BEAN)
+@Getter
+@RequiredArgsConstructor
 public class NullOperateHandler implements OperateHandler {
+
+    private final OperateProcessor operateProcessor;
 
     @Override
     public int getOrder() {

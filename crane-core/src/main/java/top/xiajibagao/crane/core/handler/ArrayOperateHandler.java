@@ -1,8 +1,9 @@
 package top.xiajibagao.crane.core.handler;
 
 import cn.hutool.core.util.ArrayUtil;
+import top.xiajibagao.crane.core.annotation.GroupRegister;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -17,10 +18,11 @@ import java.util.Objects;
  * @date 2022/04/08 16:39
  * @since 0.2.0
  */
+@GroupRegister(OperateProcessor.OPERATE_GROUP_JAVA_BEAN)
 public class ArrayOperateHandler extends CollectionOperateHandler implements OperateHandler {
 
-    public ArrayOperateHandler(OperateHandlerChain handlerChain) {
-        super(handlerChain);
+    public ArrayOperateHandler(OperateProcessor operateProcessor) {
+        super(operateProcessor);
     }
 
     @Override

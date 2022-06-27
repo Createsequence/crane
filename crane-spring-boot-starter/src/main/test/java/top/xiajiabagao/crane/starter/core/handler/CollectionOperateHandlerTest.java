@@ -8,14 +8,13 @@ import lombok.experimental.Accessors;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import top.xiajibagao.crane.core.handler.BeanOperateHandler;
-import top.xiajibagao.crane.core.handler.BeanReflexOperateHandlerChain;
 import top.xiajibagao.crane.core.handler.CollectionOperateHandler;
 import top.xiajibagao.crane.core.handler.MapOperateHandler;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.helper.property.AsmReflexBeanPropertyFactory;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
+import top.xiajibagao.crane.core.operator.BeanReflexOperateProcessor;
 import top.xiajibagao.crane.core.parser.BeanAssembleOperation;
 import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -40,10 +39,13 @@ public class CollectionOperateHandlerTest {
         );
 
         // source.xxx -> target.xxx
-        OperateHandlerChain operateHandlerChain = new BeanReflexOperateHandlerChain()
-            .addHandler(new BeanOperateHandler(new AsmReflexBeanPropertyFactory()))
-            .addHandler(new MapOperateHandler());
-        OperateHandler handler = new CollectionOperateHandler(operateHandlerChain);
+        BeanReflexOperateProcessor beanReflexOperateProcessor = new BeanReflexOperateProcessor();
+        beanReflexOperateProcessor
+            .registerTargetWriters(new BeanOperateHandler(beanReflexOperateProcessor, new AsmReflexBeanPropertyFactory()))
+            .registerSourceReaders(new BeanOperateHandler(beanReflexOperateProcessor, new AsmReflexBeanPropertyFactory()))
+            .registerTargetWriters(new MapOperateHandler(beanReflexOperateProcessor))
+            .registerSourceReaders(new MapOperateHandler(beanReflexOperateProcessor));
+        OperateHandler handler = new CollectionOperateHandler(beanReflexOperateProcessor);
         List<Example> target = Arrays.asList(new Example(1, "小明", null, null), new Example(2, "小李", null, null));
         List<Example> source = Arrays.asList(new Example(3, "小红", null, null), new Example(4, "小刚", null, null));
         PropertyMapping targetPropertyAndSourceProperty = new BeanPropertyMapping("name", "name", "", Void.class);

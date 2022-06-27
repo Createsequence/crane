@@ -14,11 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import top.xiajiabagao.crane.starter.core.CoreTestConfig;
 import top.xiajibagao.crane.core.container.EnumDictContainer;
-import top.xiajibagao.crane.core.handler.BeanReflexOperateHandlerChain;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.helper.EnumDict;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
+import top.xiajibagao.crane.core.operator.BeanReflexOperateProcessor;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.BeanAssembleOperation;
 import top.xiajibagao.crane.core.parser.BeanOperationConfiguration;
@@ -38,7 +38,7 @@ import java.util.*;
 public class EnumDictContainerTest {
 
     @Autowired
-    private BeanReflexOperateHandlerChain beanReflexOperateHandlerChain;
+    private BeanReflexOperateProcessor beanReflexOperateProcessor;
     @Autowired
     private GlobalConfiguration globalConfiguration;
 
@@ -52,7 +52,7 @@ public class EnumDictContainerTest {
         Assertions.assertEquals(CollUtil.newHashSet("1", "0"), enumDict.getType(Gender.class).getNameCache().keySet());
 
         // 获取配置
-        Assembler assembler = new BeanReflexAssembler(beanReflexOperateHandlerChain);
+        Assembler assembler = new BeanReflexAssembler(beanReflexOperateProcessor);
         OperationConfiguration configuration = new BeanOperationConfiguration(globalConfiguration, Example.class, new ArrayList<>(), new ArrayList<>());
         AssembleOperation assembleOperation = new BeanAssembleOperation(
             0, configuration, ReflexUtils.findField(Example.class, "sex"),

@@ -6,12 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.PairEntry;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.EmptyPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.jackson.impl.handler.JacksonOperateHandlerChain;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
 import java.util.Collections;
@@ -22,14 +21,14 @@ import java.util.Objects;
  *
  * @author huangchengxing
  * @date 2022/03/02 10:03
- * @see JacksonOperateHandlerChain
+ * @see JacksonOperateProcessor
  */
 @Getter
 @RequiredArgsConstructor
 public class JacksonAssembler implements Assembler {
 
     protected final ObjectMapper objectMapper;
-    private final OperateHandlerChain handlerChain;
+    private final OperateProcessor operateProcessor;
 
     @Override
     public void execute(Object target, Object source, AssembleOperation operation) {
@@ -41,9 +40,9 @@ public class JacksonAssembler implements Assembler {
             (JsonNode)source : objectMapper.valueToTree(source);
         CollUtil.defaultIfEmpty(operation.getPropertyMappings(), Collections.singletonList(EmptyPropertyMapping.instance()))
             .stream()
-            .map(property -> PairEntry.of(property, handlerChain.readFromSource(sourceNode, property, operation)))
+            .map(property -> PairEntry.of(property, operateProcessor.readFromSource(sourceNode, property, operation)))
             .filter(PairEntry::hasValue)
-            .forEach(pair -> handlerChain.writeToTarget(pair.getValue(), targetNode, pair.getKey(), operation));
+            .forEach(pair -> operateProcessor.writeToTarget(pair.getValue(), targetNode, pair.getKey(), operation));
     }
 
     /**

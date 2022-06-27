@@ -1,45 +1,127 @@
-package top.xiajibagao.crane.core.handler;
+package top.xiajibagao.crane.core.operator;
 
+import cn.hutool.core.util.ArrayUtil;
 import lombok.Getter;
-import lombok.experimental.Accessors;
+import top.xiajibagao.crane.core.handler.*;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
-import top.xiajibagao.crane.core.handler.interfaces.SourceOperateInterceptor;
 import top.xiajibagao.crane.core.helper.Orderly;
+import top.xiajibagao.crane.core.operator.interfaces.*;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * {@link #handlers()}与{@link #interceptors()}皆按{@link Orderly#comparator()}排序的处理器链，提供一些方法的基本实现
+ * {@link OperateProcessor}的基础实现
  *
  * @author huangchengxing
- * @date 2022/04/08 21:02
- * @since 0.2.0
+ * @date 2022/06/27 14:32
+ * @see 0.5.8
+ * @see ArrayOperateHandler
+ * @see CollectionOperateHandler
+ * @see MapOperateHandler
+ * @see NullOperateHandler
+ * @see BeanOperateHandler
  */
 @Getter
-@Accessors(fluent = true)
-public class AbstractOrderlyHandlerChain implements OperateHandlerChain {
+public abstract class AbstractOperateProcessor<T extends AbstractOperateProcessor<T>> implements OperateProcessor {
 
-    protected final List<OperateHandler> handlers = new ArrayList<>();
-    protected final List<SourceOperateInterceptor> interceptors = new ArrayList<>();
+    private final List<TargetWriter> targetWriters = new ArrayList<>();
+    private final List<TargetWriteInterceptor> targetWriteInterceptors = new ArrayList<>();
+    private final List<SourceReader> sourceReaders = new ArrayList<>();
+    private final List<SourceReadInterceptor> sourceReadInterceptors = new ArrayList<>();
+    @SuppressWarnings("unchecked")
+    private final T typedThis = (T) this;
 
+    // ============================ register ============================
+
+    /**
+     * 注册待处理对象写入器
+     *
+     * @param targetWriters 待处理对象写入器
+     * @return T
+     * @author huangchengxing
+     * @date 2022/6/27 14:43
+     */
     @Override
-    public OperateHandlerChain addInterceptor(SourceOperateInterceptor interceptor) {
-        interceptors.add(interceptor);
-        interceptors.sort(SourceOperateInterceptor::compareTo);
-        return this;
+    public T registerTargetWriters(TargetWriter... targetWriters) {
+        return register(this.targetWriters, targetWriters);
+    }
+    
+    /**
+     * 注册待处理对象写入拦截器
+     *
+     * @param targetWriteInterceptors 待处理对象写入拦截器
+     * @return T
+     * @author huangchengxing
+     * @date 2022/6/27 14:44
+     */
+    @Override
+    public T registerTargetWriteInterceptors(TargetWriteInterceptor... targetWriteInterceptors) {
+        return register(this.targetWriteInterceptors, targetWriteInterceptors);
+    }
+    
+    /**
+     * 注册数据源读取器
+     *
+     * @param sourceReaders 数据源读取器
+     * @return T
+     * @author huangchengxing
+     * @date 2022/6/27 14:45
+     */
+    @Override
+    public T registerSourceReaders(SourceReader... sourceReaders) {
+        return register(this.sourceReaders, sourceReaders);
+    }
+    
+    /**
+     * 注册数据源读取拦截器
+     *
+     * @param sourceReadInterceptors 数据源读取拦截器
+     * @return T
+     * @author huangchengxing
+     * @date 2022/6/27 14:45
+     */
+    @Override
+    public T registerSourceReadInterceptors(SourceReadInterceptor... sourceReadInterceptors) {
+        return register(this.sourceReadInterceptors, sourceReadInterceptors);
     }
 
-    @Override
-    public OperateHandlerChain addHandler(OperateHandler handler) {
-        handlers.add(handler);
-        handlers.sort(OperateHandler::compareTo);
-        return this;
+    /**
+     * 注册{@link OperateHandler}
+     *
+     * @param  operateHandler operateHandler
+     * @return T
+     * @author huangchengxing
+     * @date 2022/6/27 17:33
+     */
+    public T registerHandlers(OperateHandler... operateHandler) {
+        registerTargetWriters(operateHandler);
+        registerTargetWriters(operateHandler);
+        return typedThis;
     }
+
+    @SafeVarargs
+    private final <I extends Orderly> T register(List<I> list, I... items) {
+        if (ArrayUtil.isEmpty(items)) {
+            return typedThis;
+        }
+        for (I item : items) {
+            if (Objects.isNull(item) || list.contains(item)) {
+                continue;
+            }
+            list.add(item);
+        }
+        list.sort(Orderly.comparator());
+        return typedThis;
+    }
+
+
+    // ============================ execute ============================
 
     /**
      * 处理器链中是否存在可以从数据源中读取数据的节点
@@ -54,7 +136,7 @@ public class AbstractOrderlyHandlerChain implements OperateHandlerChain {
      */
     @Override
     public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
-        return handlers().stream().anyMatch(h -> h.sourceCanRead(source, property, operation));
+        return getSourceReaders().stream().anyMatch(h -> h.sourceCanRead(source, property, operation));
     }
 
     /**
@@ -69,14 +151,15 @@ public class AbstractOrderlyHandlerChain implements OperateHandlerChain {
      * @since 0.5.6
      */
     @Override
+    @Nullable
     public Object readFromSource(Object source, PropertyMapping property, Operation operation) {
-        for (SourceOperateInterceptor interceptor : interceptors()) {
+        for (SourceReadInterceptor interceptor : getSourceReadInterceptors()) {
             if (interceptor.supportInterceptReadSource(source, property, operation)) {
                 source = interceptor.interceptReadSource(source, property, operation);
             }
         }
         final Object interceptedSources = source;
-        return handlers()
+        return getSourceReaders()
             .stream()
             .filter(h -> h.sourceCanRead(interceptedSources, property, operation))
             .findFirst()
@@ -97,6 +180,7 @@ public class AbstractOrderlyHandlerChain implements OperateHandlerChain {
      * @since 0.5.6
      */
     @Override
+    @Nullable
     public Object tryReadFromSource(Object source, PropertyMapping property, Operation operation) {
         return sourceCanRead(source, property, operation) ? readFromSource(source, property, operation) : null;
     }
@@ -115,7 +199,7 @@ public class AbstractOrderlyHandlerChain implements OperateHandlerChain {
      */
     @Override
     public boolean targetCanWrite(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        return handlers().stream().anyMatch(h -> h.targetCanWrite(sourceData, target, property, operation));
+        return getTargetWriters().stream().anyMatch(h -> h.targetCanWrite(sourceData, target, property, operation));
     }
 
     /**
@@ -131,13 +215,13 @@ public class AbstractOrderlyHandlerChain implements OperateHandlerChain {
      */
     @Override
     public void writeToTarget(Object sourceData, Object target, PropertyMapping property, AssembleOperation operation) {
-        for (SourceOperateInterceptor interceptor : interceptors()) {
+        for (TargetWriteInterceptor interceptor : getTargetWriteInterceptors()) {
             if (interceptor.supportInterceptSourceWrite(sourceData, target, property, operation)) {
                 sourceData = interceptor.interceptSourceWrite(sourceData, target, property, operation);
             }
         }
         final Object interceptedSourcesData = sourceData;
-        handlers()
+        getTargetWriters()
             .stream()
             .filter(h -> h.targetCanWrite(interceptedSourcesData, target, property, operation))
             .findFirst()

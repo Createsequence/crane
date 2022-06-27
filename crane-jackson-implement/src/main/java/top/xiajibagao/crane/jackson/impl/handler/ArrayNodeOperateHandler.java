@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
+import top.xiajibagao.crane.core.annotation.GroupRegister;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -23,13 +23,11 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/04/12 13:07
  */
-public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler implements OperateHandler {
+@GroupRegister(OperateProcessor.OPERATE_GROUP_JSON_BEAN)
+public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler {
 
-    private final OperateHandlerChain handlerChain;
-
-    public ArrayNodeOperateHandler(ObjectMapper objectMapper, OperateHandlerChain assembleHandlerChain) {
-        super(objectMapper);
-        this.handlerChain = assembleHandlerChain;
+    public ArrayNodeOperateHandler(ObjectMapper objectMapper, OperateProcessor operateProcessor) {
+        super(objectMapper, operateProcessor);
     }
 
     @Override
@@ -52,7 +50,7 @@ public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler i
         // 有数据源字段，获取json数组中的元素，并进一步处理
         ArrayNode arrayNode = objectMapper.getNodeFactory().arrayNode();
         StreamUtil.of(sourceNode)
-            .map(node -> handlerChain.tryReadFromSource(node, property, operation))
+            .map(node -> operateProcessor.tryReadFromSource(node, property, operation))
             .map(JsonNode.class::cast)
             .filter(JacksonUtils::isNotNull)
             .forEach(arrayNode::add);
@@ -70,7 +68,7 @@ public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler i
         if (targetNode.isEmpty()) {
             return;
         }
-        targetNode.forEach(node -> handlerChain.tryWriteToTarget(sourceData, node, property, operation));
+        targetNode.forEach(node -> operateProcessor.tryWriteToTarget(sourceData, node, property, operation));
     }
 
 }

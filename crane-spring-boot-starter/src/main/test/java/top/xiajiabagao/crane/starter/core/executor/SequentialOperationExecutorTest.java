@@ -18,11 +18,11 @@ import top.xiajibagao.crane.core.container.Container;
 import top.xiajibagao.crane.core.container.KeyIntrospectContainer;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
 import top.xiajibagao.crane.core.executor.SequentialOperationExecutor;
-import top.xiajibagao.crane.core.handler.BeanReflexOperateHandlerChain;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.operator.BeanReflexAssembler;
 import top.xiajibagao.crane.core.operator.BeanReflexDisassembler;
+import top.xiajibagao.crane.core.operator.BeanReflexOperateProcessor;
 import top.xiajibagao.crane.core.operator.interfaces.Assembler;
 import top.xiajibagao.crane.core.parser.*;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -42,7 +42,7 @@ import java.util.function.Supplier;
 public class SequentialOperationExecutorTest {
 
     @Autowired
-    private BeanReflexOperateHandlerChain beanReflexOperateHandlerChain;
+    private BeanReflexOperateProcessor beanReflexOperateProcessor;
     @Autowired
     private GlobalConfiguration globalConfiguration;
     @Autowired
@@ -59,7 +59,7 @@ public class SequentialOperationExecutorTest {
         keyValueContainer.register("test", MapUtil.builder().put(0, "动态的嵌套对象").build());
 
         // 获取配置
-        Assembler assembler = new BeanReflexAssembler(beanReflexOperateHandlerChain);
+        Assembler assembler = new BeanReflexAssembler(beanReflexOperateProcessor);
         OperationConfiguration configuration = new BeanOperationConfiguration(globalConfiguration, Example.class, new ArrayList<>(), new ArrayList<>());
         AssembleOperation nameIntrospectOperation = new BeanAssembleOperation(
             0, configuration, ReflexUtils.findField(Example.class, "name"),
@@ -80,7 +80,7 @@ public class SequentialOperationExecutorTest {
         DisassembleOperation disassembleOperation = new BeanDynamicDisassembleOperation(
             fieldAnnotationConfigurationParser, 0,
             configuration,
-            new BeanReflexDisassembler(beanReflexOperateHandlerChain),
+            new BeanReflexDisassembler(beanReflexOperateProcessor),
             ReflexUtils.findField(Example.class, "dynamicObject"),
             Collections.emptySet(),
             ConfigurationCache

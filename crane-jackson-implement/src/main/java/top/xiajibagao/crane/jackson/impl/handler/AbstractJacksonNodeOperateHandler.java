@@ -3,8 +3,10 @@ package top.xiajibagao.crane.jackson.impl.handler;
 import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.jackson.impl.helper.JacksonUtils;
 
@@ -17,10 +19,12 @@ import java.util.Collection;
  * @date 2022/04/12 13:23
  * @since 0.2.0
  */
+@Getter
 @RequiredArgsConstructor
 public abstract class AbstractJacksonNodeOperateHandler implements OperateHandler {
 
     protected final ObjectMapper objectMapper;
+    protected final OperateProcessor operateProcessor;
 
     /**
      * 先寻找ObjectMapper的命名规则处理后的指定字段名对应的节点，若不存在，则再根据别名寻找至少一个存在的别名字段对应的节点

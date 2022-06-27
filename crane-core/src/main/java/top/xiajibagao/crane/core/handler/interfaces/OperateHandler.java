@@ -1,72 +1,17 @@
 package top.xiajibagao.crane.core.handler.interfaces;
 
 import top.xiajibagao.crane.core.helper.Orderly;
-import top.xiajibagao.crane.core.operator.interfaces.Operator;
-import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
-import top.xiajibagao.crane.core.parser.interfaces.Operation;
-import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
-
-import javax.annotation.Nullable;
+import top.xiajibagao.crane.core.operator.interfaces.*;
 
 /**
- * 操作处理器 <br />
- * 用于在{@link Operator}中从不同类型的数据结构中读取或写入所需数据
+ * <p>用于针对特定类型对象进行读写的操作处理器。一般会注册到{@link OperateProcessor}中使用。<br />
+ * 其内部持有一个{@link OperateProcessor}实例，可通过{@link #getOperateProcessor()}获取。
+ * 若当前处理器解析无法处理该类型的数据，则可能会将操作委托给该操作处理器，<br />
+ * <b>若持有的处理器中注册了当前实例，则此行为有潜在导致{@link StackOverflowError}的可能性，需要实现类尤其注意。</b>
  *
  * @author huangchengxing
- * @date 2022/04/06 19:55
+ * @date 2022/06/27 15:56
  */
-public interface OperateHandler extends Orderly {
-
-    /**
-     * 是否支持从数据源中读取数据
-     *
-     * @param source 数据源
-     * @param property 待处理字段
-     * @param operation 字段配置
-     * @return boolean
-     * @author huangchengxing
-     * @date 2022/4/8 9:40
-     */
-    boolean sourceCanRead(@Nullable Object source, PropertyMapping property, Operation operation);
-
-    /**
-     * 从数据源中读取数据 <br />
-     * source必须是{@link #sourceCanRead(Object, PropertyMapping, Operation)}所支持的类型
-     *
-     * @param source 数据源
-     * @param property 待处理字段
-     * @param operation 字段配置
-     * @return java.lang.Object
-     * @author huangchengxing
-     * @date 2022/4/8 9:48
-     */
-    @Nullable
-    Object readFromSource(@Nullable Object source, PropertyMapping property, Operation operation);
-
-    /**
-     * 是否支持将数据源数据写入待处理对象
-     *
-     * @param sourceData 从数据源获取的数据
-     * @param target 待处理对象
-     * @param property 待处理字段
-     * @param operation 字段配置
-     * @return boolean
-     * @author huangchengxing
-     * @date 2022/4/8 9:40
-     */
-    boolean targetCanWrite(@Nullable Object sourceData, @Nullable Object target, PropertyMapping property, AssembleOperation operation);
-
-    /**
-     * 将数据源数据写入待处理对象 <br />
-     * target必须是{@link #targetCanWrite(Object, Object, PropertyMapping, AssembleOperation)}所支持的类型
-     *
-     * @param sourceData 从数据源获取的数据
-     * @param target 待处理对象
-     * @param property 待处理字段
-     * @param operation 字段配置
-     * @author huangchengxing
-     * @date 2022/4/8 9:48
-     */
-    void writeToTarget(@Nullable Object sourceData, @Nullable Object target, PropertyMapping property, AssembleOperation operation);
+public interface OperateHandler extends SourceReader, TargetWriter, Operator, GroupRegistrable, Orderly {
 
 }

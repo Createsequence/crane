@@ -4,7 +4,8 @@ import cn.hutool.core.util.ClassUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ValueNode;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
+import top.xiajibagao.crane.core.annotation.GroupRegister;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -18,10 +19,11 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/04/12 13:07
  */
-public class ValueNodeOperateHandler extends AbstractJacksonNodeOperateHandler implements OperateHandler {
+@GroupRegister(OperateProcessor.OPERATE_GROUP_JSON_BEAN)
+public class ValueNodeOperateHandler extends AbstractJacksonNodeOperateHandler {
 
-    public ValueNodeOperateHandler(ObjectMapper objectMapper) {
-        super(objectMapper);
+    public ValueNodeOperateHandler(ObjectMapper objectMapper, OperateProcessor operateProcessor) {
+        super(objectMapper, operateProcessor);
     }
 
     @Override

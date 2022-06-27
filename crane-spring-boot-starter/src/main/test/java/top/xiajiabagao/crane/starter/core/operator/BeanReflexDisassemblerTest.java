@@ -11,9 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import top.xiajiabagao.crane.starter.core.CoreTestConfig;
 import top.xiajibagao.crane.core.container.KeyValueContainer;
-import top.xiajibagao.crane.core.handler.BeanReflexOperateHandlerChain;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 import top.xiajibagao.crane.core.operator.BeanReflexDisassembler;
+import top.xiajibagao.crane.core.operator.BeanReflexOperateProcessor;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
 import top.xiajibagao.crane.core.parser.BeanDisassembleOperation;
 import top.xiajibagao.crane.core.parser.BeanOperationConfiguration;
@@ -35,7 +35,7 @@ import java.util.List;
 public class BeanReflexDisassemblerTest {
 
     @Autowired
-    private BeanReflexOperateHandlerChain beanReflexOperateHandlerChain;
+    private BeanReflexOperateProcessor beanReflexOperateProcessor;
     @Autowired
     private KeyValueContainer keyValueContainer;
     @Autowired
@@ -45,7 +45,7 @@ public class BeanReflexDisassemblerTest {
 
     @Test
     public void testBeanReflexDisassembler() {
-        Disassembler disassembler = new BeanReflexDisassembler(beanReflexOperateHandlerChain);
+        Disassembler disassembler = new BeanReflexDisassembler(beanReflexOperateProcessor);
         OperationConfiguration configuration = new BeanOperationConfiguration(globalConfiguration, Example.class, new ArrayList<>(), new ArrayList<>());
         DisassembleOperation disassembleOperation = new BeanDisassembleOperation(
             0, new BeanOperationConfiguration(globalConfiguration, Example.class, new ArrayList<>(), new ArrayList<>()),

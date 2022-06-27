@@ -1,7 +1,11 @@
 package top.xiajibagao.crane.core.handler;
 
 import cn.hutool.core.collection.CollUtil;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import top.xiajibagao.crane.core.annotation.GroupRegister;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -15,7 +19,12 @@ import java.util.Map;
  * @date 2022/04/08 9:54
  * @since 0.2.0
  */
+@GroupRegister(OperateProcessor.OPERATE_GROUP_JAVA_BEAN)
+@Getter
+@RequiredArgsConstructor
 public class MapOperateHandler implements OperateHandler {
+
+    private final OperateProcessor operateProcessor;
 
     @Override
     public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {

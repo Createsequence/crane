@@ -20,8 +20,8 @@ import top.xiajibagao.crane.core.parser.BeanOperationConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.GlobalConfiguration;
 import top.xiajibagao.crane.core.parser.interfaces.OperationConfiguration;
-import top.xiajibagao.crane.jackson.impl.handler.JacksonOperateHandlerChain;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonDisassembler;
+import top.xiajibagao.crane.jackson.impl.operator.JacksonOperateProcessor;
 
 import java.util.*;
 
@@ -35,7 +35,7 @@ public class JacksonDisassemblerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
-    private JacksonOperateHandlerChain jacksonOperateHandlerChain;
+    private JacksonOperateProcessor jacksonOperateProcessor;
     @Autowired
     private KeyValueContainer keyValueContainer;
     @Autowired
@@ -46,7 +46,7 @@ public class JacksonDisassemblerTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testJacksonDisassembler() {
-        Disassembler disassembler = new JacksonDisassembler(objectMapper);
+        Disassembler disassembler = new JacksonDisassembler(objectMapper, jacksonOperateProcessor);
         OperationConfiguration configuration = new BeanOperationConfiguration(globalConfiguration, Example.class, new ArrayList<>(), new ArrayList<>());
         DisassembleOperation disassembleOperation = new BeanDisassembleOperation(
             0, new BeanOperationConfiguration(globalConfiguration, Example.class, new ArrayList<>(), new ArrayList<>()),

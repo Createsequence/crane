@@ -1,12 +1,13 @@
 package top.xiajibagao.crane.core.operator;
 
 import cn.hutool.core.lang.Assert;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.ClassUtils;
 import top.xiajibagao.crane.core.exception.CraneException;
-import top.xiajibagao.crane.core.handler.interfaces.OperateHandlerChain;
 import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.operator.interfaces.Disassembler;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.BeanPropertyMapping;
 import top.xiajibagao.crane.core.parser.interfaces.DisassembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.DynamicDisassembleOperation;
@@ -19,17 +20,18 @@ import java.util.*;
  * @author huangchengxing
  * @date 2022/03/02 13:29
  */
+@Getter
 @RequiredArgsConstructor
 public class BeanReflexDisassembler implements Disassembler {
 
-    private final OperateHandlerChain handlerChain;
+    private final OperateProcessor operateProcessor;
 
     @Override
     public Collection<?> execute(Object target, DisassembleOperation operation) {
         Assert.isFalse(DisassembleOperation.isDynamic(operation), "无法处理{}", DynamicDisassembleOperation.class);
         List<Object> results = new ArrayList<>();
         // bfs遍历集合
-        Object disassemblePropertyValue = handlerChain.readFromSource(
+        Object disassemblePropertyValue = operateProcessor.readFromSource(
             target, BeanPropertyMapping.ofNameOnlyProperty(operation.getTargetProperty().getName()), operation
         );
         Deque<Object> deque = new LinkedList<>();

@@ -1,27 +1,36 @@
 package top.xiajibagao.crane.starter;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import top.xiajibagao.crane.core.handler.ExpressionPreprocessingInterceptor;
-import top.xiajibagao.crane.core.handler.interfaces.SourceOperateInterceptor;
-import top.xiajibagao.crane.jackson.impl.handler.*;
+import org.springframework.stereotype.Component;
+import top.xiajibagao.crane.core.interceptor.ExpressionPreprocessingInterceptor;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
+import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
+import top.xiajibagao.crane.jackson.impl.handler.NullNodeOperateHandler;
+import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
+import top.xiajibagao.crane.jackson.impl.handler.ValueNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.helper.JsonNodeAccessor;
 import top.xiajibagao.crane.jackson.impl.module.DynamicJsonNodeModule;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonAssembler;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonDisassembler;
+import top.xiajibagao.crane.jackson.impl.operator.JacksonOperateProcessor;
 
-import java.util.List;
+import java.util.Objects;
 
 /**
  * @author huangchengxing
@@ -54,43 +63,51 @@ public class CraneJacksonAutoConfiguration {
     }
 
     @Order
-    @ConditionalOnMissingBean(ExpressionPreprocessingInterceptor.ContextFactory.class)
-    @Bean("DefaultCraneExpressionPreprocessingInterceptorContextFactory")
-    public ExpressionPreprocessingInterceptor.ContextFactory expressionContextFactory(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
-        return new ExpressionPreprocessingInterceptor.DefaultContextFactory()
-            .addAction(context -> context.addPropertyAccessor(new JsonNodeAccessor(objectMapper)));
+    @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
+    @ConditionalOnMissingBean(JacksonOperateProcessor.class)
+    @Bean("DefaultCraneJacksonOperateProcessor")
+    public JacksonOperateProcessor jacksonOperateProcessor() {
+        return new JacksonOperateProcessor();
     }
 
-    @Order
-    @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
-    @ConditionalOnMissingBean(JacksonOperateHandlerChain.class)
-    @Bean("DefaultCraneJacksonOperateHandlerChain")
-    public JacksonOperateHandlerChain jacksonOperateHandlerChain(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, List<SourceOperateInterceptor> interceptors) {
-        JacksonOperateHandlerChain operateHandlerChain = new JacksonOperateHandlerChain();
-        interceptors.forEach(operateHandlerChain::addInterceptor);
-        operateHandlerChain.addHandler(new ArrayNodeOperateHandler(objectMapper, operateHandlerChain))
-            .addHandler(new NullNodeOperateHandler())
-            .addHandler(new ObjectNodeOperateHandler(objectMapper))
-            .addHandler(new ValueNodeOperateHandler(objectMapper));
-        log.info("注册处理器链 {}, 已配置节点: {}", "DefaultCraneJacksonOrderlyOperateHandlerChain", CollUtil.join(operateHandlerChain.handlers(), ", ", h -> h.getClass()
-            .getName()));
-        return operateHandlerChain;
+    @ConditionalOnMissingBean(ValueNodeOperateHandler.class)
+    @Bean("DefaultCraneValueNodeOperateHandler")
+    public ValueNodeOperateHandler valueNodeOperateHandler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, JacksonOperateProcessor jacksonOperateProcessor) {
+        return new ValueNodeOperateHandler(objectMapper, jacksonOperateProcessor);
+    }
+
+    @ConditionalOnMissingBean(ObjectNodeOperateHandler.class)
+    @Bean("DefaultCraneObjectNodeOperateHandler")
+    public ObjectNodeOperateHandler objectNodeOperateHandler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, JacksonOperateProcessor jacksonOperateProcessor) {
+        return new ObjectNodeOperateHandler(objectMapper, jacksonOperateProcessor);
+    }
+
+    @ConditionalOnMissingBean(NullNodeOperateHandler.class)
+    @Bean("DefaultCraneNullNodeOperateHandler")
+    public NullNodeOperateHandler nullNodeOperateHandler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, JacksonOperateProcessor jacksonOperateProcessor) {
+        return new NullNodeOperateHandler(objectMapper, jacksonOperateProcessor);
+    }
+
+    @ConditionalOnMissingBean(ArrayNodeOperateHandler.class)
+    @Bean("DefaultCraneArrayNodeOperateHandler")
+    public ArrayNodeOperateHandler arrayNodeOperateHandler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, JacksonOperateProcessor jacksonOperateProcessor) {
+        return new ArrayNodeOperateHandler(objectMapper, jacksonOperateProcessor);
     }
 
     @Order
     @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
     @ConditionalOnMissingBean(JacksonAssembler.class)
     @Bean("DefaultCraneJacksonAssembler")
-    public JacksonAssembler jacksonAssembler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, JacksonOperateHandlerChain operateHandlerChain) {
-        return new JacksonAssembler(objectMapper, operateHandlerChain);
+    public JacksonAssembler jacksonAssembler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, JacksonOperateProcessor jacksonOperateProcessor) {
+        return new JacksonAssembler(objectMapper, jacksonOperateProcessor);
     }
 
     @Order
     @ConditionalOnBean(name = CRANE_INNER_OBJECT_MAPPER)
     @ConditionalOnMissingBean(JacksonDisassembler.class)
     @Bean("DefaultCraneJacksonDisassembler")
-    public JacksonDisassembler jacksonDisassembler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
-        return new JacksonDisassembler(objectMapper);
+    public JacksonDisassembler jacksonDisassembler(@Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper, JacksonOperateProcessor jacksonOperateProcessor) {
+        return new JacksonDisassembler(objectMapper, jacksonOperateProcessor);
     }
 
     @Order
@@ -98,6 +115,48 @@ public class CraneJacksonAutoConfiguration {
     @Bean("DefaultCraneJacksonDynamicJsonNodeModule")
     public DynamicJsonNodeModule dynamicJsonNodeModule(BeanFactory beanFactory, @Qualifier(CRANE_INNER_OBJECT_MAPPER) ObjectMapper objectMapper) {
         return new DynamicJsonNodeModule(beanFactory, objectMapper);
+    }
+
+    @Component
+    @RequiredArgsConstructor
+    public static class AfterJacksonConfigurationInitedRunner implements ApplicationRunner {
+
+        private final JacksonOperateProcessor jacksonOperateProcessor;
+        private final ExpressionPreprocessingInterceptor expressionPreprocessingInterceptor;
+        private final ApplicationContext applicationContext;
+
+        @Qualifier(CRANE_INNER_OBJECT_MAPPER)
+        private final ObjectMapper objectMapper;
+
+        @Override
+        public void run(ApplicationArguments args) throws Exception {
+            initOperateProcessor();
+            initContextFactoryFactory();
+        }
+
+        /**
+         * 为上下文工厂添加{@link JsonNodeAccessor}
+         */
+        public void initContextFactoryFactory() {
+            ExpressionPreprocessingInterceptor.ContextFactory contextFactory = expressionPreprocessingInterceptor.getContextFactory();
+            if (contextFactory instanceof ExpressionPreprocessingInterceptor.DefaultContextFactory) {
+                ((ExpressionPreprocessingInterceptor.DefaultContextFactory) contextFactory)
+                    .addAction(context -> context.addPropertyAccessor(new JsonNodeAccessor(objectMapper)));
+            }
+        }
+
+        /**
+         * 初始化{@link JacksonOperateProcessor}，为其注册必要的组件
+         */
+        private void initOperateProcessor() {
+            ConfigHelper.registerForOperateProcessor(
+                jacksonOperateProcessor,
+                applicationContext,
+                annotation -> Objects.isNull(annotation)
+                    || CharSequenceUtil.containsAny(OperateProcessor.OPERATE_GROUP_JSON_BEAN, annotation.value())
+            );
+        }
+
     }
 
 }
