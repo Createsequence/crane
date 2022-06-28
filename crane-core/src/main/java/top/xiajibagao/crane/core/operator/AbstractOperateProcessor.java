@@ -1,8 +1,12 @@
 package top.xiajibagao.crane.core.operator;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ClassUtil;
 import lombok.Getter;
-import top.xiajibagao.crane.core.handler.*;
+import org.springframework.aop.framework.AopProxyUtils;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import top.xiajibagao.crane.core.annotation.GroupRegister;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.operator.interfaces.*;
@@ -10,10 +14,13 @@ import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * {@link OperateProcessor}的基础实现
@@ -21,11 +28,6 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/06/27 14:32
  * @see 0.5.8
- * @see ArrayOperateHandler
- * @see CollectionOperateHandler
- * @see MapOperateHandler
- * @see NullOperateHandler
- * @see BeanOperateHandler
  */
 @Getter
 public abstract class AbstractOperateProcessor<T extends AbstractOperateProcessor<T>> implements OperateProcessor {
@@ -34,8 +36,17 @@ public abstract class AbstractOperateProcessor<T extends AbstractOperateProcesso
     private final List<TargetWriteInterceptor> targetWriteInterceptors = new ArrayList<>();
     private final List<SourceReader> sourceReaders = new ArrayList<>();
     private final List<SourceReadInterceptor> sourceReadInterceptors = new ArrayList<>();
+    protected final String[] registerGroups;
     @SuppressWarnings("unchecked")
     private final T typedThis = (T) this;
+
+    protected AbstractOperateProcessor(@Nonnull String... defaultRegisterGroups) {
+        this.registerGroups = Optional.ofNullable(this.getClass())
+            .map(t -> AnnotatedElementUtils.findMergedAnnotation(t, GroupRegister.class))
+            .map(GroupRegister::value)
+            .orElse(defaultRegisterGroups);
+        Assert.notNull(this.registerGroups, "registerGroups must not null");
+    }
 
     // ============================ register ============================
 
@@ -46,6 +57,7 @@ public abstract class AbstractOperateProcessor<T extends AbstractOperateProcesso
      * @return T
      * @author huangchengxing
      * @date 2022/6/27 14:43
+     * @see #register(List, Orderly[])
      */
     @Override
     public T registerTargetWriters(TargetWriter... targetWriters) {
@@ -59,6 +71,7 @@ public abstract class AbstractOperateProcessor<T extends AbstractOperateProcesso
      * @return T
      * @author huangchengxing
      * @date 2022/6/27 14:44
+     * @see #register(List, Orderly[])
      */
     @Override
     public T registerTargetWriteInterceptors(TargetWriteInterceptor... targetWriteInterceptors) {
@@ -72,6 +85,7 @@ public abstract class AbstractOperateProcessor<T extends AbstractOperateProcesso
      * @return T
      * @author huangchengxing
      * @date 2022/6/27 14:45
+     * @see #register(List, Orderly[])
      */
     @Override
     public T registerSourceReaders(SourceReader... sourceReaders) {
@@ -85,6 +99,7 @@ public abstract class AbstractOperateProcessor<T extends AbstractOperateProcesso
      * @return T
      * @author huangchengxing
      * @date 2022/6/27 14:45
+     * @see #register(List, Orderly[])
      */
     @Override
     public T registerSourceReadInterceptors(SourceReadInterceptor... sourceReadInterceptors) {
@@ -98,24 +113,35 @@ public abstract class AbstractOperateProcessor<T extends AbstractOperateProcesso
      * @return T
      * @author huangchengxing
      * @date 2022/6/27 17:33
+     * @see #register(List, Orderly[])
      */
     public T registerHandlers(OperateHandler... operateHandler) {
         registerTargetWriters(operateHandler);
-        registerTargetWriters(operateHandler);
+        registerSourceReaders(operateHandler);
         return typedThis;
     }
 
+    /**
+     * 将以下符合条件的组件注册到指定列表：
+     * <ul>
+     *     <li>组件不为null；</li>
+     *     <li>组件在列表中不存在；</li>
+     *     <li>组件不为{@link OperateProcessor}；</li>
+     *     <li>组件的注册组必须与当前有处理器所属的组成组有交集；</li>
+     *     <li>组件在列表中不存在；</li>
+     * </ul>
+     */
     @SafeVarargs
-    private final <I extends Orderly> T register(List<I> list, I... items) {
+    protected final <I extends Orderly & GroupRegistrable> T register(List<I> list, I... items) {
         if (ArrayUtil.isEmpty(items)) {
             return typedThis;
         }
-        for (I item : items) {
-            if (Objects.isNull(item) || list.contains(item)) {
-                continue;
-            }
-            list.add(item);
-        }
+        Stream.of(items)
+            .filter(Objects::nonNull)
+            .filter(t -> !list.contains(t))
+            .filter(t -> !ClassUtil.isAssignable(OperateProcessor.class, AopProxyUtils.ultimateTargetClass(t)))
+            .filter(this::isRegistrable)
+            .forEach(list::add);
         list.sort(Orderly.comparator());
         return typedThis;
     }

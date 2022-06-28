@@ -1,7 +1,6 @@
 package top.xiajibagao.crane.starter;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ClassUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +44,6 @@ import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -340,12 +338,7 @@ public class CraneAutoConfiguration {
          * 初始化{@link BeanReflexOperateProcessor}，为其注册必要的组件
          */
         private void initOperateProcessor() {
-            ConfigHelper.registerForOperateProcessor(
-                beanReflexOperateProcessor,
-                applicationContext,
-                annotation -> Objects.isNull(annotation)
-                    || CharSequenceUtil.containsAny(OperateProcessor.OPERATE_GROUP_JAVA_BEAN, annotation.value())
-            );
+            ConfigHelper.registerForOperateProcessor(beanReflexOperateProcessor, applicationContext);
         }
     }
 

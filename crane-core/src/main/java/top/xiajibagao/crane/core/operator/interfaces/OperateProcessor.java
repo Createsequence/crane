@@ -26,7 +26,7 @@ import java.util.List;
  * @date 2022/06/27 15:17
  * @since 0.5.8
  */
-public interface OperateProcessor extends TargetWriter, SourceReader, Orderly {
+public interface OperateProcessor extends TargetWriter, SourceReader, GroupRegistrable, Orderly {
 
     String OPERATE_GROUP_JAVA_BEAN = "JAVA_BEAN";
     String OPERATE_GROUP_JSON_BEAN = "JSON_BEAN";

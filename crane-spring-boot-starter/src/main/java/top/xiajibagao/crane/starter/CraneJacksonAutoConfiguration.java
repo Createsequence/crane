@@ -1,6 +1,5 @@
 package top.xiajibagao.crane.starter;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import top.xiajibagao.crane.core.interceptor.ExpressionPreprocessingInterceptor;
-import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.jackson.impl.handler.ArrayNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.NullNodeOperateHandler;
 import top.xiajibagao.crane.jackson.impl.handler.ObjectNodeOperateHandler;
@@ -29,8 +27,6 @@ import top.xiajibagao.crane.jackson.impl.module.DynamicJsonNodeModule;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonAssembler;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonDisassembler;
 import top.xiajibagao.crane.jackson.impl.operator.JacksonOperateProcessor;
-
-import java.util.Objects;
 
 /**
  * @author huangchengxing
@@ -129,7 +125,7 @@ public class CraneJacksonAutoConfiguration {
         private final ObjectMapper objectMapper;
 
         @Override
-        public void run(ApplicationArguments args) throws Exception {
+        public void run(ApplicationArguments args) {
             initOperateProcessor();
             initContextFactoryFactory();
         }
@@ -149,12 +145,7 @@ public class CraneJacksonAutoConfiguration {
          * 初始化{@link JacksonOperateProcessor}，为其注册必要的组件
          */
         private void initOperateProcessor() {
-            ConfigHelper.registerForOperateProcessor(
-                jacksonOperateProcessor,
-                applicationContext,
-                annotation -> Objects.isNull(annotation)
-                    || CharSequenceUtil.containsAny(OperateProcessor.OPERATE_GROUP_JSON_BEAN, annotation.value())
-            );
+            ConfigHelper.registerForOperateProcessor(jacksonOperateProcessor, applicationContext);
         }
 
     }

@@ -10,8 +10,8 @@ import java.lang.annotation.*;
  *
  * @author huangchengxing
  * @date 2022/06/27 15:03
- * @see OperateProcessor#OPERATE_GROUP_JAVA_BEAN
- * @see OperateProcessor#OPERATE_GROUP_JSON_BEAN
+ * @see GroupRegistrable#OPERATE_GROUP_JAVA_BEAN
+ * @see GroupRegistrable#OPERATE_GROUP_JSON_BEAN
  * @see 0.5.8
  */
 @MateAnnotation
@@ -26,9 +26,9 @@ public @interface GroupRegister {
      * @return java.lang.String[]
      * @author huangchengxing
      * @date 2022/6/27 15:11
-     * @see OperateProcessor#OPERATE_GROUP_JSON_BEAN
-     * @see OperateProcessor#OPERATE_GROUP_JAVA_BEAN
+     * @see GroupRegistrable#OPERATE_GROUP_JSON_BEAN
+     * @see GroupRegistrable#OPERATE_GROUP_JAVA_BEAN
      */
-    String[] value() default { OperateProcessor.OPERATE_GROUP_JAVA_BEAN, OperateProcessor.OPERATE_GROUP_JSON_BEAN};
+    String[] value() default { GroupRegistrable.OPERATE_GROUP_JAVA_BEAN, GroupRegistrable.OPERATE_GROUP_JSON_BEAN};
 
 }
