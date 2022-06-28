@@ -22,6 +22,13 @@ import java.util.List;
  * 拦截器应当被视为一个可按照{@link Orderly}的定义顺序排序不纯责任链，
  * 在其对应的Reader与Writer之前被调用之前，当前操作者中任何符合的拦截器都应该被依次调用。
  *
+ * <p>操作者允许注册{@link TargetWriter}, {@link SourceReader},{@link TargetWriteInterceptor}
+ * 与{@link SourceReadInterceptor}。其中，允许注册的组件都应当符合下述规则：
+ * <ul>
+ *     <li>组件不能也是一个{@link OperateProcessor}；</li>
+ *     <li>组件必须使当前实例的{@link #isRegistrable(GroupRegistrable)}方法返回{@code true}；</li>
+ * </ul>
+ *
  * @author huangchengxing
  * @date 2022/06/27 15:17
  * @since 0.5.8
@@ -29,7 +36,7 @@ import java.util.List;
 public interface OperateProcessor extends TargetWriter, SourceReader, GroupRegistrable, Orderly {
 
     /**
-     * 注册待处理对象写入器，写入器不应该是{@link OperateProcessor}
+     * 注册待处理对象写入器
      *
      * @param targetWriters 待处理对象写入器
      * @return top.xiajibagao.crane.core.operator.interfaces.OperateProcessor
@@ -49,7 +56,7 @@ public interface OperateProcessor extends TargetWriter, SourceReader, GroupRegis
     OperateProcessor registerTargetWriteInterceptors(TargetWriteInterceptor... targetWriteInterceptors);
 
     /**
-     * 注册数据源读取器，读取器不应该是{@link OperateProcessor}
+     * 注册数据源读取器
      *
      * @param sourceReaders 数据源读取器
      * @return top.xiajibagao.crane.core.operator.interfaces.OperateProcessor

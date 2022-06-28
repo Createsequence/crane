@@ -13,6 +13,8 @@ import java.util.Optional;
  * 仅有分组{@link #getRegisterGroups()}存在交集时才应当被允许注册。<br />
  * 当组件上存在{@link GroupRegister}注解时，将以该注解上的分组优先。
  *
+ * <p>约定，该接口的实现类都不应该能够注册到与其类型相同的组件中。
+ *
  * @author huangchengxing
  * @date 2022/06/27 16:34
  * @since 0.5.8

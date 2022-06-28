@@ -1,12 +1,9 @@
 package top.xiajibagao.crane.core.operator;
 
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
 import lombok.Getter;
 import org.springframework.aop.framework.AopProxyUtils;
-import org.springframework.core.annotation.AnnotatedElementUtils;
-import top.xiajibagao.crane.core.annotation.GroupRegister;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.helper.Orderly;
 import top.xiajibagao.crane.core.operator.interfaces.*;
@@ -19,7 +16,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -36,16 +32,22 @@ public abstract class AbstractOperateProcessor<T extends AbstractOperateProcesso
     private final List<TargetWriteInterceptor> targetWriteInterceptors = new ArrayList<>();
     private final List<SourceReader> sourceReaders = new ArrayList<>();
     private final List<SourceReadInterceptor> sourceReadInterceptors = new ArrayList<>();
-    protected final String[] registerGroups;
+    protected final GroupRegisteredSign groupRegisteredSign;
     @SuppressWarnings("unchecked")
     private final T typedThis = (T) this;
 
     protected AbstractOperateProcessor(@Nonnull String... defaultRegisterGroups) {
-        this.registerGroups = Optional.ofNullable(this.getClass())
-            .map(t -> AnnotatedElementUtils.findMergedAnnotation(t, GroupRegister.class))
-            .map(GroupRegister::value)
-            .orElse(defaultRegisterGroups);
-        Assert.notNull(this.registerGroups, "registerGroups must not null");
+        this.groupRegisteredSign = new GroupRegisteredSign(this.getClass(), defaultRegisterGroups);
+    }
+
+    @Override
+    public String[] getRegisterGroups() {
+        return groupRegisteredSign.getRegisterGroups();
+    }
+
+    @Override
+    public boolean isRegistrable(GroupRegistrable registrable) {
+        return groupRegisteredSign.isRegistrable(registrable);
     }
 
     // ============================ register ============================
