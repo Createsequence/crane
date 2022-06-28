@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
  * @date 2022/06/27 14:10
  * @since 0.5.8
  */
-public interface SourceReadInterceptor extends GroupRegistrable, Orderly {
+public interface SourceReadInterceptor extends OperateProcessorComponent, Orderly {
 
     /**
      * 是否支持拦截读操作的数据源

@@ -12,6 +12,6 @@ import top.xiajibagao.crane.core.operator.interfaces.*;
  * @author huangchengxing
  * @date 2022/06/27 15:56
  */
-public interface OperateHandler extends SourceReader, TargetWriter, Operator, GroupRegistrable, Orderly {
+public interface OperateHandler extends SourceReader, TargetWriter, Operator, OperateProcessorComponent, Orderly {
 
 }

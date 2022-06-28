@@ -3,9 +3,9 @@ package top.xiajibagao.crane.core.handler;
 import cn.hutool.core.lang.Assert;
 import lombok.Getter;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
-import top.xiajibagao.crane.core.operator.GroupRegisteredSign;
-import top.xiajibagao.crane.core.operator.interfaces.GroupRegistrable;
+import top.xiajibagao.crane.core.operator.OperateProcessorComponentSign;
 import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessorComponent;
 
 /**
  * {@link OperateHandler}的基本实现
@@ -18,14 +18,14 @@ import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 public abstract class AbstractOperateHandler implements OperateHandler {
 
     protected final OperateProcessor operateProcessor;
-    protected final GroupRegisteredSign groupRegisteredSign;
+    protected final OperateProcessorComponentSign operateProcessorComponentSign;
 
     protected AbstractOperateHandler(OperateProcessor operateProcessor, String... defaultRegisterGroups) {
         Assert.notNull(operateProcessor, "operateProcessor must not null");
-        this.groupRegisteredSign = new GroupRegisteredSign(this.getClass(), defaultRegisterGroups);
+        this.operateProcessorComponentSign = new OperateProcessorComponentSign(this.getClass(), defaultRegisterGroups);
         Assert.isTrue(
-            groupRegisteredSign.isRegistrable(operateProcessor),
-            "can not to register operation processors [{}] of different groups : [{}]",
+            operateProcessorComponentSign.isRegistrable(operateProcessor),
+            "can not to register operation processors [{}] of different groups : {}",
             operateProcessor.getClass(), operateProcessor.getRegisterGroups()
         );
         this.operateProcessor = operateProcessor;
@@ -33,11 +33,11 @@ public abstract class AbstractOperateHandler implements OperateHandler {
 
     @Override
     public String[] getRegisterGroups() {
-        return groupRegisteredSign.getRegisterGroups();
+        return operateProcessorComponentSign.getRegisterGroups();
     }
 
     @Override
-    public boolean isRegistrable(GroupRegistrable registrable) {
-        return groupRegisteredSign.isRegistrable(registrable);
+    public boolean isRegistrable(OperateProcessorComponent registrable) {
+        return operateProcessorComponentSign.isRegistrable(registrable);
     }
 }

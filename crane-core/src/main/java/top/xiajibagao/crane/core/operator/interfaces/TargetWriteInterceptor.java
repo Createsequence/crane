@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
  * @date 2022/06/27 14:11
  * @see 0.5.8
  */
-public interface TargetWriteInterceptor extends GroupRegistrable, Orderly {
+public interface TargetWriteInterceptor extends OperateProcessorComponent, Orderly {
 
     /**
      * 是否支持拦截写操作的数据源

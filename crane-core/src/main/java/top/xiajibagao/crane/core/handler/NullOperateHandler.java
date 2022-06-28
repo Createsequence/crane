@@ -1,10 +1,10 @@
 package top.xiajibagao.crane.core.handler;
 
 import org.springframework.core.Ordered;
-import top.xiajibagao.crane.core.annotation.GroupRegister;
+import top.xiajibagao.crane.core.annotation.ProcessorComponent;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
-import top.xiajibagao.crane.core.operator.interfaces.GroupRegistrable;
 import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessorComponent;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -20,7 +20,7 @@ import java.util.Objects;
  * @date 2022/06/07 16:49
  * @since 0.5.5
  */
-@GroupRegister(GroupRegistrable.OPERATE_GROUP_JAVA_BEAN)
+@ProcessorComponent(OperateProcessorComponent.OPERATE_GROUP_JAVA_BEAN)
 public class NullOperateHandler extends AbstractOperateHandler implements OperateHandler {
 
     public NullOperateHandler(OperateProcessor operateProcessor, String... defaultRegisterGroups) {

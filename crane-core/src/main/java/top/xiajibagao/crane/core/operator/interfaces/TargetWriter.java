@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
  * @date 2022/06/27 14:05
  * @see 0.5.8
  */
-public interface TargetWriter extends GroupRegistrable, Orderly {
+public interface TargetWriter extends OperateProcessorComponent, Orderly {
 
     /**
      * 是否支持将数据源数据写入待处理对象

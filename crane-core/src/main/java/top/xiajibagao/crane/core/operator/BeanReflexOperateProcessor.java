@@ -1,8 +1,8 @@
 package top.xiajibagao.crane.core.operator;
 
 import top.xiajibagao.crane.core.handler.*;
-import top.xiajibagao.crane.core.operator.interfaces.GroupRegistrable;
 import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessorComponent;
 
 /**
  * 基于bean反射的{@link OperateProcessor}实现
@@ -19,7 +19,7 @@ import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 public class BeanReflexOperateProcessor extends AbstractOperateProcessor<BeanReflexOperateProcessor> implements OperateProcessor {
 
     public BeanReflexOperateProcessor() {
-        super(GroupRegistrable.OPERATE_GROUP_JAVA_BEAN);
+        super(OperateProcessorComponent.OPERATE_GROUP_JAVA_BEAN);
     }
 
 }

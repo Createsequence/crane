@@ -26,14 +26,14 @@ import java.util.List;
  * 与{@link SourceReadInterceptor}。其中，允许注册的组件都应当符合下述规则：
  * <ul>
  *     <li>组件不能也是一个{@link OperateProcessor}；</li>
- *     <li>组件必须使当前实例的{@link #isRegistrable(GroupRegistrable)}方法返回{@code true}；</li>
+ *     <li>组件必须使当前实例的{@link #isRegistrable(OperateProcessorComponent)}方法返回{@code true}；</li>
  * </ul>
  *
  * @author huangchengxing
  * @date 2022/06/27 15:17
  * @since 0.5.8
  */
-public interface OperateProcessor extends TargetWriter, SourceReader, GroupRegistrable, Orderly {
+public interface OperateProcessor extends TargetWriter, SourceReader, OperateProcessorComponent, Orderly {
 
     /**
      * 注册待处理对象写入器

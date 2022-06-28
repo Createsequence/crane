@@ -32,22 +32,22 @@ public abstract class AbstractOperateProcessor<T extends AbstractOperateProcesso
     private final List<TargetWriteInterceptor> targetWriteInterceptors = new ArrayList<>();
     private final List<SourceReader> sourceReaders = new ArrayList<>();
     private final List<SourceReadInterceptor> sourceReadInterceptors = new ArrayList<>();
-    protected final GroupRegisteredSign groupRegisteredSign;
+    protected final OperateProcessorComponentSign operateProcessorComponentSign;
     @SuppressWarnings("unchecked")
     private final T typedThis = (T) this;
 
     protected AbstractOperateProcessor(@Nonnull String... defaultRegisterGroups) {
-        this.groupRegisteredSign = new GroupRegisteredSign(this.getClass(), defaultRegisterGroups);
+        this.operateProcessorComponentSign = new OperateProcessorComponentSign(this.getClass(), defaultRegisterGroups);
     }
 
     @Override
     public String[] getRegisterGroups() {
-        return groupRegisteredSign.getRegisterGroups();
+        return operateProcessorComponentSign.getRegisterGroups();
     }
 
     @Override
-    public boolean isRegistrable(GroupRegistrable registrable) {
-        return groupRegisteredSign.isRegistrable(registrable);
+    public boolean isRegistrable(OperateProcessorComponent registrable) {
+        return operateProcessorComponentSign.isRegistrable(registrable);
     }
 
     // ============================ register ============================
@@ -126,13 +126,13 @@ public abstract class AbstractOperateProcessor<T extends AbstractOperateProcesso
     /**
      * 注册组件
      *
-     * @param groupRegistrable 组件
+     * @param operateProcessorComponent 组件
      * @return T
      * @author huangchengxing
      * @date 2022/6/28 15:38
      */
-    public T registerComponents(GroupRegistrable... groupRegistrable) {
-        for (GroupRegistrable registrable : groupRegistrable) {
+    public T registerComponents(OperateProcessorComponent... operateProcessorComponent) {
+        for (OperateProcessorComponent registrable : operateProcessorComponent) {
             if (registrable instanceof TargetWriter) {
                 registerTargetWriters((TargetWriter)registrable);
             } else if (registrable instanceof SourceReader) {
@@ -157,7 +157,7 @@ public abstract class AbstractOperateProcessor<T extends AbstractOperateProcesso
      * </ul>
      */
     @SafeVarargs
-    protected final <I extends Orderly & GroupRegistrable> T register(List<I> list, I... items) {
+    protected final <I extends Orderly & OperateProcessorComponent> T register(List<I> list, I... items) {
         if (ArrayUtil.isEmpty(items)) {
             return typedThis;
         }

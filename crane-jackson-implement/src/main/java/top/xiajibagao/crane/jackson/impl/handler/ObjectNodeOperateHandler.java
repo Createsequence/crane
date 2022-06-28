@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import top.xiajibagao.crane.core.annotation.GroupRegister;
-import top.xiajibagao.crane.core.operator.interfaces.GroupRegistrable;
+import top.xiajibagao.crane.core.annotation.ProcessorComponent;
 import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessorComponent;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -22,7 +22,7 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/04/12 13:07
  */
-@GroupRegister(GroupRegistrable.OPERATE_GROUP_JSON_BEAN)
+@ProcessorComponent(OperateProcessorComponent.OPERATE_GROUP_JSON_BEAN)
 public class ObjectNodeOperateHandler extends AbstractJacksonNodeOperateHandler {
 
     public ObjectNodeOperateHandler(ObjectMapper objectMapper, OperateProcessor operateProcessor, String... defaultRegisterGroups) {

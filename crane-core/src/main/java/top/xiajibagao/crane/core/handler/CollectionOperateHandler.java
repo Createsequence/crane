@@ -1,10 +1,10 @@
 package top.xiajibagao.crane.core.handler;
 
 import cn.hutool.core.collection.CollUtil;
-import top.xiajibagao.crane.core.annotation.GroupRegister;
+import top.xiajibagao.crane.core.annotation.ProcessorComponent;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
-import top.xiajibagao.crane.core.operator.interfaces.GroupRegistrable;
 import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessorComponent;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @date 2022/04/08 10:24
  * @since 0.2.0
  */
-@GroupRegister(GroupRegistrable.OPERATE_GROUP_JAVA_BEAN)
+@ProcessorComponent(OperateProcessorComponent.OPERATE_GROUP_JAVA_BEAN)
 public class CollectionOperateHandler extends AbstractOperateHandler implements OperateHandler {
 
     public CollectionOperateHandler(OperateProcessor operateProcessor, String... defaultRegisterGroups) {

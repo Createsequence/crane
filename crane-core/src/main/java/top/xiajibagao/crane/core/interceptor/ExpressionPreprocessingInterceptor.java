@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import top.xiajibagao.crane.core.annotation.GroupRegister;
+import top.xiajibagao.crane.core.annotation.ProcessorComponent;
 import top.xiajibagao.crane.core.helper.ExpressionUtils;
-import top.xiajibagao.crane.core.operator.GroupRegisteredSign;
-import top.xiajibagao.crane.core.operator.interfaces.GroupRegistrable;
+import top.xiajibagao.crane.core.operator.OperateProcessorComponentSign;
+import top.xiajibagao.crane.core.operator.interfaces.OperateProcessorComponent;
 import top.xiajibagao.crane.core.operator.interfaces.TargetWriteInterceptor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.PropertyMapping;
@@ -27,27 +27,27 @@ import java.util.function.Consumer;
  * @author huangchengxing
  * @date 2022/06/04 23:37
  */
-@GroupRegister
-public class ExpressionPreprocessingInterceptor implements TargetWriteInterceptor, GroupRegistrable {
+@ProcessorComponent
+public class ExpressionPreprocessingInterceptor implements TargetWriteInterceptor, OperateProcessorComponent {
 
     @Getter
     private ContextFactory contextFactory;
-    private final GroupRegisteredSign groupRegisteredSign;
+    private final OperateProcessorComponentSign operateProcessorComponentSign;
 
     public ExpressionPreprocessingInterceptor(@Nonnull ContextFactory contextFactory, String... defaultRegisterGroups) {
         Objects.requireNonNull(contextFactory);
         this.contextFactory = contextFactory;
-        this.groupRegisteredSign = new GroupRegisteredSign(this.getClass(), defaultRegisterGroups);
+        this.operateProcessorComponentSign = new OperateProcessorComponentSign(this.getClass(), defaultRegisterGroups);
     }
 
     @Override
     public String[] getRegisterGroups() {
-        return groupRegisteredSign.getRegisterGroups();
+        return operateProcessorComponentSign.getRegisterGroups();
     }
 
     @Override
-    public boolean isRegistrable(GroupRegistrable registrable) {
-        return groupRegisteredSign.isRegistrable(registrable);
+    public boolean isRegistrable(OperateProcessorComponent registrable) {
+        return operateProcessorComponentSign.isRegistrable(registrable);
     }
 
     public ExpressionPreprocessingInterceptor setContextFactory(@Nonnull ContextFactory contextFactory) {
