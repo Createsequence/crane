@@ -28,9 +28,6 @@ import java.util.List;
  */
 public interface OperateProcessor extends TargetWriter, SourceReader, GroupRegistrable, Orderly {
 
-    String OPERATE_GROUP_JAVA_BEAN = "JAVA_BEAN";
-    String OPERATE_GROUP_JSON_BEAN = "JSON_BEAN";
-
     /**
      * 注册待处理对象写入器，写入器不应该是{@link OperateProcessor}
      *

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import top.xiajibagao.crane.core.annotation.GroupRegister;
+import top.xiajibagao.crane.core.operator.interfaces.GroupRegistrable;
 import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
@@ -23,7 +24,7 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/04/12 13:07
  */
-@GroupRegister(OperateProcessor.OPERATE_GROUP_JSON_BEAN)
+@GroupRegister(GroupRegistrable.OPERATE_GROUP_JSON_BEAN)
 public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler {
 
     public ArrayNodeOperateHandler(ObjectMapper objectMapper, OperateProcessor operateProcessor) {

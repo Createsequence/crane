@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import org.springframework.core.Ordered;
 import top.xiajibagao.crane.core.annotation.GroupRegister;
+import top.xiajibagao.crane.core.operator.interfaces.GroupRegistrable;
 import top.xiajibagao.crane.core.operator.interfaces.OperateProcessor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
 import top.xiajibagao.crane.core.parser.interfaces.Operation;
@@ -20,7 +21,7 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/06/07 17:08
  */
-@GroupRegister(OperateProcessor.OPERATE_GROUP_JSON_BEAN)
+@GroupRegister(GroupRegistrable.OPERATE_GROUP_JSON_BEAN)
 public class NullNodeOperateHandler extends AbstractJacksonNodeOperateHandler {
 
     public NullNodeOperateHandler(ObjectMapper objectMapper, OperateProcessor operateProcessor) {
