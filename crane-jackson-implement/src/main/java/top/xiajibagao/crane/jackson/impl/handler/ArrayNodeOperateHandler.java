@@ -27,8 +27,8 @@ import java.util.Objects;
 @GroupRegister(GroupRegistrable.OPERATE_GROUP_JSON_BEAN)
 public class ArrayNodeOperateHandler extends AbstractJacksonNodeOperateHandler {
 
-    public ArrayNodeOperateHandler(ObjectMapper objectMapper, OperateProcessor operateProcessor) {
-        super(objectMapper, operateProcessor);
+    public ArrayNodeOperateHandler(ObjectMapper objectMapper, OperateProcessor operateProcessor, String... defaultRegisterGroups) {
+        super(objectMapper, operateProcessor, defaultRegisterGroups);
     }
 
     @Override

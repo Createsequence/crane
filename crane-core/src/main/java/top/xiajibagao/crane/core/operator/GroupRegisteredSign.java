@@ -29,7 +29,7 @@ public class GroupRegisteredSign implements GroupRegistrable {
             .map(t -> AnnotatedElementUtils.findMergedAnnotation(t, GroupRegister.class))
             .map(GroupRegister::value)
             .orElse(defaultRegisterGroups);
-        Assert.notNull(this.registerGroups, "registerGroups must not null");
+        Assert.notNull(this.registerGroups, "defaultRegisterGroups must not null");
     }
 
     /**

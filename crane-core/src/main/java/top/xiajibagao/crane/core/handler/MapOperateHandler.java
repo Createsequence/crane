@@ -1,8 +1,6 @@
 package top.xiajibagao.crane.core.handler;
 
 import cn.hutool.core.collection.CollUtil;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.annotation.GroupRegister;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.operator.interfaces.GroupRegistrable;
@@ -21,11 +19,11 @@ import java.util.Map;
  * @since 0.2.0
  */
 @GroupRegister(GroupRegistrable.OPERATE_GROUP_JAVA_BEAN)
-@Getter
-@RequiredArgsConstructor
-public class MapOperateHandler implements OperateHandler {
+public class MapOperateHandler extends AbstractOperateHandler implements OperateHandler {
 
-    private final OperateProcessor operateProcessor;
+    public MapOperateHandler(OperateProcessor operateProcessor, String... defaultRegisterGroups) {
+        super(operateProcessor, defaultRegisterGroups);
+    }
 
     @Override
     public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {

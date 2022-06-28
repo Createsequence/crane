@@ -1,7 +1,5 @@
 package top.xiajibagao.crane.core.handler;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.annotation.GroupRegister;
 import top.xiajibagao.crane.core.handler.interfaces.OperateHandler;
 import top.xiajibagao.crane.core.helper.property.BeanPropertyFactory;
@@ -21,12 +19,14 @@ import java.util.Objects;
  * @since 0.2.0
  */
 @GroupRegister(GroupRegistrable.OPERATE_GROUP_JAVA_BEAN)
-@Getter
-@RequiredArgsConstructor
-public class BeanOperateHandler implements OperateHandler {
+public class BeanOperateHandler extends AbstractOperateHandler implements OperateHandler {
 
-    private final OperateProcessor operateProcessor;
     private final BeanPropertyFactory beanPropertyFactory;
+
+    public BeanOperateHandler(OperateProcessor operateProcessor, BeanPropertyFactory beanPropertyFactory, String... defaultRegisterGroups) {
+        super(operateProcessor, defaultRegisterGroups);
+        this.beanPropertyFactory = beanPropertyFactory;
+    }
 
     @Override
     public boolean sourceCanRead(Object source, PropertyMapping property, Operation operation) {
