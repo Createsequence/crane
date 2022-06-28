@@ -43,6 +43,7 @@ public class GroupRegisteredSign implements GroupRegistrable {
     @Override
     public boolean isRegistrable(GroupRegistrable registrable) {
         return Objects.nonNull(registrable)
+            && Objects.equals(registrable.getClass(), this.getTargetClass())
             && ArrayUtil.containsAny(getRegisterGroups(), registrable.getRegisterGroups());
     }
 

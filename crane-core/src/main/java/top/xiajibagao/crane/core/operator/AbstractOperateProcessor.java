@@ -122,6 +122,29 @@ public abstract class AbstractOperateProcessor<T extends AbstractOperateProcesso
         registerSourceReaders(operateHandler);
         return typedThis;
     }
+    
+    /**
+     * 注册组件
+     *
+     * @param groupRegistrable 组件
+     * @return T
+     * @author huangchengxing
+     * @date 2022/6/28 15:38
+     */
+    public T registerComponents(GroupRegistrable... groupRegistrable) {
+        for (GroupRegistrable registrable : groupRegistrable) {
+            if (registrable instanceof TargetWriter) {
+                registerTargetWriters((TargetWriter)registrable);
+            } else if (registrable instanceof SourceReader) {
+                registerSourceReaders((SourceReader)registrable);
+            } else if (registrable instanceof TargetWriteInterceptor) {
+                registerTargetWriteInterceptors((TargetWriteInterceptor)registrable);
+            } else if (registrable instanceof SourceReadInterceptor) {
+                registerSourceReadInterceptors((SourceReadInterceptor)registrable);
+            }
+        }
+        return typedThis;
+    }
 
     /**
      * 将以下符合条件的组件注册到指定列表：

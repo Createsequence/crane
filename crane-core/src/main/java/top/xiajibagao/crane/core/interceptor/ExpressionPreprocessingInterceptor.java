@@ -8,6 +8,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import top.xiajibagao.crane.core.annotation.GroupRegister;
 import top.xiajibagao.crane.core.helper.ExpressionUtils;
+import top.xiajibagao.crane.core.operator.GroupRegisteredSign;
 import top.xiajibagao.crane.core.operator.interfaces.GroupRegistrable;
 import top.xiajibagao.crane.core.operator.interfaces.TargetWriteInterceptor;
 import top.xiajibagao.crane.core.parser.interfaces.AssembleOperation;
@@ -31,10 +32,22 @@ public class ExpressionPreprocessingInterceptor implements TargetWriteIntercepto
 
     @Getter
     private ContextFactory contextFactory;
+    private final GroupRegisteredSign groupRegisteredSign;
 
-    public ExpressionPreprocessingInterceptor(@Nonnull ContextFactory contextFactory) {
+    public ExpressionPreprocessingInterceptor(@Nonnull ContextFactory contextFactory, String... defaultRegisterGroups) {
         Objects.requireNonNull(contextFactory);
         this.contextFactory = contextFactory;
+        this.groupRegisteredSign = new GroupRegisteredSign(this.getClass(), defaultRegisterGroups);
+    }
+
+    @Override
+    public String[] getRegisterGroups() {
+        return groupRegisteredSign.getRegisterGroups();
+    }
+
+    @Override
+    public boolean isRegistrable(GroupRegistrable registrable) {
+        return groupRegisteredSign.isRegistrable(registrable);
     }
 
     public ExpressionPreprocessingInterceptor setContextFactory(@Nonnull ContextFactory contextFactory) {
