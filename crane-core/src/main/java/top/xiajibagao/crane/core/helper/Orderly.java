@@ -23,7 +23,12 @@ import java.util.Objects;
  */
 public interface Orderly extends Ordered, Comparable<Orderly> {
 
-    Comparator<Orderly> comparator = Comparator.comparingInt(Orderly::getActualOrder);
+    /**
+     * 用于比较{@link Orderly}实现类的比较器，可通过{@link #comparator()}获取
+     *
+     * @since 0.5.8
+     */
+    Comparator<Orderly> ORDERLY_COMPARATOR = Comparator.comparingInt(Orderly::getActualOrder);
 
     /**
      * 排序值，值越小则优先级越高，排序越靠前 <br />
@@ -76,7 +81,7 @@ public interface Orderly extends Ordered, Comparable<Orderly> {
      * @date 2022/4/15 13:08
      */
     static Comparator<Orderly> comparator() {
-        return Orderly.comparator;
+        return Orderly.ORDERLY_COMPARATOR;
     }
 
 }
