@@ -3,6 +3,7 @@ package top.xiajibagao.crane.core.container;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import top.xiajibagao.crane.core.helper.ObjectUtils;
 
@@ -17,6 +18,7 @@ import java.util.Objects;
  * @author huangchengxing
  * @date 2022/03/02 13:19
  */
+@Slf4j
 public class KeyValueContainer extends BaseNamespaceContainer<String, Object> implements Container {
 
     /**
@@ -59,8 +61,10 @@ public class KeyValueContainer extends BaseNamespaceContainer<String, Object> im
      */
     public void register(String namespace, Map<?, ?> values) {
         if (CollectionUtils.isEmpty(values)) {
+            log.info("注册缓存[{}]为空，跳过注册", namespace);
             return;
         }
+        log.info("注册缓存[{}]，共{}条数据", namespace, values.size());
         values.forEach((k, v) -> ObjectUtils.acceptIfNotNull(
             parseKey(k), keyStr -> cache.put(namespace, keyStr, v)
         ));

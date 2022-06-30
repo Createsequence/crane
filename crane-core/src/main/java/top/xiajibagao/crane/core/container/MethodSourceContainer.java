@@ -137,7 +137,7 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
                     method.getParameterTypes().length == 0
                 );
                 methodCache.put(annotation.namespace(), cache);
-                log.info("注册方法数据源：[{}], 映射类型：[{}]", annotation.namespace(), annotation.mappingType().name());
+                log.info("注册数据源方法[{}]: {}, 映射类型：[{}]", annotation.namespace(), method.getName(), annotation.mappingType().name());
             });
     }
 
