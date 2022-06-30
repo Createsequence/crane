@@ -150,7 +150,7 @@ public class MethodSourceContainerTest {
             sourceType = Example.class, sourceKey = "groupId",
             mappingType = MappingType.ONE_TO_MORE
         )
-        public List<Example> listExampleByGroupIds(Collection<Integer> ids) {
+        public List<Example> listExampleByGroupIds() {
             return getExamples();
         }
 

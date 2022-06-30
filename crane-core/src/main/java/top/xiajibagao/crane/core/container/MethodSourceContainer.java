@@ -133,7 +133,8 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
             .ifPresent(property -> {
                 MethodSource cache = new MethodSource(
                     annotation.mappingType(), methodSourceBean, targetClass, annotation.namespace(),
-                    AsmReflexUtils.findMethod(targetClass, method, true), property
+                    AsmReflexUtils.findMethod(targetClass, method, true), property,
+                    method.getParameterTypes().length == 0
                 );
                 methodCache.put(annotation.namespace(), cache);
                 log.info("注册方法数据源：[{}], 映射类型：[{}]", annotation.namespace(), annotation.mappingType().name());
@@ -143,9 +144,9 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
     private void checkMethod(Method declaredMethod, String containerName) {
         Assert.isTrue(!methodCache.containsKey(containerName), "容器方法已经被注册: " + containerName);
         Assert.isTrue(
-            declaredMethod.getParameterTypes().length == 1
-                && ClassUtils.isAssignable(Collection.class, declaredMethod.getParameterTypes()[0]),
-            "容器方法有且仅能有一个Collection类型的参数: " + Arrays.asList(declaredMethod.getParameterTypes())
+            declaredMethod.getParameterTypes().length == 0
+                || (declaredMethod.getParameterTypes().length == 1 && ClassUtils.isAssignable(Collection.class, declaredMethod.getParameterTypes()[0])),
+            "容器方法最多仅能有一个Collection类型的参数: " + Arrays.asList(declaredMethod.getParameterTypes())
         );
         Assert.isTrue(
             ClassUtils.isAssignable(Collection.class, declaredMethod.getReturnType()),
@@ -187,10 +188,13 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         private final String containerName;
         private final MethodInvoker methodInvoker;
         private final BeanProperty sourceKeyProperty;
+        private final boolean isNotArgMethod;
 
         @SuppressWarnings("unchecked")
         public Collection<Object> getSources(Collection<Object> keys) {
-            return (Collection<Object>)methodInvoker.invoke(target, keys);
+            Object result = isNotArgMethod ?
+                methodInvoker.invoke(target) : methodInvoker.invoke(target, keys);
+            return (Collection<Object>)result;
         }
 
         public Object getSourceKeyPropertyValue(Object source) {
