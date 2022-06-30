@@ -43,7 +43,7 @@
 
     <groupId>top.xiajibagao</groupId>
     <artifactId>crane</artifactId>
-    <version>0.5.7</version>
+    <version>0.6.0</version>
     <name>crane</name>
     <description>基于 SpringBoot 的注解式字典项、关联表与枚举值通用处理框架</description>
     <url>https://github.com/Createsequence/crane</url>
