@@ -1,6 +1,7 @@
 package top.xiajibagao.crane.core.aop;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ReflectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -9,11 +10,13 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import top.xiajibagao.crane.core.annotation.ProcessResult;
 import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.helper.ConfigOptionAnnotationProcessor;
 import top.xiajibagao.crane.core.helper.ExpressionUtils;
+import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -41,18 +44,21 @@ public class MethodResultProcessAspect extends ConfigOptionAnnotationProcessor<M
         }
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
-
         ProcessResult annotation = AnnotatedElementUtils.findMergedAnnotation(method, ProcessResult.class);
         if (Objects.isNull(annotation)) {
             return;
         }
+
+        // 处理包装类
+        result = getWrappedSource(result, annotation);
+
+        // 处理表达式
         String condition = annotation.condition();
         // 无表达式需要执行
         if (CharSequenceUtil.isBlank(condition)) {
             process(method, result);
             return;
         }
-
         // 先执行表达式
         Boolean isProcess = Boolean.TRUE;
         StandardEvaluationContext context = new StandardEvaluationContext();
@@ -68,6 +74,19 @@ public class MethodResultProcessAspect extends ConfigOptionAnnotationProcessor<M
         if (Objects.nonNull(isProcess) && isProcess) {
             process(method, result);
         }
+    }
+
+    private Object getWrappedSource(Object data, ProcessResult annotation) {
+        String wrapperIn = annotation.wrappedIn();
+        if (CharSequenceUtil.isBlank(wrapperIn)) {
+            return data;
+        }
+        Class<?> wrapperClass = data.getClass();
+        Method method = ReflexUtils.findGetterMethod(wrapperClass, wrapperIn);
+        if (Objects.isNull(method)) {
+            method = ClassUtils.getMethod(wrapperClass, wrapperIn);
+        }
+        return ReflectUtil.invoke(data, method);
     }
 
 }

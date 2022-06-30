@@ -82,6 +82,22 @@ public class MethodResultProcessAspectTest {
         exampleMap = CollStreamUtil.toMap(examples, Example::getId, Function.identity());
         Assertions.assertNull(exampleMap.get(1).getName());
         Assertions.assertNull(exampleMap.get(1).getName());
+
+        // 返回2，且不填充数据
+        ResultWrapper<List<Example>> wrapperResult = exampleService.getExampleProcessByTestGroupAndWrapped(new QueryDTO(true, 1));
+        examples = wrapperResult.getData();
+        Assertions.assertEquals(1, examples.size());
+        exampleMap = CollStreamUtil.toMap(examples, Example::getId, Function.identity());
+        Assertions.assertNull(exampleMap.get(1).getName());
+        Assertions.assertNull(exampleMap.get(1).getName());
+
+        // 返回2，且不填充数据
+        wrapperResult = exampleService.getExampleProcessByTestGroupAndWrappedMethod(new QueryDTO(true, 1));
+        examples = wrapperResult.getData();
+        Assertions.assertEquals(1, examples.size());
+        exampleMap = CollStreamUtil.toMap(examples, Example::getId, Function.identity());
+        Assertions.assertNull(exampleMap.get(1).getName());
+        Assertions.assertNull(exampleMap.get(1).getName());
     }
 
     @Component
@@ -122,6 +138,33 @@ public class MethodResultProcessAspectTest {
             return results;
         }
 
+        // 指定只填充TestGroup分组
+        @ProcessResult(
+            targetClass = Example.class,
+            groups = TestGroup.class,
+            wrappedIn = "data"
+        )
+        public ResultWrapper<List<Example>> getExampleProcessByTestGroupAndWrapped(QueryDTO queryDTO) {
+            List<Example> results = new ArrayList<>();
+            for (int i = 0; i < queryDTO.resultCount; i++) {
+                results.add(new Example(i + 1));
+            }
+            return new ResultWrapper<>(results);
+        }
+
+        // 指定只填充TestGroup分组
+        @ProcessResult(
+            targetClass = Example.class,
+            groups = TestGroup.class,
+            wrappedIn = "getWrapperData"
+        )
+        public ResultWrapper<List<Example>> getExampleProcessByTestGroupAndWrappedMethod(QueryDTO queryDTO) {
+            List<Example> results = new ArrayList<>();
+            for (int i = 0; i < queryDTO.resultCount; i++) {
+                results.add(new Example(i + 1));
+            }
+            return new ResultWrapper<>(results);
+        }
 
     }
 
@@ -150,5 +193,16 @@ public class MethodResultProcessAspectTest {
     }
 
     private interface TestGroup {};
+
+    @AllArgsConstructor
+    @Data
+    private static class ResultWrapper<T> {
+        private T data;
+
+        private T getWrapperData() {
+            return getData();
+        }
+
+    }
 
 }
