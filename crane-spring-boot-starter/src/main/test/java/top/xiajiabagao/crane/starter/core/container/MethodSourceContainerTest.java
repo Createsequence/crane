@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
 import top.xiajiabagao.crane.starter.core.CoreTestConfig;
 import top.xiajibagao.crane.core.annotation.MappingType;
@@ -133,7 +132,6 @@ public class MethodSourceContainerTest {
      * 方法数据源对象，即默认的service
      */
     @MethodSourceBean
-    @Component
     protected static class MethodSourceService {
 
         @MethodSourceBean.Method (
