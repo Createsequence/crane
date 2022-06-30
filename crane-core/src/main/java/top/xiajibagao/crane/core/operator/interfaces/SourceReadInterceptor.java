@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
  *
  * @author huangchengxing
  * @date 2022/06/27 14:10
- * @since 0.5.8
+ * @since 0.6.0
  */
 public interface SourceReadInterceptor extends OperateProcessorComponent, Orderly {
 

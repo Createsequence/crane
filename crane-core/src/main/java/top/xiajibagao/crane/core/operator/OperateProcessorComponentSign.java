@@ -15,6 +15,7 @@ import java.util.Optional;
  *
  * @author huangchengxing
  * @date 2022/06/28 15:00
+ * @since 0.6.0
  */
 @Getter
 public class OperateProcessorComponentSign implements OperateProcessorComponent {

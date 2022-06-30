@@ -4,8 +4,11 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import top.xiajibagao.crane.core.operator.interfaces.*;
 
 /**
+ * 配置工具类
+ *
  * @author huangchengxing
  * @date 2022/06/27 17:39
+ * @see 0.6.0
  */
 public class ConfigHelper {
 

@@ -76,7 +76,7 @@ public @interface ProcessResult {
      * 若方法的返回值的某个包装类，则使用该属性指定包装类中的某个值为真正需要处理的数据 <br />
      * 该属性可以填写获取数据源的方法，或者包装类中用于存放数据源的属性
      *
-     * @since 0.5.8
+     * @since 0.6.0
      */
     String wrappedIn() default "";
 

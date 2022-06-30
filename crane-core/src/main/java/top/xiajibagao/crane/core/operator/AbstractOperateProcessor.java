@@ -23,7 +23,7 @@ import java.util.stream.Stream;
  *
  * @author huangchengxing
  * @date 2022/06/27 14:32
- * @see 0.5.8
+ * @see 0.6.0
  */
 @Getter
 public abstract class AbstractOperateProcessor<T extends AbstractOperateProcessor<T>> implements OperateProcessor {

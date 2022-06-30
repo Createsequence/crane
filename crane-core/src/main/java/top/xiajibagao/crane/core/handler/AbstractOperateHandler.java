@@ -12,7 +12,7 @@ import top.xiajibagao.crane.core.operator.interfaces.OperateProcessorComponent;
  *
  * @author huangchengxing
  * @date 2022/06/28 14:58
- * @since 0.5.8
+ * @since 0.6.0
  */
 @Getter
 public abstract class AbstractOperateHandler implements OperateHandler {

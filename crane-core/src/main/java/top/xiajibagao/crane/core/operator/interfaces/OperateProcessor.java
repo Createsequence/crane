@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author huangchengxing
  * @date 2022/06/27 15:17
- * @since 0.5.8
+ * @since 0.6.0
  */
 public interface OperateProcessor extends TargetWriter, SourceReader, OperateProcessorComponent, Orderly {
 
