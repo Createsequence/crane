@@ -37,7 +37,7 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
             return;
         }
         Class<?> targetClass = getTargetClass(annotation, annotatedElement, target);
-        if (targetClass.isAssignableFrom(Void.TYPE)) {
+        if (Objects.isNull(targetClass) || targetClass.isAssignableFrom(Void.TYPE)) {
             return;
         }
 
@@ -49,7 +49,7 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
         OperationExecutor executor = BeanFactoryUtils.getBean(beanFactory, annotation.executor(), annotation.executorName());
         executor.execute(CollUtils.adaptToCollection(target), configuration, annotation.groups());
     }
-    
+
     /**
      * 获取指定namespace
      *
@@ -76,7 +76,8 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
     }
     
     /**
-     * 获取配置对象类型
+     * 获取配置对象类型，若{@link ConfigOption#targetClass()}不为{@link Void}，则返回该类型，
+     * 否则根据{@code target}尝试推断类型
      *
      * @param annotation 注解
      * @param annotatedElement 注解元素
@@ -86,7 +87,7 @@ public class ConfigOptionAnnotationProcessor<T extends AnnotatedElement> {
      * @date 2022/5/5 22:51
      */
     protected Class<?> getTargetClass(ConfigOption annotation, T annotatedElement, Object target) {
-        return annotation.value();
+        return Objects.equals(annotation.value(), Void.TYPE) ? ObjectUtils.getClass(target) : annotation.value();
     }
 
 }

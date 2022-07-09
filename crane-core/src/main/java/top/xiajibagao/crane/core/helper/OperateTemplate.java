@@ -1,6 +1,5 @@
 package top.xiajibagao.crane.core.helper;
 
-import cn.hutool.core.collection.CollUtil;
 import lombok.RequiredArgsConstructor;
 import top.xiajibagao.crane.core.cache.ConfigurationCache;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
@@ -71,11 +70,7 @@ public class OperateTemplate {
 
         // 适配为集合
         Collection<?> targets = CollUtils.adaptToCollection(target);
-        if (CollUtil.isEmpty(targets)) {
-            return;
-        }
-        // 获取类型
-        Class<?> targetClass = ObjectUtils.computeIfNotNull(CollUtil.getFirst(targets), Object::getClass);
+        Class<?> targetClass = ObjectUtils.getClass(target);
         if (Objects.isNull(targetClass)) {
             return;
         }

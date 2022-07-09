@@ -4,6 +4,7 @@ import org.springframework.core.annotation.AliasFor;
 import top.xiajibagao.crane.core.executor.OperationExecutor;
 import top.xiajibagao.crane.core.executor.UnorderedOperationExecutor;
 import top.xiajibagao.crane.core.helper.DefaultGroup;
+import top.xiajibagao.crane.core.helper.ObjectUtils;
 import top.xiajibagao.crane.core.parser.CombineOperationConfigurationParser;
 import top.xiajibagao.crane.core.parser.interfaces.OperateConfigurationParser;
 
@@ -23,13 +24,17 @@ import java.lang.annotation.*;
 public @interface ProcessResult {
 
     /**
-     * 待处理的目标类型
+     * 待处理的目标类型，当不指定类型时，将会尝试进行自动推断
+     *
+     * @see ObjectUtils#getClass(Object)
      */
     @AliasFor(annotation = ConfigOption.class, attribute = "value")
     Class<?> value() default Void.class;
 
     /**
-     * 待处理的目标类型
+     * 待处理的目标类型，当不指定类型时，将会尝试进行自动推断
+     *
+     * @see ObjectUtils#getClass(Object)
      */
     @AliasFor(annotation = ConfigOption.class, attribute = "targetClass")
     Class<?> targetClass() default Void.class;

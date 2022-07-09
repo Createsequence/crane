@@ -1,5 +1,8 @@
 package top.xiajibagao.crane.core.helper;
 
+import cn.hutool.core.collection.CollUtil;
+
+import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -15,6 +18,24 @@ import java.util.function.Supplier;
 public class ObjectUtils {
     
     private ObjectUtils() {
+    }
+    
+    /**
+     * 获取对象类型，若对象为集合，则尝试获取第一个对象的类型
+     *
+     * @param target 对象
+     * @return java.lang.Class<?>
+     * @author huangchengxing
+     * @date 2022/7/9 17:45
+     */
+    public static Class<?> getClass(Object target) {
+        // 适配为集合
+        Collection<?> targets = CollUtils.adaptToCollection(target);
+        if (CollUtil.isEmpty(targets)) {
+            return null;
+        }
+        // 获取类型
+        return ObjectUtils.computeIfNotNull(CollUtil.getFirst(targets), Object::getClass);
     }
 
     /**
