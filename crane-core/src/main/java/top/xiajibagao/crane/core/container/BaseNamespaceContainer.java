@@ -1,6 +1,8 @@
 package top.xiajibagao.crane.core.container;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ClassUtil;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,12 @@ import java.util.Objects;
  */
 @Slf4j
 public abstract class BaseNamespaceContainer<K, T> implements Container {
+
+    protected final Class<K> keyType;
+
+    protected BaseNamespaceContainer() {
+        this.keyType = getKeyType();
+    }
 
     @Override
     public void process(Multimap<AssembleOperation, ?> operations) {
@@ -106,6 +114,16 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
     }
 
     /**
+     * 获取key类型
+     *
+     * @return java.lang.Class<K>
+     */
+    @SuppressWarnings("unchecked")
+    protected Class<K> getKeyType() {
+        return (Class<K>) ClassUtil.getTypeArgument(this.getClass());
+    }
+
+    /**
      * 将获取的key字段值转为所需要的类型
      *
      * @param key key
@@ -114,9 +132,8 @@ public abstract class BaseNamespaceContainer<K, T> implements Container {
      * @date 2022/3/21 12:16
      */
     @Nullable
-    @SuppressWarnings("unchecked")
     protected K parseKey(@Nullable Object key) {
-        return (K) key;
+        return Convert.convert(keyType, key);
     }
 
 }
