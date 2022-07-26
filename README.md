@@ -137,7 +137,7 @@ crane 允许自由的在任何地方去触发填充行为的执行。
 该功能支持处理单个对象、对象的数组或 `Collection` 集合，并且支持根据 SpEL 表达式动态确定是否对结果进行填充。
 
 ~~~java
-@ProcessResult(Classroom.class, condition = "!#result.isEmpty && !#isHandle")
+@ProcessResult(targetClass= Classroom.class, condition = "!#result.isEmpty && !#isHandle")
 public List<Classroom> getClassroom(Boolean isHandler) {
     // return something.......
 }
