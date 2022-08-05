@@ -2,7 +2,7 @@
 
 基于 SpringBoot 的注解式字典项、关联表与枚举值处理框架。
 
-![CRANE](https://img.shields.io/github/license/Createsequence/crane) ![maven--central](https://img.shields.io/badge/maven--central-0.6.0-green)
+![qq群](https://img.shields.io/badge/qq%E7%BE%A4-540919540-yellowgreen) ![CRANE](https://img.shields.io/github/license/Createsequence/crane) ![maven--central](https://img.shields.io/badge/maven--central-0.6.0-green)
 
 ## 项目介绍
 
