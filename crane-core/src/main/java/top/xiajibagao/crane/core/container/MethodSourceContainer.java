@@ -88,6 +88,31 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         parseClassAnnotation(methodSourceBean, targetClass, annotations);
         parseMethodAnnotations(methodSourceBean, targetClass);
     }
+    
+    /**
+     * 注册方法数据源
+     *
+     * @param target 方法数据源
+     * @param targetMethod 调用的方法
+     * @param namespace 命名空间
+     * @param sourceType 数据源对象类型
+     * @param sourceKey 数据源key字段
+     * @param mappingType 数据映射类型
+     */
+    public void registerMethod(
+        Object target, Method targetMethod, String namespace,
+        Class<?> sourceType, String sourceKey, MappingType mappingType) {
+        // 非空校验
+        Assert.notNull(target, "target must not null");
+        Assert.notNull(targetMethod, "targetMethod must not null");
+        Assert.notNull(namespace, "namespace must not null");
+        Assert.notNull(sourceType, "sourceType must not null");
+        Assert.notNull(sourceKey, "sourceKey must not null");
+        Assert.notNull(mappingType, "mappingType must not null");
+        // 注册
+        Class<?> targetClass = target.getClass();
+        registerMethodSource(target, targetClass, targetMethod, namespace, sourceType, sourceKey, mappingType);
+    }
 
     /**
      * 解析{@link MethodSourceBean}注解中声明的方法
@@ -102,7 +127,7 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
                     true, annotation.returnType(), annotation.paramTypes()
                 );
                 if (Objects.nonNull(method)) {
-                    registerMethod(methodSourceBean, targetClass, annotation, method);
+                    registerMethodFromAnnotation(methodSourceBean, targetClass, annotation, method);
                 }
             });
     }
@@ -120,24 +145,38 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
             if (Objects.isNull(annotation)) {
                 return;
             }
-            registerMethod(methodSourceBean, targetClass, annotation, proxyMethod);
+            registerMethodFromAnnotation(methodSourceBean, targetClass, annotation, proxyMethod);
         });
+    }
+
+    /**
+     * 注册方法数据源
+     */
+    private void registerMethodFromAnnotation(Object target, Class<?> targetClass, MethodSourceBean.Method annotation, Method method) {
+        registerMethodSource(
+            target, targetClass, method,
+            annotation.namespace(),
+            annotation.sourceType(), annotation.sourceKey(), annotation.mappingType()
+        );
     }
 
     /**
      * 注册方法
      */
-    private void registerMethod(Object methodSourceBean, Class<?> targetClass, MethodSourceBean.Method annotation, Method method) {
-        checkMethod(method, annotation.namespace());
-        beanPropertyFactory.getProperty(annotation.sourceType(), annotation.sourceKey())
+    private void registerMethodSource(
+        Object target, Class<?> targetClass, Method targetMethod,
+        String namespace,
+        Class<?> sourceType, String sourceKey, MappingType mappingType) {
+        checkMethod(targetMethod, namespace);
+        beanPropertyFactory.getProperty(sourceType, sourceKey)
             .ifPresent(property -> {
                 MethodSource cache = new MethodSource(
-                    annotation.mappingType(), methodSourceBean, targetClass, annotation.namespace(),
-                    AsmReflexUtils.findMethod(targetClass, method, true), property,
-                    method.getParameterTypes().length == 0
+                    mappingType, target, targetClass, namespace,
+                    AsmReflexUtils.findMethod(targetClass, targetMethod, true), property,
+                    targetMethod.getParameterTypes().length == 0
                 );
-                methodCache.put(annotation.namespace(), cache);
-                log.info("注册数据源方法[{}]: {}, 映射类型：[{}]", annotation.namespace(), method.getName(), annotation.mappingType().name());
+                methodCache.put(namespace, cache);
+                log.info("注册数据源方法[{}]: {}, 映射类型：[{}]", namespace, targetMethod.getName(), mappingType.name());
             });
     }
 
@@ -202,4 +241,5 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         }
 
     }
+
 }
