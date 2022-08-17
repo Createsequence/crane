@@ -53,6 +53,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object> implements Container {
 
+    private final AnnotatedMethodRegistrar annotatedMethodRegistrar = new AnnotatedMethodRegistrar(this);
     public final Map<String, MethodSource> methodCache = new HashMap<>();
     private final BeanPropertyFactory beanPropertyFactory;
 
@@ -69,9 +70,15 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
     }
     
     /**
-     * 注册方法数据源
+     * <p>注册方法数据源，若{@code methodSourceBean}的类被{@link MethodSourceBean}注解，
+     * 则尝试将{@link MethodSourceBean#methods()}声明的方法，
+     * 以及该类中被{@link MethodSourceBean.Method}注解的方法作为方法数据源注册到容器
      *
-     * @param methodSourceBean 方法数据源
+     * <p><strong>注意:</strong>
+     * 若{@code methodSourceBean}是通过SpringAOP生成的代理对象，
+     * 则调用从该对象获得的方法数据源时，该代理依然生效。
+     *
+     * @param methodSourceBean 配置有方法数据源的类实例
      * @author huangchengxing
      * @date 2022/6/1 9:23
      */
@@ -79,14 +86,9 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         if (Objects.isNull(methodSourceBean)) {
             return;
         }
-
         Class<?> targetClass = methodSourceBean.getClass();
         Set<MethodSourceBean> annotations = AnnotatedElementUtils.findAllMergedAnnotations(targetClass, MethodSourceBean.class);
-        if (CollUtil.isEmpty(annotations)) {
-            return;
-        }
-        parseClassAnnotation(methodSourceBean, targetClass, annotations);
-        parseMethodAnnotations(methodSourceBean, targetClass);
+        annotatedMethodRegistrar.register(methodSourceBean, targetClass, annotations);
     }
     
     /**
@@ -111,59 +113,13 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         Assert.notNull(mappingType, "mappingType must not null");
         // 注册
         Class<?> targetClass = target.getClass();
-        registerMethodSource(target, targetClass, targetMethod, namespace, sourceType, sourceKey, mappingType);
-    }
-
-    /**
-     * 解析{@link MethodSourceBean}注解中声明的方法
-     */
-    private void parseClassAnnotation(Object methodSourceBean, Class<?> targetClass, Set<MethodSourceBean> annotations) {
-        annotations.stream()
-            .map(MethodSourceBean::value)
-            .flatMap(Stream::of)
-            .filter(annotation -> CharSequenceUtil.isNotBlank(annotation.name()))
-            .forEach(annotation -> {
-                Method method = ReflexUtils.findMethod(targetClass, annotation.name(),
-                    true, annotation.returnType(), annotation.paramTypes()
-                );
-                if (Objects.nonNull(method)) {
-                    registerMethodFromAnnotation(methodSourceBean, targetClass, annotation, method);
-                }
-            });
-    }
-
-    /**
-     * 解析被{@link MethodSourceBean.Method}注解的方法
-     */
-    private void parseMethodAnnotations(Object methodSourceBean, Class<?> targetClass) {
-        List<Method> annotatedMethods = Stream.of(targetClass.getDeclaredMethods())
-            .filter(m -> AnnotatedElementUtils.hasAnnotation(m, MethodSourceBean.Method.class))
-            .collect(Collectors.toList());
-        annotatedMethods.forEach(proxyMethod -> {
-            Method actualMethod = AopUtils.getMostSpecificMethod(proxyMethod, targetClass);
-            MethodSourceBean.Method annotation = AnnotatedElementUtils.findMergedAnnotation(actualMethod, MethodSourceBean.Method.class);
-            if (Objects.isNull(annotation)) {
-                return;
-            }
-            registerMethodFromAnnotation(methodSourceBean, targetClass, annotation, proxyMethod);
-        });
-    }
-
-    /**
-     * 注册方法数据源
-     */
-    private void registerMethodFromAnnotation(Object target, Class<?> targetClass, MethodSourceBean.Method annotation, Method method) {
-        registerMethodSource(
-            target, targetClass, method,
-            annotation.namespace(),
-            annotation.sourceType(), annotation.sourceKey(), annotation.mappingType()
-        );
+        registerSource(target, targetClass, targetMethod, namespace, sourceType, sourceKey, mappingType);
     }
 
     /**
      * 注册方法
      */
-    private void registerMethodSource(
+    private void registerSource(
         Object target, Class<?> targetClass, Method targetMethod,
         String namespace,
         Class<?> sourceType, String sourceKey, MappingType mappingType) {
@@ -180,6 +136,9 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
             });
     }
 
+    /**
+     * 校验方法
+     */
     private void checkMethod(Method declaredMethod, String containerName) {
         Assert.isTrue(!methodCache.containsKey(containerName), "容器方法已经被注册: " + containerName);
         Assert.isTrue(
@@ -238,6 +197,67 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
 
         public Object getSourceKeyPropertyValue(Object source) {
             return sourceKeyProperty.getValue(source);
+        }
+
+    }
+
+    @RequiredArgsConstructor
+    private static class AnnotatedMethodRegistrar {
+
+        private final MethodSourceContainer container;
+
+        public void register(Object target, Class<?> targetClass, Set<MethodSourceBean> annotations) {
+            if (CollUtil.isEmpty(annotations)) {
+                return;
+            }
+            registerSourceFromAnnotatedClass(target, targetClass, annotations);
+            registerSourceFromAnnotatedMethod(target, targetClass);
+        }
+
+        /**
+         * 注册在{@link MethodSourceBean}注解中声明的方法
+         */
+        private void registerSourceFromAnnotatedClass(Object methodSourceBean, Class<?> targetClass, Set<MethodSourceBean> annotations) {
+            annotations.stream()
+                .map(MethodSourceBean::value)
+                .flatMap(Stream::of)
+                .filter(annotation -> CharSequenceUtil.isNotBlank(annotation.name()))
+                .forEach(annotation -> {
+                    Method method = ReflexUtils.findMethod(targetClass, annotation.name(),
+                        true, annotation.returnType(), annotation.paramTypes()
+                    );
+                    if (Objects.nonNull(method)) {
+                        registerMethodFromAnnotation(methodSourceBean, annotation, method);
+                    }
+                });
+        }
+
+        /**
+         * 注册被{@link MethodSourceBean.Method}注解的方法
+         */
+        private void registerSourceFromAnnotatedMethod(Object methodSourceBean, Class<?> targetClass) {
+            List<Method> annotatedMethods = Stream.of(targetClass.getDeclaredMethods())
+                .filter(m -> AnnotatedElementUtils.hasAnnotation(m, MethodSourceBean.Method.class))
+                .collect(Collectors.toList());
+            annotatedMethods.forEach(proxyMethod -> {
+                Method actualMethod = AopUtils.getMostSpecificMethod(proxyMethod, targetClass);
+                MethodSourceBean.Method annotation = AnnotatedElementUtils.findMergedAnnotation(actualMethod, MethodSourceBean.Method.class);
+                if (Objects.isNull(annotation)) {
+                    return;
+                }
+                registerMethodFromAnnotation(methodSourceBean, annotation, proxyMethod);
+            });
+        }
+
+        /**
+         * 注册方法数据源
+         */
+        private void registerMethodFromAnnotation(Object target, MethodSourceBean.Method annotation, Method method) {
+            container.registerMethod(
+                target, method,
+                annotation.namespace(),
+                annotation.sourceType(), annotation.sourceKey(), annotation.mappingType()
+            );
         }
 
     }
