@@ -3,7 +3,7 @@ package top.xiajibagao.crane.core.helper.invoker;
 import com.esotericsoftware.reflectasm.MethodAccess;
 import lombok.RequiredArgsConstructor;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * 基于字节码调用的{@link MethodInvoker}实现
@@ -19,7 +19,7 @@ public class AsmReflexMethodInvoker implements MethodInvoker {
     private final int methodIndex;
 
     @Override
-    public Object invoke(@Nonnull Object target, Object... args) {
+    public Object invoke(@Nullable Object target, @Nullable Object... args) {
         return methodAccess.invoke(target, methodIndex, args);
     }
 

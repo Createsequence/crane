@@ -1,6 +1,6 @@
 package top.xiajibagao.crane.core.helper.invoker;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * 描述一个可以被调用的方法
@@ -22,6 +22,6 @@ public interface MethodInvoker {
      * @author huangchengxing
      * @date 2022/6/7 17:49
      */
-    Object invoke(@Nonnull Object target, Object... args);
+    Object invoke(@Nullable Object target, @Nullable Object... args);
 
 }

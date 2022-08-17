@@ -3,7 +3,7 @@ package top.xiajibagao.crane.core.helper.invoker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.ReflectionUtils;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
@@ -20,7 +20,7 @@ public class ReflexMethodInvoker implements MethodInvoker {
     private final Method method;
 
     @Override
-    public Object invoke(@Nonnull Object target, Object... args) {
+    public Object invoke(@Nullable Object target, @Nullable Object... args) {
         Objects.requireNonNull(target);
         return ReflectionUtils.invokeMethod(method, target, args);
     }

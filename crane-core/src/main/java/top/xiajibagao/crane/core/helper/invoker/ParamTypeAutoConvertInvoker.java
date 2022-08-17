@@ -4,7 +4,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ArrayUtil;
 import lombok.RequiredArgsConstructor;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -23,7 +23,7 @@ public class ParamTypeAutoConvertInvoker implements MethodInvoker {
     private final MethodInvoker method;
 
     @Override
-    public Object invoke(@Nonnull Object target, Object... args) {
+    public Object invoke(@Nullable Object target, @Nullable Object... args) {
         if (Objects.nonNull(args)) {
             args = (args.length == paramTypes.length) ? args : ArrayUtil.resize(args, paramTypes.length);
             for (int i = 0; i < paramTypes.length; i++) {

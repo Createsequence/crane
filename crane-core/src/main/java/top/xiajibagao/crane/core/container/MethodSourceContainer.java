@@ -2,6 +2,7 @@ package top.xiajibagao.crane.core.container;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.util.ClassUtils;
 import top.xiajibagao.crane.core.annotation.Assemble;
 import top.xiajibagao.crane.core.annotation.MappingType;
 import top.xiajibagao.crane.core.annotation.MethodSourceBean;
+import top.xiajibagao.crane.core.helper.CollUtils;
 import top.xiajibagao.crane.core.helper.invoker.MethodInvoker;
 import top.xiajibagao.crane.core.helper.property.BeanProperty;
 import top.xiajibagao.crane.core.helper.property.BeanPropertyFactory;
@@ -20,8 +22,10 @@ import top.xiajibagao.crane.core.helper.reflex.AsmReflexUtils;
 import top.xiajibagao.crane.core.helper.reflex.ReflexUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -117,6 +121,37 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
     }
 
     /**
+     * 注册lambda表达式作为方法数据源
+     *
+     * @param targetMethod 表达式
+     * @param namespace 命名空间
+     * @param sourceType 数据源对象类型
+     * @param sourceKey 数据源key字段
+     * @param mappingType 数据映射类型
+     */
+    public <S> void registerMethod(
+        Function<Collection<?>, Collection<? extends S>> targetMethod,
+        String namespace, Class<S> sourceType, String sourceKey, MappingType mappingType) {
+        // 非空校验
+        Assert.notNull(targetMethod, "targetMethod must not null");
+        Assert.notNull(namespace, "namespace must not null");
+        Assert.notNull(sourceType, "sourceType must not null");
+        Assert.notNull(sourceKey, "sourceKey must not null");
+        Assert.notNull(mappingType, "mappingType must not null");
+        // 非空校验
+        MethodInvoker lambdaInvoker = (t, args) -> {
+            Collection<?> argColl = CollUtils.adaptToCollection(ArrayUtil.get(args, 0));
+            return targetMethod.apply(argColl);
+        };
+        beanPropertyFactory.getProperty(sourceType, sourceKey)
+            .ifPresent(property -> {
+                MethodSource cache = MethodSource.fromLambda(mappingType, namespace, lambdaInvoker, property);
+                methodCache.put(namespace, cache);
+                log.info("注册数据源方法[{}]: {}, 映射类型：[{}]", namespace, targetMethod, mappingType.name());
+            });
+    }
+
+    /**
      * 注册方法
      */
     private void registerSource(
@@ -126,8 +161,8 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
         checkMethod(targetMethod, namespace);
         beanPropertyFactory.getProperty(sourceType, sourceKey)
             .ifPresent(property -> {
-                MethodSource cache = new MethodSource(
-                    mappingType, target, targetClass, namespace,
+                MethodSource cache = MethodSource.fromMethodObject(
+                    mappingType, target, namespace,
                     AsmReflexUtils.findMethod(targetClass, targetMethod, true), property,
                     targetMethod.getParameterTypes().length == 0
                 );
@@ -179,14 +214,22 @@ public class MethodSourceContainer extends BaseNamespaceContainer<Object, Object
 
         @Getter
         private final MappingType mappingType;
+        @Nullable
         private final Object target;
         @Getter
-        private final Class<?> targetClass;
-        @Getter
-        private final String containerName;
+        private final String namespace;
         private final MethodInvoker methodInvoker;
         private final BeanProperty sourceKeyProperty;
         private final boolean isNotArgMethod;
+
+        static MethodSource fromLambda(MappingType mappingType, String namespace, MethodInvoker invoker, BeanProperty property) {
+            return new MethodSource(mappingType, null, namespace, invoker, property, false);
+        }
+
+        static MethodSource fromMethodObject(
+            MappingType mappingType, Object target, String namespace, MethodInvoker invoker, BeanProperty property, boolean isNotArgMethod) {
+            return new MethodSource(mappingType, target, namespace, invoker, property, isNotArgMethod);
+        }
 
         @SuppressWarnings("unchecked")
         public Collection<Object> getSources(Collection<Object> keys) {
