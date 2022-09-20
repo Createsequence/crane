@@ -1,13 +1,13 @@
 crane:
   enums:
-    dict-enum-packages: top.xiajiabagao.crane.starter.starter.enums
+    dict-enum-packages: io.github.createsequence.crane.starter.starter.enums
   cache:
     enable-pre-parse-class: true
     pre-parsed-class-packages:
-      - top.xiajiabagao.crane.starter.starter.entity
+      - io.github.createsequence.crane.starter.starter.entity
     parser-and-pre-parsed-class-packages:
       DefaultCraneFieldAnnotationConfigurationParser:
-        - top.xiajiabagao.crane.starter.starter.entity
+        - io.github.createsequence.crane.starter.starter.entity
       DefaultCraneClassAnnotationConfigurationParser:
-        - top.xiajiabagao.crane.starter.starter.entity
+        - io.github.createsequence.crane.starter.starter.entity
   enable-asm-reflect: true

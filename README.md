@@ -186,7 +186,7 @@ JsonNode foosJsonNode = objectMapper.valueToTree(foos);
 
 ~~~xml
 <dependency>
-    <groupId>top.xiajibagao</groupId>
+    <groupId>io.github.createsequence</groupId>
     <artifactId>crane-spring-boot-starter</artifactId>
     <version>${last-version}</version>
 </dependency>

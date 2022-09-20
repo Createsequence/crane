@@ -41,7 +41,7 @@
         <reflectasm.version>1.11.9</reflectasm.version>
     </properties>
 
-    <groupId>top.xiajibagao</groupId>
+    <groupId>io.github.createsequence</groupId>
     <artifactId>crane</artifactId>
     <version>0.6.1</version>
     <name>crane</name>
