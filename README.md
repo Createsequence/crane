@@ -1,3 +1,7 @@
+>  **注意：该项目已经不再维护，其重构版本 crane4j 已经发布正式版本。新版本更好，更快，更强大！欢迎围观：** 
+> - Gitee: https://gitee.com/opengoofy/crane4j
+> - GitHub: https://github.com/opengoofy/crane4j
+
 ![CRANE](https://img.xiajibagao.top/CRANE.png)
 
 基于 SpringBoot 的注解式字典项、关联表与枚举值处理框架。
